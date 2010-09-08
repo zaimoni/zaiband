@@ -1,0 +1,1151 @@
+META: edit format break
+* object.txt: A line conversion of some kind
+* really should do something about the menu_flags type, merged in a RiscOS main that needs protection from this
+* V SVN 944 breaks top-level Makefile for Zaiband; remember to proofread before release and counter-patch
+
+[resync dirs: src, lib/edit]
+Changes Zaiband 3.0.9
+- The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:
+** ?Word of Recall
+** !Restore [stat]
+** !Restore Experience
+  This availability boost should require the affected items to not be available in any other store (including the home), 
+  and for @ to have nothing relevant.
+- The Black Market will no longer taunt you with unaffordable Rings of Speed at CL 1.  In fact, 
+  no store should taunt you with truly unaffordable items (as of the time of store maintenance). The only exception will be to 
+  prevent infinite looping of the store maintenance backend.  [In particular, the Magic Shop may taunt you with unaffordable items before 
+  your first trip.]
+- Stores should have fewer boring armors and weapons now, assuming that they can get interesting ones in.  Note that other than missiles,
+  multiple instances of the exact same kind of armor or weapon are boring.  You will only see one of each kind in stock, regardless of 
+  how many are actually in stock.
+- I couldn't think of a good reason in-character reason why summon traps should look identical to teleport traps when visible.  
+  They no longer do (but still have the same descriptive text).
+- !Experience adjusted to restore experience first, to match the Gain [stat] potions
+- cost rebalancing: first pass at resolving inadequate value of enchantment pluses.
+- monster pathfinding now has limited awareness of cover and concealment
+- non-stupid monsters that both have los on you, and los on a sleeping monster, will try to wake the sleeping monster automatically 
+  (doesn't cost a turn)
+- Energy recovery is now a public stat (you can see the monster's energy recovery when you target them...and vice versa).  When there is a ratio,
+  yours is on the left.
+- Points-based generation has been revamped.  Any stat combination from autorolling or classical generation is now possible, and no others.
+  Gold from points-based generation is exactly equivalent to that from either autorolling or classical generation.  Starting point is 
+  all optimistic median stats; you can reduce stats below their starting values if necessary.
+- option defaults changed:
+** flow_by_sound/flow_by_small/view_yellow_lite/view_bright_lite/view_granite_lite/view_special_lite/smart_monsters/smart_packs on
+** run_ignore_stairs, run_ignore_doors, ring_bell off
+** now birth: auto_scum, flow_by_sound, flow_by_smell, smart_monsters, smart_packs, smart_learn, smart_cheat, dungeon_align, dungeon_stair.
+   Have these the way you want them before importing.
+- JamesDoyle/Oook forums: a number of spelling tweaks to the artifact descriptions.
+- from V SVN:
+** all monsters that have great drops have good drops.
+** extra color names
+** character dump logic fix
+** experience for monster kill, and native depth, obvious
+** arrows, missiles, and boulders can miss now.  Using Zaiband's ranged attack penalties.
+** selling in stores forced to start on character inventory
+** Starting torches are implicitly store-bought (but 3500 turns)
+
+Technical Changes Zaiband 3.0.9
+- Windows port: require FF_MODERN (const-width font) as default rather than FF_DONTCARE
+- Windows port: efficient font cache
+- main-xaw.c is in the freezer now.
+- k_idx disconnected from savefile relevance (and gone from object.txt).
+- [Eddie Grove] ACTIVATE flag no longer exists.
+
+Changes Zaiband 3.0.8 alpha
+- monster recovery from stunning, confusion, and fear has been made 
+  more consistent with player recovery.
+- Line of sight/fire should be fully working now.  I adapted Tyrecius' 
+  Permissive Field of View to V projection (relies on rational tangents as
+  proxy for angles)
+- a very simplistic damage estimator is in place.
+- As a matter of consistent English, jellies no longer look alive when you look at them.  (Other descriptions already assumed they weren't.)
+- from V: don't burn fuel during day in town
+- from V: sound level normalization
+- from V: disturb_minor option removed, forced always-on
+- from V SVN: spellcasters always get at least one mana
+- inspired by V SVN: launchers are also checked for multipliers.  Unlike V, launcher multipliers are cumulative with those from ammunition.
+** Bard gets KILL_DRAGON for mythos reasons
+- from V SVN: bigscreen support for self-knowledge display
+- from V SVN: player melee criticals also multiply the damage bonus from the weapon
+- inspired by Un, SSCrawl: player birth catches basic equipment holes.
+** Any weapons or armor that can be equipped are equipped automatically 
+   before starting play.
+** Armor equipment slots are checked; if they aren't configured, a decidedly
+   cheap option is automatically granted.  If you don't start with gloves, 
+   it's because they hurt your spellcasting.
+- The sidebar needed some documentation; it's in the dungeon section 
+  of the help files.
+- smart_cheat documentation slightly updated.
+- Display changes:
+** Display converged to V backend (finally).
+** Energy recovery per time tick is now its own line.
+** Monster health display also includes maximum hit points.
+- Monster recall changes:
+** Breath weapons are now obvious.
+** Known melee attacks that can kill the player in one blow are now
+   frightening, if one cares to check the monster recall.  At the moment,
+   this has no in-game effect.
+** Melee attacks that automatically get supercriticals are obvious.
+   They are also frightening (with no in-game effect)
+- monster attacks targeting inventory now automatically ignore 
+  empty inventory slots.
+- monster flowing adjusted: non-door openers will now not try to open doors 
+  when a more feasible path exists and is fully visualizable by the monster.
+- Pack AI adjusted: slot-filling behavior now occurs only when practical
+- a monster failing to break a glyph of warding uses up its turn now.
+- Noise changes:
+** Bashing open doors is noisy enough to wake up monsters.  Even failing 
+   to break open the door is noisier than simply walking.
+** Monsters that cry out in pain (in various ways) are making noise.
+** Objects destroyed on the floor are noisy.
+   For now, player inventory destruction isn't noisy.
+- Energy changes:
+** Diagonal energy move cost is 150.  Non-move commands do not use more energy
+   (in particular, attacking).  This was implemented by changing 
+   the energy threshold to 150.
+** A monster that wakes up has its energy set to zero.
+** Player incapacitation locks down energy to zero.  (This may be 
+   from paralysis, or being knocked out.)
+*** An incapacitated player makes no noise.
+- ideas from Eddie Grove, Timo Pietilla
+** average pseudo-id remapped to automatic free identify.
+** Weak psuedo-id characters get automatic free identify 
+   on average wielded items.
+** merely viewing an object in the store makes you aware of it.  Entering 
+   the store is not enough, you must actually have it in view.
+- bugfix: window options now take
+- bugfix: dice sides larger than 255 no longer subject to modulo 256 truncation (affects some dragon scale mails, etc.)
+
+Technical changes Zaiband 3.0.8 alpha
+- design by contract imposed for player_type::inven_cnt, player_type::inventory
+- obfuscatory typedef cptr finally gone
+- starting time tick at beginning of game is now 1 (minimal).
+- licensing update: reviewed V SVN against Zaiband to determine where 
+  disjunctive Koeneke/GPL license was applicable
+** ui-menu.h prevented disjunctive Koeneke/GPL license from transferring
+** z-file.h/c was automatically disqualified. (Zaiband uses the ISO C 
+   z-file.h/c rather than V's)
+** As of the time of the licensing update, many *.h files either had 
+   no license notice or were under pure Koeneke, in spite of declared 
+   intentions for V3.1.0.  *.h files with corresponding *.c files generally 
+   were elevated to whatever license the *.c file had.  Remaining files with 
+   limited inclusion were elevated based on whether all inclusions were 
+   disjunctive-licensed.  (Note that copyright attribution is probably off 
+   on some of these.)
+
+Changes Zaiband 3.07
+- trap generation is somewhat more intelligent.
+- autoinscriptions that block actions only work once, no matter how many
+  of them there are.  !* is still cumulative with action-specific blocks.
+- projection paths (arrows, bolt spells, etc.) have been adjusted.
+  Knight-move ambush still works, but the hockey puck corridor won't.
+  The easier trick shots are automatically handled.  There probably are
+  a few bugs where invisible squares can be hit by careful choice of position
+  targeting, but I haven't checked for them carefully.
+- the reasonable bolt and summons checks in monster AI have been disconnected
+  from the smart_monsters option.  [They, at least, are working.]
+- discounts have been eliminated.
+- player noise is now generated when the player does something.  A single
+  central check is made, and if the player made noise it is applied
+  to all monsters that should be affected.  Aggravation, being more mystical,
+  happens when the monster is processed.
+- options eliminated
+** forced true: fresh_before, allow_quantity, expand_list
+** forced false: fresh_after, stack_force_costs
+
+Technical changes Zaiband
+- Makefile system resynced
+-- Makefile.mpw moved to freezer
+-- new Makefile.ros
+-- retaining Makefile.cyg and Makefile.con in parallel with new Makefile.win
+   for now
+- fonts resynced
+- view_g and view_n were eliminated as part of the line of sight changes.
+  They may come back in player_type if needed.
+- generalized Djikstra-based flow_from function in new file flow.c .
+  Used to quash some bugs with fleeing monsters and doors.
+
+Changes Zaiband 3.0.6s1:
+- arrow key support merged from Angband 3.07s3; disabled for VMS, until 
+  correct arrow key values are determined somehow.
+- partial merge of advanced pluralizer support from Angband 3.07s3
+- monster immunities are more informatively described now.
+- merge of "Inscribing an item with '!t' will now confirm if you try to take it
+  off."
+- merge of advanced recharge notice [If a stack of rods is recharging, you'll
+  get a message when the first rod is recharged and another message when they
+  are all recharged. There is no message when the second, third, etc., rod
+  is recharged. (Hugo Kornelis)]
+- moronicity check: truly pointless actions are now rejected by the character,
+  based on INT and WIS.
+
+Technical changes Zaiband 3.0.6s1:
+- main.c changes ported from Angband 3.07s3 : Add console mode patch for
+  Windows (Frank Palazzolo)
+- main-ami.c copied from Angband 3.07s3
+- numerous other partial merges
+- mirrored script.h, squelch.c . so we can try to recycle makefiles from V
+- POLICY: Zaiband will keep VM macro for now
+- Makefile.win deleted as unneeded, it was for Borland C 4.52; 
+  Borland has made 5.5 command-line freeware.
+- the freezer subdirectory is for catastrophically unmaintained code.
+  * main-ami.c, Makefile.ami : Amiga
+  * main-emx.c, Makefile.emx : OS2
+  * Makefile.bcc : Borland 5.5 command-line
+  * Makefile.lcc : lcc32 compiler
+  * Makefile.ibm : seems to be handled by Makefile.dos
+  * Makefile.ros : RISCOS
+  * if you actually *need* either genuine termio or genuine BSD tchars, the 
+    relevant versions of main-gcu.c and main-cap.c are here.
+- coord struct definition moved from dungeon.c to types.h; I'm testing 
+  whether the C function calls can be switched around to use coord rather 
+  than y,x pairs cleanly.  Not sure whether this is worth doing in C, as C 
+  doesn't have the necessary operator overloading for clean code.
+- [CONSIDER: imported debugging macros from Zaimoni.STL .]
+
+Changes Zaiband 3.0.6:
+- LUA support is gone.  Partial conversion to C++.
+- hit dice are now sorted in decreasing order.
+- ranged penalties have been changed to be more geometric.  Also,
+  ranged accuracy suffers when monsters are in melee range.
+- new gazes: presbyopic, hyperopic, ranged, and clairvoyant.
+	myopic: range 1, as before.
+    presbyopic: range 2-4
+    hyperopic: range 4+
+    ranged: LoS range
+    clairvoyant: in range, ignore physical obstacles
+	The Zaiband equivalent to a V Floating eye, is a Myopic floating eye.
+    A Zaiband floating eye has a ranged gaze.
+- Immobile, stupid monsters now take out appropriate items, that end up
+  under them.
+    Eats food?  It now spoils food under it.  [Rot jellies.]
+    Eats light?  It now unfuels light sources under it.  [Silver jellies.]
+    Acid attack?  Items vulnerable to acid, are destroyed under it.
+     Similarly for electricity, fire, and cold.
+- (Mobile) monsters that can attack to eat food, eat food from the floor.
+  [E.g., green glutton ghosts.]
+=====
+rec.games.roguelike.angband looking glass
+
+From: Eddie Grove <eddiegrove@hotmail.com>
+Subject: Re: to add artifact activations?
+Date: 2007-10-09 20:27:49
+Agent: Gnus/5.09 (Gnus v5.9.0) Emacs/21.3
+
+Eddie Grove <eddiegrove@hotmail.com> writes:
+
+> will_asher <will_asher@yahoo.com> writes:
+>
+> > On 2007-10-09 18:29:21, Eddie Grove <eddiegrove@hotmail.com> wrote:
+> >
+> > > I modified artifact.txt, as described in previous messages.
+> > > Things like adding +4 stealth to Celegorm worked just fine.
+> > > However, my added artifact activations did not work.
+> > >
+> > > t) The Glaive of Pain (9d6) (+3,+30) {spectre48}
+> > > It provides resistance to fear.  It cannot be harmed by the
+> > > elements.
+> > >
+> > > That has been *IDed, no activation.
+> > >
+> > > The entry is
+> > > # The Glaive of Pain
+> > >
+> > > N:94:of Pain
+> > > I:22:13:0
+> > > W:30:25:300:50000
+> > > P:0:9d6:0:30:0
+> > > F:SHOW_MODS | RES_FEAR
+> > > A:ARROW:30:30
+> > > D:The massive cleaver that crowns this glaive glows blood-red and black;
+> > > D:fell spells of annihilation swirl and dance as you swing death's myrmidon
+> > > D:down.
+> > >
+> > > I put some debugging code into grab_one_activation (or whatever
+> > > the function is that parses activations) and it is parsed:
+> > >
+> > > artifact 94 activates for ARROW
+> > >
+> > > Any ideas what is going on?  I can't think of any explanation no matter how
+> > > farfetched.  I don't even know where to look.
+> > >
+> > >
+> > > Eddie
+> >
+> > copied from artifact.txt, your answer is in the last sentance:
+> >
+> > # 'A' is for activation.  Activation is the effect the artifact
+> > # activates for. The recharge time calculates from the recharge time
+> > # plus a random value between 1 and the recharge time dice (if not 0).
+> > # If an activation is given then the artifact must also have the
+> > # ACTIVATE flag.
+>
+> Aargh.  Reading the doc is obviously too difficult for me.
+>
+>
+> Thank you, very much!
+>
+>
+> Eddie
+
+I just added the flag, and it worked immediately.  I.e. even though the Glaive
+was created without it, it now activates.  I don't know if that is a good
+thing or a bad thing.  IMO artifacts should not change in mid-game when
+artifact.txt is modified, but I can sort of see the argument for it.
+
+I changed the parser to give a warning, but maybe that is not enough.
+I think I will change the parser so that anything with an activation sets
+the TR3_ACTIVATE flag, making the F:ACTIVATE in artifact.txt not required.
+IMO that kind of redundancy, a required flag fully implied by another line,
+should be removed.
+
+
+Eddie
+======
+Angband SVN rip: on changeset 16
+* we don't worry about scripts/pkg_win (decision not made on it yet)
+* pathfind.c is dummy currently
+* squelch.c is dummy currently
+* set up a standard test to check for "char being unsigned" warnings
+
+16
+trunk/src/cmd4.c (modified) (50 diffs)
+trunk/src/defines.h (modified) (1 diff)
+trunk/src/externs.h (modified) (5 diffs)
+trunk/src/tables.c (modified) (1 diff)
+trunk/src/util.c (modified) (1 diff) [ignore, but see what could be done about "hyper to current"
+
+17
+trunk/src/cmd4.c (modified) (5 diffs)
+
+18
+trunk/lib/file/news.txt (modified) (1 diff)
+trunk/lib/readme.txt (added)
+trunk/readme.txt (modified) (3 diffs)
+trunk/src/cmd4.c (modified) (7 diffs)
+
+20
+trunk/src/birth.c  (modified)  (7 diffs)
+
+21
+trunk/src/birth.c  (modified)  (1 diff)
+
+22
+trunk/src/birth.c  (modified)  (15 diffs)
+trunk/src/cmd4.c (modified) (3 diffs)
+trunk/src/externs.h (modified) (1 diff)
+trunk/src/wizard2.c (modified) (2 diffs) 
+
+23
+trunk/src/cmd4.c  (modified)  (1 diff)
+trunk/src/wizard2.c (modified) (1 diff) 
+
+27
+trunk/src/birth.c  (modified)  (6 diffs)
+trunk/src/cmd4.c (modified) (20 diffs)
+trunk/src/dungeon.c (modified) (1 diff)
+trunk/src/externs.h (modified) (2 diffs)
+trunk/src/init2.c (modified) (1 diff)
+trunk/src/util.c (modified) (4 diffs)
+
+28
+trunk/src/birth.c  (modified)  (3 diffs)
+trunk/src/cmd4.c (modified) (3 diffs)
+trunk/src/defines.h (modified) (1 diff)
+trunk/src/util.c (modified) (3 diffs)
+
+29
+trunk/src/cmd4.c  (modified)  (23 diffs)
+
+30
+trunk/src/birth.c (modified) (3 diffs)
+trunk/src/cave.c (modified) (1 diff)
+trunk/src/cmd4.c (modified) (17 diffs)
+trunk/src/defines.h (modified) (2 diffs)
+trunk/src/obj-info.c (modified) (1 diff)
+trunk/src/tables.c (modified) (6 diffs)
+trunk/src/xtra1.c (modified) (1 diff)
+
+32
+trunk/src/cmd4.c (modified) (4 diffs)
+trunk/src/externs.h (modified) (1 diff)
+
+33
+trunk/src/birth.c (modified) (1 diff)
+trunk/src/cmd4.c (modified) (12 diffs)
+trunk/src/externs.h (modified) (1 diff)
+trunk/src/util.c (modified) (4 diffs)
+
+34
+trunk/src/defines.h  (modified)  (1 diff)
+trunk/src/xtra1.c (modified) (7 diffs) 
+
+35
+trunk/src/cmd4.c  (modified)  (12 diffs)
+
+36
+trunk/src/birth.c  (modified)  (5 diffs)
+trunk/src/defines.h (modified) (1 diff)
+trunk/src/externs.h (modified) (3 diffs)
+trunk/src/init2.c (modified) (2 diffs)
+trunk/src/store.c (modified) (68 diffs)
+trunk/src/tables.c (modified) (1 diff) 
+
+37
+trunk/src/store.c (modified) (52 diffs)
+
+38
+trunk/src/config.h (modified) (1 diff)
+trunk/src/dungeon.c (modified) (1 diff)
+trunk/src/externs.h (modified) (1 diff)
+trunk/src/files.c (modified) (1 diff)
+trunk/src/main.c (modified) (1 diff)
+trunk/src/store.c (modified) (2 diffs)
+
+39
+trunk/src/config.h (modified) (3 diffs)
+trunk/src/dungeon.c (modified) (2 diffs)
+trunk/src/load.c (modified) (5 diffs)
+trunk/src/main.c (modified) (2 diffs)
+trunk/src/save.c (modified) (1 diff)
+
+40
+trunk/src/cmd4.c (modified) (4 diffs)
+trunk/src/store.c (modified) (5 diffs)
+
+41
+trunk/src/cmd4.c  (modified)  (1 diff)
+trunk/src/config.h (modified) (3 diffs)
+trunk/src/files.c (modified) (3 diffs)
+trunk/src/h-config.h (modified) (6 diffs)
+trunk/src/init2.c (modified) (2 diffs)
+trunk/src/save.c (modified) (1 diff)
+
+NOTE: do not implement next_xp option before 46 here, it's wiped at this point
+
+47: cmd4.c
+48/49/50: options cleanout
+* keep expand_look, it's actually useful
+* todo: eliminate show_details, show_weights, show_choices by forcing true
+* evaluate: run_ignore_stairs
+* evaluate: eliminate compress_savefile
+* todo: eliminate view_reduce_lite as always-false
+* todo: eliminate hidden_player as always-false
+* todo: eliminate avoid_abort as always-false
+* todo: eliminate avoid_other as always-false
+trunk/lib/edit/cost_adj.txt (1 diff) 
+trunk/lib/edit/ego_item.txt (1 diff) 
+trunk/lib/edit/flavor.txt (1 diff) 
+trunk/lib/edit/limits.txt (1 diff) 
+trunk/lib/edit/monster.txt (1 diff) 
+trunk/lib/edit/object.txt (1 diff) 
+trunk/lib/edit/p_class.txt (1 diff) 
+trunk/lib/edit/p_hist.txt (1 diff) 
+trunk/lib/edit/p_race.txt (1 diff) 
+trunk/lib/edit/shop_own.txt (1 diff) 
+trunk/lib/edit/spell.txt (1 diff) 
+trunk/lib/edit/terrain.txt (1 diff) 
+trunk/lib/edit/vault.txt (1 diff) 
+trunk/src/birth.c (5 diffs) 
+trunk/src/cave.c (9 diffs) 
+trunk/src/cmd1.c (1 diff) 
+trunk/src/cmd3.c (2 diffs) 
+trunk/src/cmd4.c (1 diff) 
+trunk/src/config.h (4 diffs) 
+trunk/src/defines.h (12 diffs) 
+trunk/src/dungeon.c (5 diffs) 
+trunk/src/files.c (1 diff) 
+trunk/src/generate.c (4 diffs) 
+trunk/src/load.c (3 diffs) 
+trunk/src/melee2.c (16 diffs) 
+trunk/src/monster1.c (1 diff) 
+trunk/src/monster2.c (1 diff) 
+trunk/src/obj-info.c (1 diff) 
+trunk/src/object1.c (16 diffs) 
+trunk/src/object2.c (1 diff) 
+trunk/src/save.c (2 diffs) 
+trunk/src/store.c (9 diffs) 
+trunk/src/tables.c (24 diffs) 
+trunk/src/types.h (1 diff) 
+trunk/src/util.c (2 diffs) 
+trunk/src/xtra1.c (1 diff) 
+trunk/src/xtra2.c (3 diffs) 
+trunk/src/z-file.c (1 diff)
+
+54: birth.c
+55: cmd4.c, store.c
+56/57: store.c
+58: default illumination twang/table.c
+
+59/60/62: ego light
+trunk/src/birth.c (2 diffs) 
+trunk/src/cmd3.c (7 diffs) 
+trunk/src/dungeon.c (4 diffs) 
+trunk/src/load.c (1 diff) 
+trunk/src/object1.c (2 diffs) 
+trunk/src/object2.c (1 diff) 
+trunk/src/store.c (5 diffs) 
+trunk/src/ui.c (1 diff) 
+trunk/src/ui.h (1 diff) 
+trunk/src/xtra1.c (2 diffs)
+---
+trunk/lib/edit/object.txt
+----
+trunk/src/object2.c (4 diffs) 
+trunk/src/store.c (1 diff)
+
+65/67/68: store menu adjust
+trunk/src/store.c (2 diffs) 
+trunk/src/ui.c (2 diffs)
+---
+trunk/src/store.c (3 diffs) 
+trunk/src/xtra1.c (3 diffs)
+---
+trunk/src/store.c (3 diffs) 
+trunk/src/ui.c (1 diff)
+
+66: birth menu twang
+trunk/src/birth.c (2 diffs)
+
+69/70: mouse patching; pathfind.c goes in here
+trunk/src/Makefile.inc (1 diff) 
+trunk/src/cmd1.c (2 diffs) 
+trunk/src/cmd2.c (2 diffs) 
+trunk/src/dungeon.c (2 diffs) 
+trunk/src/externs.h (5 diffs) 
+trunk/src/main-win.c (6 diffs) 
+trunk/src/main-x11.c (3 diffs) 
+trunk/src/pathfind.c 
+trunk/src/types.h (2 diffs) 
+trunk/src/util.c (16 diffs) 
+trunk/src/xtra2.c (24 diffs)
+---
+trunk/src/dungeon.c (2 diffs) 
+trunk/src/main-win.c (2 diffs)
+
+71: macro menu fix
+trunk/src/cmd4.c (4 diffs) 
+trunk/src/store.c (1 diff)
+
+
+73: macro command adjust
+trunk/src/cmd4.c (2 diffs) 
+trunk/src/dungeon.c (1 diff)
+
+79: ui fix
+trunk/src/ui.c (2 diffs)
+
+82: mass change
+trunk/src/cmd4.c (13 diffs) 
+trunk/src/defines.h (1 diff) 
+trunk/src/externs.h (2 diffs) 
+trunk/src/files.c (2 diffs) 
+trunk/src/h-basic.h (2 diffs) 
+trunk/src/object1.c (3 diffs) 
+trunk/src/tables.c (1 diff) 
+trunk/src/variable.c (1 diff) 
+trunk/src/z-term.h (1 diff)
+
+86: cmd4.c, object1.c
+92: store.c
+
+94: store.c (backout of prior changes)
+98: char isn't guaranteed to be signed
+trunk/src/cmd4.c (1 diff) 
+trunk/src/files.c (1 diff) 
+trunk/src/z-term.c (2 diffs)
+
+100/101/104/108: HTML dump cleanup
+trunk/src/cmd4.c (5 diffs) 
+trunk/src/externs.h (1 diff) 
+trunk/src/files.c (5 diffs)
+---
+trunk/src/files.c (5 diffs)
+---
+trunk/src/cmd4.c (1 diff) 
+trunk/src/files.c (5 diffs)
+---
+trunk/src/files.c (5 diffs)
+
+102: store.c (fixes)
+
+103: autobalancing support
+trunk/src/config.h (1 diff) 
+trunk/src/init.h (3 diffs) 
+trunk/src/init1.c (2 diffs) 
+trunk/src/init2.c (4 diffs) 
+trunk/src/types.h (2 diffs)
+
+110: mass reorganize of store
+trunk/lib/edit/object.txt (11 diffs) 
+trunk/src/cmd4.c (5 diffs) 
+trunk/src/defines.h (4 diffs) 
+trunk/src/init1.c (1 diff) 
+trunk/src/object2.c (2 diffs) 
+trunk/src/randname.c (1 diff) 
+trunk/src/store.c (17 diffs) 
+trunk/src/tables.c (4 diffs) 
+trunk/src/types.h (2 diffs) 
+trunk/src/ui.c (1 diff) 
+trunk/src/xtra1.c (22 diffs) 
+trunk/src/z-form.c (5 diffs)
+
+111: compiler warning suppression
+trunk/src/birth.c (4 diffs) 
+trunk/src/cmd4.c (19 diffs) 
+trunk/src/files.c (5 diffs) 
+trunk/src/tables.c (1 diff) 
+trunk/src/ui.c (1 diff)
+
+116: warning tweak
+trunk/src/cmd4.c (1 diff) 
+trunk/src/dungeon.c (1 diff) 
+trunk/src/files.c (5 diffs) 
+trunk/src/randname.c (1 diff) 
+trunk/src/ui.c (4 diffs)
+
+117: code clean
+trunk/src/cmd3.c (2 diffs) 
+trunk/src/defines.h (1 diff) 
+trunk/src/dungeon.c (3 diffs) 
+trunk/src/load.c (1 diff) 
+trunk/src/object1.c (2 diffs) 
+trunk/src/object2.c (4 diffs) 
+trunk/src/save.c (1 diff) 
+trunk/src/spells2.c (2 diffs) 
+trunk/src/store.c (9 diffs) 
+trunk/src/tables.c (3 diffs) 
+trunk/src/types.h (1 diff)
+
+118: dungeon.c (array bounds error)
+
+119/123/124/137: Sangband-style object handling
+120: RNG for names, 
+125
+126
+127: z-file.h/c introduced
+128: merge h-config.h into h-basic.h
+130/131: monster list command (useful)
+132: enhanced roller menu (birth.c)
+133: explicit store help (useful)
+134/142/143: introduces cmd0.h/c
+135/144: prompt for overwriting existing savefile; global elimination
+136/140: insecure string function suppression
+138
+141: TERM_EXTRA_SOUND eliminated, replaced with option
+142
+
+147: not wiping unsupported *.prf files is intentional
+
+148: license header cleanup
+150: license file change
+152: option flush
+* !eliminate fresh-before with always-true
+* !eliminate fresh-after with always-false
+* todo: eliminate stack-force-notes with always-false
+* review others
+155: sift this one
+156/157: squelch major rewrite
+158/203/204: amnesia feature
+160:
+161
+162
+163: major light patch
+166: review
+168
+169: copying info update
+171: review
+
+186: directory scan fixup
+187: directory scan fixup, maybe just big-bang this
+191: autoinscribe (involves squelch)
+192
+193
+194/195: damage-rather-than-destroy patch (interesting)
+196
+199/200: review
+* !ALLOW_AUTOROLLER always-on
+* !ALLOW_REPEAT always-on
+* CAPITALIZE_USER_NAME: ?
+* MONSTER_FLOW_DEPTH relocated; reverted back to 32 from 3 in rev. 547
+* other changes go against archaic system support
+206: birth tuning
+208: tracer code
+209: fix more prompt in store.c
+210/211/212: coordinate keyboard and mouse in stores
+213: require setegid (probable security issue)
+215: birth adjust
+216: compiler fix
+217: menu adjust/commands
+220
+221: squelch fixup
+222
+224/225: mouse adjust
+227/230/231: automatic pickup adjustments
+228
+229/234: new option hide-squelchable
+232: warning suppress; fix arg_graphics type to in
+233/241: amnesia tuning
+234/235/236: squelch adjust
+237
+238: command routing fix
+239: store titling fix
+240: option menu adjust
+242/243: some kinds of potions are good
+244: zero-time auto-repeat destruction tweak
+245: autopickup adjustment
+246: help text for birth menu
+247: look command fix
+248: mouse movement option
+249: macro fix to allow function keys
+250: no-spoil capability for self-knowledge
+251: compiler warning clean
+252: artifact knowledge fix
+254: knowledge menu/store fixes
+256: caseless menu tags
+257: superfluous window toggle suppression
+259: gold in inventory bug fix
+
+Aug 18, 2007: -107 days
+260
+261: everburning tweak
+262
+263
+264
+265
+266
+267
+268
+270
+271
+274
+===
+276: amnesia tuning
+277: mouse fix for option menus
+278: browsing fix
+279: prototype fix
+280: retval fix
+281
+282
+283
+284
+285: create gold with debug commands
+286: make destroying items ask for confirmation again
+287
+288: fix some behavior issues
+289: squelch fix
+290: squelch display/store fix
+291: squelch fix
+292: squelch fix
+293: autoinscription settings
+294: adjust squelch
+295
+301: general store adjusted to not buy things back
+303/304: add quickstart birth option
+305: add trap detection flag
+306/307: LM dungeon generation
+308: status bar does all effects left-to-right
+309
+310: circular magic mapping/detection
+311: trap detection display fix
+312/313: monster recall adjust
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+468
+----
+====
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+519: ANGBAND_LITE option off always
+520: !DRS_SMART_OPTIONS, !MONSTER_FLOW, CHECK_MODIFICATION_TIME, and FIXED_PATHS always on
+* catch FIXED_PATHS later
+* catch CHECK_MODIFICATION_TIME later
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532/535: *Identify* transmogrified to Identify
+543: healing potion twang
+544: text formatting in color
+549: inventory display: add maximum capacity
+550: version# twang, do not need to mirror
+552:
+554: study autopickup refactor here
+555:
+556: study object information refactor
+557: autoscum option removed (do it right, though; this duplicated the roguelike keyset as a birth option)
+559: nothing-to-sell message
+562: flavor fix elimination: slime mold juice, water, 
+563: birth torches same as shop torches (use?)
+564: ALLOW_TEMPLATES fixing (need to jumpstart new z-file.h/c for this)
+565: suppress inappropriate savefile overwrite prompt
+566: variable-size dungeons
+567: potion effect changes
+568: nerf points-based gold
+569: doxygen conversion
+570: eliminate depth-in-feet option (use)
+571: debugging package
+575/576: options hotkey fix 
+577: ID rods when zapping
+579: bogus "fix" (handled by autoconversion in C++), ignore
+580/581: Detection adjustments
+583: pseudoID changes, one_in_() [latter partially done, generate.c remains (but is scheduled for complete replacement with Leon's algorithm)]
+586: option rename
+589: autopickup fixup
+590: object description work
+591: dungeon generation refactor
+592: consider uint64_t use if subsequent code wants it; other change vacuous
+593: test rig for dungeon stat generation
+594: ID changes (use) 
+595/596/597/598/599/601: file rearrange
+602: drop squelched items
+603: scan_floor() adjust
+604: dungeon stat calculator adjust
+605: wizard.h in, finally
+606: object browser adjust
+607: item destruction adjust
+608: interface tweak
+609: vacuous cmds.h adjust
+610: object-make.c/object.h code adjust
+611/619: monster coloring change
+612: snap back to V3.0.9 dungeon generator, leave out autoscum option
+613: object description cleanup
+614: warning blame shell script
+615: copyright adjust
+616: store twang (but think twice about min_level, might want to patch this one)
+617: licence twang
+618: redo stat-swapper potions
+620: LUA stat analyzer
+621: tool script readme
+622: remove zero-effect code
+625: clean up object flags as part of *ID* annihilation
+626: chardump fix to z-file.c
+628: chardump fix
+630: death display uses scrollable menu
+631/632: relocate death code to death.c, cleanup; crown.txt
+636: history notes patch
+637: macro rename, effects.h/c
+638/639: alternate detection approach
+640: overwrite savefile prompt fix
+643/644: version adjust (ignore, but note out-of-memory issue with 643)
+652/653/654: object_desc cleanup
+* this one's messy, and I'm not sure I agree with AS's file reorganization
+** done:
+
+/** modes for object_desc() */
+enum object_desc_mode	{	ODESC_BASE = 0, 
+							ODESC_COMBAT, 
+							ODESC_STORE,
+							ODESC_FULL
+						};
+
+** next: reorganize along lines of V obj-desc
+
+662: Angband man page
+665: obj-ui.c reorganization
+666-668: more object-handling file reorganization 
+670: ang_sort and ang_cmp moved to z-util.c; target.c created
+671/672: Stop access to p_ptr->target_* from anywhere except target.c.
+673: move target_ variables from player_type to target.c (do *not* do this, breaks multi-PC)
+676: psuedo-id changes en-masse; INSCRIP enum interesting
+677: rename good to magical; new psuedo-id strange for mixed-bonuses; adjust weak psuedo-id to know difference between good and excellent; do not autocurse bad weapons
+678/679: remove redundant IDENT_BROKEN (probably should make this useful instead)
+680: stop making rings of stupidity, weakness, and woe; allow any/all rings to be cursed if game wants to make a bad item
+681: torch/lantern fuel adjust (do not match; consider making stores sell full torches/lanterns)
+680,682: object generation code clean
+688: rename Cesti to Mithril Gauntlets (but do it better)
+689: remove support for pre-3.0.1 savefiles
+690: (squelch fixup)
+691: make pt-based mostly equivalent to autoroller
+695/696: Make get_mon_num_prep() void. 
+698: Mouse button patch
+700: min gold always 200
+705: rename no-preserve option: "Lose artifacts when leaving level"
+711: torches made lighter (do not copy to Zaiband)
+715: command_see eliminated; not as simple as it looks
+726: kill -s option in main.c (show scores)
+727: CCW rarity adjustment (study new V rarity config)
+728: check_for_inscript is an object function, not a util function: relocated
+729: multiple-inscriptions work (probably won't move to Zaiband)
+730/731: Z randint0/randint1 introduction
+733: resist poison potion
+742: store/AI fixes
+750: swap priority of can_pickup and blind checks when picking up items
+751: reverse order of monster list.  Really should be in toughness order (think about this more carefully)
+752: V-specific
+753: blow count correction (V-specific)
+754: try to robustify store item quantity prompt by duplicating object_similar code (think about this more carefully)
+755: feature: detection via aware means can give definitive negative results
+756: MN_NULL constant
+758: repair connected stairs option
+767: PNG transparency fix
+768: z-virt.h adjust, study
+778: Mac fixup
+779: guarantee CHR is applied before store price cap
+782: debian prototype distro system
+787: object knowledge sorts by cost
+796: ?Rune of Protection fixup
+808/812: DTRAP borders
+810: pickup function interface cleanup
+816: lazy movement patch (allows combining arrow keys into diagonals, useful for laptops)
+819: fix mouse pointing
+825: object distribution experiment
+833: X11 graphics support removed to prepare way for free licensing
+834/836: X11-maid merged into X11-main; graphics support, etc. removed to enable GPL-ification
+835: doxygenize types.h
+843: min depth for each kind of trap
+847: event handler fix: phantom object prevention
+848/855: Rogue should be better at melee (Timo)
+854: prepare for textual tvals/svals
+862,863,864,865,866,867,868,869,870,871: menu system adjust
+874: autoconf fixup
+882: FAQ adjust
+883: nerf missile weapon range (not sure about this one)
+889: gold drop revamp
+891: external config for store items
+892: init error constant adjust
+893: more specific errors
+895: rand_int |-> randint0, randint |-> randint1, rand_die |-> randint1
+896/897: adjust artifact.txt to use textual svals/tvals
+898: temporary confusion resist
+899: terror timed effect; stoneskin timed effect; Clear Mind effect; Deep Descent effect; Line of Sight confusion effect; 
+901: IMPAIR_HP, IMPAIR_MANA; food level only affects HP regeneration; impairment means halving regeneration rate
+902: player vulnerabilities to RBase
+903: Purging effect (mushrooms)
+904: AFRAID item flag (induces perma-fear)
+907: mass object reorganization
+916: mithril ammo allowed to be SLAY_EVIL, VENOM
+921: allow ENTER in more places
+932: GTK2 (clear to merge, V uses tvalsval.h like Zaiband)
+934/935: save.c adjust to make savefile issues go back to UI
+936/937: change DROP_dice to be a mutex
+939: replace RF0_DROP_USEFUL with RF0_DROP_20
+940: undo mutex for DROP_dice
+958: OSX
+961: Mac-Carbon
+962: OSX
+968: character dump cleanup
+
+Ekolis/V Trac: should invisible traps have their attr/char pair hard-coded?
+Idea: mushroom death drop is mushrooms
+Idea: make DROP_?? and DROP_?D? "lexical flags"
+Idea: configurable thresholds for R*
+Idea: ironman option: V SVN detection range
+Idea: player net worth used during store restocking
+* cost suppression: done
+* stop dominated items: needs rethink of store stocking.  In progress.
+* intrastore sales: doable
+* dynamic purse: savefile format change
+** idea is that storekeeper's purse is a function of his current wealth; he's not really willing to spend more than 1% per purchase
+** may want "psuedocustomers" to apply CHA/race effects with
+** affects: intrastore sales
+* warehousing: savefile format change
+** store record has 10 bytes of deadspace : can swing dynamic purse on 4 bytes
+Idea: automatic description of food value
+* note: only food that has an interesting tradeoff against Rations is Beef Jerky, currently.  Would need a more complex hunger/thirst system to justify the others.

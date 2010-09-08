@@ -1,0 +1,33 @@
+Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
+
+This software may be copied and distributed for educational, research,
+and not for profit purposes provided that this copyright and statement
+are included in all such copies.  Other copyrights may also apply.
+
+All changes made by Ben Harrison, Robert Ruehlmann, and many other Angband
+developers are also available under the GNU GENERAL PUBLIC LICENSE.
+Note that this doesn't influence the current distribution, since parts of
+the source are still only available under the old Moria/Angband license.
+Until all parts of Angband are distributed under the GPL the only valid
+license remains the original Moria/Angband license.
+
+More information about Angband and the GPL can be found at:
+http://www.thangorodrim.net/development/opensource.html
+
+====
+
+David Gervais' (32x32) graphics may be redistributed, modified, and used 
+only under the terms of the Creative Commons Attribution 3.0 licence: 
+http://creativecommons.org/licenses/by/3.0/
+
+The sounds are freeware, whatever that means.
+
+The font files are under the licences noted in lib/xtra/font/copying.txt, 
+all of which are OSI-compliant.
+
+====
+
+Note that V SVN is mostly under GPL now.  Where this license transfers to Zaiband, it has been transferred.
+
+Material changes by Kenneth 'Bessarion' Boyd are usually in their own files under the Boost License 1.0, which is compatible with (version 2 of) the GPL.
+Those that aren't in their own files will be relicensed when they are license-firewalled properly.
