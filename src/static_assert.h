@@ -14,7 +14,11 @@
 #  if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #	 define ZAIBAND_STATIC_ASSERT(A) static_assert(A, #A)
 #  endif
-#elif defined(HAVE_BOOST)
+#endif
+#endif
+
+#ifndef ZAIBAND_STATIC_ASSERT
+#if defined(HAVE_BOOST)
 # include <boost/static_assert.hpp>
 # define ZAIBAND_STATIC_ASSERT(A) BOOST_STATIC_ASSERT(A)
 #else
