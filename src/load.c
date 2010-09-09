@@ -196,9 +196,7 @@ static void rd_s32b(s32b *ip)
 }
 
 
-/*!
- * read a string
- */
+/*! read a string */
 static void rd_string(char *str, int max)
 {
 	int i = 0;
@@ -214,10 +212,21 @@ static void rd_string(char *str, int max)
 	str[max-1] = '\0';	/* Terminate */
 }
 
+/*! read a coord */
+static void rd(coord& loc)
+{
+	rd_byte(&loc.y);
+	rd_byte(&loc.x);
+}
 
-/*!
- * strip some bytes
- */
+/*! read a tvalsval */
+static void rd(tvalsval& id)
+{
+	rd_byte(&id.tval);
+	rd_byte(&id.sval);
+}
+
+/*! strip some bytes */
 static void strip_bytes(int n)
 {
 	byte tmp8u;
@@ -246,12 +255,10 @@ static errr rd_item(object_type *o_ptr)
 	rd_s16b(&tmp_s16b);
 
 	/* Location */
-	rd_byte((byte*)(&o_ptr->loc.y));
-	rd_byte((byte*)(&o_ptr->loc.x));
+	rd(o_ptr->loc);
 
 	/* Type/Subtype */
-	rd_byte(&o_ptr->obj_id.tval);
-	rd_byte(&o_ptr->obj_id.sval);
+	rd((o_ptr->obj_id);
 
 	/* tval/sval translators go here */
 
@@ -451,8 +458,7 @@ static void rd_monster(monster_type *m_ptr)
 	rd_s16b(&m_ptr->r_idx);
 
 	/* Read the other information */
-	rd_byte((byte*)&m_ptr->loc.y);
-	rd_byte((byte*)&m_ptr->loc.x);
+	rd(m_ptr->loc);
 	rd_s16b(&m_ptr->chp);
 	rd_s16b(&m_ptr->mhp);
 	rd_s16b(&m_ptr->csleep);
@@ -1000,8 +1006,7 @@ static errr rd_randarts(void)
 		{
 			artifact_type *a_ptr = &object_type::a_info[i];
 
-			rd_byte(&a_ptr->obj_id.tval);
-			rd_byte(&a_ptr->obj_id.sval);
+			rd(a_ptr->obj_id)
 			rd_s16b(&a_ptr->pval);
 
 			rd_s16b(&a_ptr->to_h);

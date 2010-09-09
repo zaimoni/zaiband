@@ -87,6 +87,19 @@ static void wr_string(const char* str)
 	wr_byte(*str);
 }
 
+/*! write a coord */
+static void wr(const coord& loc)
+{
+	wr_byte(loc.y);
+	wr_byte(loc.x);
+}
+
+/*! write a tvalsval */
+static void rd(tvalsval& id)
+{
+	wr_byte(&id.tval);
+	wr_byte(&id.sval);
+}
 
 /*
  * These functions write info in larger logical records
@@ -101,11 +114,9 @@ static void wr_item(const object_type *o_ptr)
 	wr_s16b(0);	/* old k_idx */
 
 	/* Location */
-	wr_byte(o_ptr->loc.y);
-	wr_byte(o_ptr->loc.x);
+	wr(o_ptr->loc);
 
-	wr_byte(o_ptr->obj_id.tval);
-	wr_byte(o_ptr->obj_id.sval);
+	wr(o_ptr->obj_id)
 	wr_s16b(o_ptr->pval);
 
 	wr_byte(o_ptr->pseudo);
@@ -152,8 +163,7 @@ static void wr_item(const object_type *o_ptr)
 static void wr_monster(const monster_type *m_ptr)
 {
 	wr_s16b(m_ptr->r_idx);
-	wr_byte(m_ptr->loc.y);
-	wr_byte(m_ptr->loc.x);
+	wr(m_ptr->loc);
 	wr_s16b(m_ptr->chp);
 	wr_s16b(m_ptr->mhp);
 	wr_s16b(m_ptr->csleep);
@@ -534,8 +544,7 @@ static void wr_randarts(void)
 	{
 		artifact_type *a_ptr = &object_type::a_info[i];
 
-		wr_byte(a_ptr->obj_id.tval);
-		wr_byte(a_ptr->obj_id.sval);
+		wr(a_ptr->obj_id)
 		wr_s16b(a_ptr->pval);
 
 		wr_s16b(a_ptr->to_h);
