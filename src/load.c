@@ -471,9 +471,6 @@ static void rd_monster(monster_type *m_ptr)
 }
 
 
-
-
-
 /*
  * Read the monster lore
  */
@@ -1158,19 +1155,17 @@ static errr rd_inventory(void)
 
 
 
-/*
- * Read the saved messages
- */
+/*! Read the saved messages */
 static void rd_messages(void)
 {
-	int i;
+	size_t i;
 	char buf[128];
 	u16b tmp16u;
 
-	s16b num;
+	u16b num;
 
 	/* Total */
-	rd_s16b(&num);
+	rd_u16b(&num);
 
 	/* Read the messages */
 	for (i = 0; i < num; i++)
@@ -1473,7 +1468,6 @@ static errr rd_savefile_new_aux(void)
 
 	byte tmp8u;
 	u16b tmp16u;
-	u32b tmp32u;
 
 	u32b n_x_check, n_v_check;
 	u32b o_x_check, o_v_check;
@@ -1495,24 +1489,10 @@ static errr rd_savefile_new_aux(void)
 	x_check = 0L;
 
 
-	/* Operating system info */
-	rd_u32b(&sf_xtra);
-
-	/* Time of savefile creation */
-	rd_u32b(&sf_when);
-
-	/* Number of resurrections */
-	rd_u16b(&sf_lives);
-
-	/* Number of times played */
-	rd_u16b(&sf_saves);
-
-
-	/* Later use (always zero) */
-	rd_u32b(&tmp32u);
-
-	/* Later use (always zero) */
-	rd_u32b(&tmp32u);
+	rd_u32b(&sf_xtra);	/* Operating system info */
+	rd_u32b(&sf_when);	/* Time of savefile creation */
+	rd_u16b(&sf_lives);	/* Number of resurrections */
+	rd_u16b(&sf_saves);	/* Number of times played */
 
 
 	/* Read RNG state */

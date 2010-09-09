@@ -723,6 +723,22 @@ static void wr_dungeon(void)
 }
 
 
+/*! write the messages */
+static void wr_messages(void)
+{
+	/* Dump the number of "messages" */
+	u16b i = messages_num();
+	if (OPTION(compress_savefile) && (40 < i)) i = 40;
+	wr_u16b(i);
+
+	/* Dump the messages (oldest first!) */
+	while(0<i)
+		{
+		wr_string(message_str(--i));
+		wr_u16b(message_type(i));
+		}
+}
+
 
 /*
  * Actually write a save-file
@@ -730,12 +746,11 @@ static void wr_dungeon(void)
 static bool wr_savefile_new(void)
 {
 	int i;
-	u32b now;
 	u16b tmp16u;
 
 
 	/* Guess at the current time */
-	now = time((time_t *)0);
+	u32b now = time((time_t *)0);
 
 
 	/* Note the operating system */
@@ -766,44 +781,14 @@ static bool wr_savefile_new(void)
 	x_stamp = 0L;
 
 
-	/* Operating system */
-	wr_u32b(sf_xtra);
+	wr_u32b(sf_xtra);	/* Operating system */
+	wr_u32b(sf_when);	/* Time file last saved */
+	wr_u16b(sf_lives);	/* Number of past lives */
+	wr_u16b(sf_saves);	/* Number of times saved */
 
-
-	/* Time file last saved */
-	wr_u32b(sf_when);
-
-	/* Number of past lives */
-	wr_u16b(sf_lives);
-
-	/* Number of times saved */
-	wr_u16b(sf_saves);
-
-
-	/* Space */
-	wr_u32b(0L);
-	wr_u32b(0L);
-
-
-	/* Write the RNG state */
-	wr_randomizer();
-
-
-	/* Write the boolean "options" */
-	wr_options();
-
-
-	/* Dump the number of "messages" */
-	tmp16u = messages_num();
-	if (OPTION(compress_savefile) && (tmp16u > 40)) tmp16u = 40;
-	wr_u16b(tmp16u);
-
-	/* Dump the messages (oldest first!) */
-	for (i = tmp16u - 1; i >= 0; i--)
-	{
-		wr_string(message_str((s16b)i));
-		wr_u16b(message_type((s16b)i));
-	}
+	wr_randomizer();	/* Write the RNG state */
+	wr_options();	/* Write the boolean "options" */
+	wr_messages();	/* Dump the number of "messages" */
 
 
 	/* Dump the monster lore */
