@@ -24,19 +24,6 @@
 #include "store.h"
 
 /*
- * Import constants
- */
-#define OPT307_auto_scum				33
-#define OPT307_dungeon_align			40
-#define OPT307_dungeon_stair			41
-#define OPT307_flow_by_sound			42
-#define OPT307_flow_by_smell			43
-#define OPT307_smart_learn				46
-#define OPT307_smart_cheat				47
-#define OPT307_smart_monsters			72
-#define OPT307_smart_packs				73
-
-/*
  * This file loads savefiles from Angband 2.9.X.
  *
  * We attempt to prevent corrupt savefiles from inducing memory errors.
@@ -64,41 +51,31 @@
 /*
  * Oldest version number that can still be imported
  */
-#define OLD_VERSION_MAJOR	2
-#define OLD_VERSION_MINOR	9
-#define OLD_VERSION_PATCH	0
+#define OLD_VERSION_MAJOR	3
+#define OLD_VERSION_MINOR	0
+#define OLD_VERSION_PATCH	8
 
 
-/*
- * Local "savefile" pointer
- */
+/*! Local "savefile" pointer */
 static FILE	*fff;
 
-/*
- * Hack -- old "encryption" byte
- */
+/*! Hack -- old "encryption" byte */
 static byte	xor_byte;
 
-/*
- * Hack -- simple "checksum" on the actual values
- */
+/*! Hack -- simple "checksum" on the actual values */
 static u32b	v_check = 0L;
 
-/*
- * Hack -- simple "checksum" on the encoded bytes
- */
+/*! Hack -- simple "checksum" on the encoded bytes */
 static u32b	x_check = 0L;
 
-/*
- * Savefile version
- */
+/*! Savefile version */
 static byte sf_major;	/**< Savefile's VERSION_MAJOR */
 static byte sf_minor;	/**< Savefile's VERSION_MINOR" */
 static byte sf_patch;	/**< Savefile's VERSION_PATCH */
 static byte sf_extra;	/**< Savefile's VERSION_EXTRA" */
 
 
-/*
+/*!
  * Hack -- Show information on the screen, one line at a time.
  *
  * Avoid the top two lines, to avoid interference with "msg_print()".
@@ -107,43 +84,36 @@ static void note(const char* const msg)
 {
 	static int y = 2;
 
-	/* Draw the message */
-	prt(msg, y, 0);
-
-	/* Advance one line (wrap if needed) */
-	if (++y >= 24) y = 2;
-
-	/* Flush it */
-	Term_fresh();
+	prt(msg, y, 0);	/* Draw the message */
+	if (++y >= 24) y = 2;	/* Advance one line (wrap if needed) */
+	Term_fresh();	/* Flush it */
 }
 
 
-/*
+/*!
  * This function determines if the version of the savefile
  * currently being read is older than version "x.y.z".
  */
 static bool older_than(byte x, byte y, byte z)
 {
 	/* Much older, or much more recent */
-	if (sf_major < x) return (TRUE);
-	if (sf_major > x) return (FALSE);
+	if (sf_major < x) return TRUE;
+	if (sf_major > x) return FALSE;
 
 	/* Distinctly older, or distinctly more recent */
-	if (sf_minor < y) return (TRUE);
-	if (sf_minor > y) return (FALSE);
+	if (sf_minor < y) return TRUE;
+	if (sf_minor > y) return FALSE;
 
 	/* Barely older, or barely more recent */
-	if (sf_patch < z) return (TRUE);
-	if (sf_patch > z) return (FALSE);
+	if (sf_patch < z) return TRUE;
+	if (sf_patch > z) return FALSE;
 
 	/* Identical versions */
-	return (FALSE);
+	return FALSE;
 }
 
 
-/*
- * Hack -- determine if an item is "wearable" (or a missile)
- */
+/*! determine if an item is "wearable" (or a missile) */
 static bool wearable_p(const object_type *o_ptr)
 {
 	/* Valid "tval" codes */
@@ -169,28 +139,23 @@ static bool wearable_p(const object_type *o_ptr)
 		case TV_LITE:
 		case TV_AMULET:
 		case TV_RING:
-		{
-			return (TRUE);
-		}
+			return TRUE;
 	}
 
-	/* Nope */
-	return (FALSE);
+	return FALSE;	/* Nope */
 }
 
 
-/*
+/*!
  * The following functions are used to load the basic building blocks
  * of savefiles.  They also maintain the "checksum" info.
  */
 
 static byte sf_get(void)
 {
-	byte c, v;
-
 	/* Get a character, decode the value */
-	c = getc(fff) & 0xFF;
-	v = c ^ xor_byte;
+	byte c = getc(fff) & 0xFF;
+	byte v = c ^ xor_byte;
 	xor_byte = c;
 
 	/* Maintain the checksum info */
@@ -198,7 +163,7 @@ static byte sf_get(void)
 	x_check += xor_byte;
 
 	/* Return the value */
-	return (v);
+	return v;
 }
 
 static void rd_byte(byte *ip)
@@ -231,35 +196,27 @@ static void rd_s32b(s32b *ip)
 }
 
 
-/*
- * Hack -- read a string
+/*!
+ * read a string
  */
 static void rd_string(char *str, int max)
 {
-	int i;
+	int i = 0;
+	byte tmp8u;
 
-	/* Read the string */
-	for (i = 0; TRUE; i++)
-	{
-		byte tmp8u;
+	do	{
+		rd_byte(&tmp8u);	/* Read a byte */
+		if (i < max) str[i] = tmp8u;	/* Collect string while legal */
+		++i;
+		}
+	while(tmp8u);	/* continue until end of string */
 
-		/* Read a byte */
-		rd_byte(&tmp8u);
-
-		/* Collect string while legal */
-		if (i < max) str[i] = tmp8u;
-
-		/* End of string */
-		if (!tmp8u) break;
-	}
-
-	/* Terminate */
-	str[max-1] = '\0';
+	str[max-1] = '\0';	/* Terminate */
 }
 
 
-/*
- * Hack -- strip some bytes
+/*!
+ * strip some bytes
  */
 static void strip_bytes(int n)
 {
@@ -370,15 +327,6 @@ static errr rd_item(object_type *o_ptr)
 	{
 		o_ptr->timeout = o_ptr->pval;
 		o_ptr->pval = k_ptr->pval * o_ptr->number;
-	}
-
-	if (older_than(3, 0, 4))
-	{
-		/* Recalculate charges of stacked wands and staves */
-		if ((o_ptr->obj_id.tval == TV_WAND) || (o_ptr->obj_id.tval == TV_STAFF))
-		{
-			o_ptr->pval = o_ptr->pval * o_ptr->number;
-		}
 	}
 
 	/* Repair non "wearable" items */
@@ -630,12 +578,6 @@ static errr rd_store(int n)
 			return (-1);
 		}
 
-		/* Pre-3.0.2 objects in store inventories need to be marked */
-		if (older_than(3, 0, 2))
-		{
-			if (n != STORE_HOME) i_ptr->ident |= IDENT_STORE;
-		}
-
 		/* Accept any valid items */
 		if (st_ptr->stock_num < STORE_INVEN_MAX) st_ptr->stock[st_ptr->stock_num++] = *i_ptr;
 	}
@@ -741,76 +683,6 @@ static void rd_options(void)
 		int os = i / 32;
 		int ob = i % 32;
 
-		/* Process real entries */
-		if (older_than(3,0,8))
-		{
-			switch(i)
-			{
-			case OPT307_auto_scum:		{
-										flag_set(mask[os], flag[os], ob, OPT_birth_auto_scum);
-										flag_set(mask[os], flag[os], ob, OPT_adult_auto_scum);
-										continue;
-										};
-			case OPT307_dungeon_align:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_dungeon_align);
-										flag_set(mask[os], flag[os], ob, OPT_adult_dungeon_align);
-										continue;
-										};
-			case OPT307_dungeon_stair:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_dungeon_stair);
-										flag_set(mask[os], flag[os], ob, OPT_adult_dungeon_stair);
-										continue;
-										};
-			case OPT307_flow_by_sound:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_flow_by_sound);
-										flag_set(mask[os], flag[os], ob, OPT_adult_flow_by_sound);
-										continue;
-										};
-			case OPT307_flow_by_smell:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_flow_by_smell);
-										flag_set(mask[os], flag[os], ob, OPT_adult_flow_by_smell);
-										continue;
-										};
-			case OPT307_smart_learn:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_smart_learn);
-										flag_set(mask[os], flag[os], ob, OPT_adult_smart_learn);
-										continue;
-										};
-			case OPT307_smart_cheat:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_smart_cheat);
-										flag_set(mask[os], flag[os], ob, OPT_adult_smart_cheat);
-										continue;
-										};
-			case OPT307_smart_monsters:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_smart_monsters);
-										flag_set(mask[os], flag[os], ob, OPT_adult_smart_monsters);
-										continue;
-										};
-			case OPT307_smart_packs:	{
-										flag_set(mask[os], flag[os], ob, OPT_birth_smart_packs);
-										flag_set(mask[os], flag[os], ob, OPT_adult_smart_packs);
-										continue;
-										};
-			case OPT_birth_auto_scum:
-			case OPT_birth_dungeon_align:
-			case OPT_birth_dungeon_stair:
-			case OPT_birth_flow_by_sound:
-			case OPT_birth_flow_by_smell:
-			case OPT_birth_smart_learn:
-			case OPT_birth_smart_cheat:
-			case OPT_birth_smart_monsters:
-			case OPT_birth_smart_packs:
-			case OPT_adult_auto_scum:
-			case OPT_adult_dungeon_align:
-			case OPT_adult_dungeon_stair:
-			case OPT_adult_flow_by_sound:
-			case OPT_adult_flow_by_smell:
-			case OPT_adult_smart_learn:
-			case OPT_adult_smart_cheat:
-			case OPT_adult_smart_monsters:
-			case OPT_adult_smart_packs:		continue;
-			}
-		};
 		flag_set(mask[os], flag[os], ob, i);
 	}
 
@@ -852,9 +724,6 @@ static void rd_options(void)
 }
 
 
-
-
-
 /*
  * Hack -- strip the "ghost" info
  *
@@ -880,86 +749,19 @@ static errr rd_player_spells(void)
 	int i;
 	u16b tmp16u;
 
-	if (older_than(2, 9, 8))
+	/* Read the number of spells */
+	rd_u16b(&tmp16u);
+	if (tmp16u > PY_MAX_SPELLS)
 	{
-		/* The magic spells were changed drastically in Angband 2.9.7 */
-		if (older_than(2, 9, 7) &&
-		    (player_type::c_info[p_ptr->pclass].spell_book == TV_MAGIC_BOOK))
-		{
-			/* Discard old spell info */
-			strip_bytes(24);
-
-			/* Discard old spell order */
-			strip_bytes(64);
-
-			/* None of the spells have been learned yet */
-			for (i = 0; i < 64; i++)
-				p_ptr->spell_order[i] = 99;
-		}
-		else
-		{
-			u32b spell_learned1, spell_learned2;
-			u32b spell_worked1, spell_worked2;
-			u32b spell_forgotten1, spell_forgotten2;
-
-			/* Read spell info */
-			rd_u32b(&spell_learned1);
-			rd_u32b(&spell_learned2);
-			rd_u32b(&spell_worked1);
-			rd_u32b(&spell_worked2);
-			rd_u32b(&spell_forgotten1);
-			rd_u32b(&spell_forgotten2);
-
-			for (i = 0; i < 64; i++)
-			{
-				if (i < 32)
-				{
-					if (spell_learned1 & (1L << i))
-						p_ptr->spell_flags[i] |= PY_SPELL_LEARNED;
-					if (spell_worked1 & (1L << i))
-						p_ptr->spell_flags[i] |= PY_SPELL_WORKED;
-					if (spell_forgotten1 & (1L << i))
-						p_ptr->spell_flags[i] |= PY_SPELL_FORGOTTEN;
-				}
-				else
-				{
-					if (spell_learned2 & (1L << (i - 32)))
-						p_ptr->spell_flags[i] |= PY_SPELL_LEARNED;
-					if (spell_worked2 & (1L << (i - 32)))
-						p_ptr->spell_flags[i] |= PY_SPELL_WORKED;
-					if (spell_forgotten2 & (1L << (i - 32)))
-						p_ptr->spell_flags[i] |= PY_SPELL_FORGOTTEN;
-				}
-			}
-
-			for (i = 0; i < 64; i++)
-			{
-				rd_byte(&p_ptr->spell_order[i]);
-			}
-		}
+		note(format("Too many player spells (%d).", tmp16u));
+		return (-1);
 	}
-	else
-	{
-		/* Read the number of spells */
-		rd_u16b(&tmp16u);
-		if (tmp16u > PY_MAX_SPELLS)
-		{
-			note(format("Too many player spells (%d).", tmp16u));
-			return (-1);
-		}
 
-		/* Read the spell flags */
-		for (i = 0; i < tmp16u; i++)
-		{
-			rd_byte(&p_ptr->spell_flags[i]);
-		}
+	/* Read the spell flags */
+	for (i = 0; i < tmp16u; i++) rd_byte(&p_ptr->spell_flags[i]);
 
-		/* Read the spell order */
-		for (i = 0; i < tmp16u; i++)
-		{
-			rd_byte(&p_ptr->spell_order[i]);
-		}
-	}
+	/* Read the spell order */
+	for (i = 0; i < tmp16u; i++) rd_byte(&p_ptr->spell_order[i]);
 
 	/* Success */
 	return (0);
@@ -981,30 +783,7 @@ static errr rd_extra(void)
 
 	rd_string(p_ptr->died_from, 80);
 
-	if (older_than(3, 0, 1))
-	{
-		char *hist = p_ptr->history;
-
-		for (i = 0; i < 4; i++)
-		{
-			/* Read a part of the history */
-			rd_string(hist, 60);
-
-			/* Advance */
-			hist += strlen(hist);
-
-			/* Separate by spaces */
-			hist[0] = ' ';
-			hist++;
-		}
-
-		/* Make sure it is terminated */
-		hist[0] = '\0';
-	}
-	else
-	{
-		rd_string(p_ptr->history, 250);
-	}
+	rd_string(p_ptr->history, 250);
 
 	/* Player race */
 	rd_byte(&tmp8u);
@@ -1086,50 +865,6 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->sc);
 	strip_bytes(2);
 
-	/* Read the flags */
-	if (older_than(3, 0, 7))
-	{
-		strip_bytes(2);	/* Old "rest" */
-		rd_s16b(&p_ptr->timed[TMD_BLIND]);
-		rd_s16b(&p_ptr->timed[TMD_PARALYZED]);
-		rd_s16b(&p_ptr->timed[TMD_CONFUSED]);
-		rd_s16b(&p_ptr->food);
-		strip_bytes(4);	/* Old "food_digested" / "protection" */
-		rd_s16b(&tmp16s);
-		p_ptr->energy = tmp16s;
-		rd_s16b(&p_ptr->timed[TMD_FAST]);
-		rd_s16b(&p_ptr->timed[TMD_SLOW]);
-		rd_s16b(&p_ptr->timed[TMD_AFRAID]);
-		rd_s16b(&p_ptr->timed[TMD_CUT]);
-		rd_s16b(&p_ptr->timed[TMD_STUN]);
-		rd_s16b(&p_ptr->timed[TMD_POISONED]);
-		rd_s16b(&p_ptr->timed[TMD_IMAGE]);
-		rd_s16b(&p_ptr->timed[TMD_PROTEVIL]);
-		rd_s16b(&p_ptr->timed[TMD_INVULN]);
-		rd_s16b(&p_ptr->timed[TMD_HERO]);
-		rd_s16b(&p_ptr->timed[TMD_SHERO]);
-		rd_s16b(&p_ptr->timed[TMD_SHIELD]);
-		rd_s16b(&p_ptr->timed[TMD_BLESSED]);
-		rd_s16b(&p_ptr->timed[TMD_SINVIS]);
-		rd_s16b(&p_ptr->word_recall);
-		rd_s16b(&p_ptr->see_infra);
-		rd_s16b(&p_ptr->timed[TMD_SINFRA]);
-		rd_s16b(&p_ptr->timed[TMD_OPP_FIRE]);
-		rd_s16b(&p_ptr->timed[TMD_OPP_COLD]);
-		rd_s16b(&p_ptr->timed[TMD_OPP_ACID]);
-		rd_s16b(&p_ptr->timed[TMD_OPP_ELEC]);
-		rd_s16b(&p_ptr->timed[TMD_OPP_POIS]);
-
-		rd_byte(&p_ptr->confusing);
-		rd_byte(&tmp8u);	/* oops */
-		rd_byte(&tmp8u);	/* oops */
-		rd_byte(&tmp8u);	/* oops */
-		rd_byte(&p_ptr->searching);
-		rd_byte(&tmp8u);	/* oops */
-		rd_byte(&tmp8u);	/* oops */
-		rd_byte(&tmp8u);	/* oops */
-	}
-	else
 	{
 		byte num;
 		int i;
@@ -1239,121 +974,96 @@ static errr rd_randarts(void)
 	u32b tmp32u;
 
 
-	if (older_than(2, 9, 3))
-	{
-		/*
-		 * XXX XXX XXX
-		 * Importing old savefiles with random artifacts is dangerous
-		 * since the randart-generators differ and produce different
-		 * artifacts from the same random seed.
-		 *
-		 * Switching off the check for incompatible randart versions
-		 * allows to import such a savefile - do it at your own risk.
-		 */
+	/* Read the number of artifacts */
+	rd_u16b(&artifact_count);
 
-		/* Check for incompatible randart version */
-		if (randart_version != RANDART_VERSION)
+	/* Alive or cheating death */
+	if (!p_ptr->is_dead || arg_wizard)
+	{
+		/* Incompatible save files */
+		if (artifact_count > z_info->a_max)
 		{
-			note(format("Incompatible random artifacts version!"));
+			note(format("Too many (%u) random artifacts!", artifact_count));
 			return (-1);
 		}
 
-		/* Initialize randarts */
-		do_randart(seed_randart, TRUE);
+		/* Mark the old artifacts as "empty" */
+		for (i = 0; i < z_info->a_max; i++)
+		{
+			artifact_type *a_ptr = &object_type::a_info[i];
+			a_ptr->_name = 0;
+			a_ptr->obj_id.clear();
+		}
+
+		/* Read the artifacts */
+		for (i = 0; i < artifact_count; i++)
+		{
+			artifact_type *a_ptr = &object_type::a_info[i];
+
+			rd_byte(&a_ptr->obj_id.tval);
+			rd_byte(&a_ptr->obj_id.sval);
+			rd_s16b(&a_ptr->pval);
+
+			rd_s16b(&a_ptr->to_h);
+			rd_s16b(&a_ptr->to_d);
+			rd_s16b(&a_ptr->to_a);
+			rd_s16b(&a_ptr->ac);
+
+			rd_byte(&a_ptr->d.dice);
+			rd_byte(&a_ptr->d.sides);
+
+			rd_s16b(&a_ptr->weight);
+
+			rd_s32b(&a_ptr->cost);
+
+			for(j = 0; j < OBJECT_FLAG_STRICT_UB; ++j)
+				rd_u32b(&a_ptr->flags[j]);
+
+			rd_byte(&a_ptr->level);
+			rd_byte(&a_ptr->rarity);
+
+			rd_byte(&a_ptr->activation);
+			rd_u16b(&a_ptr->time.base);
+			rd_u16b(&a_ptr->time.range.sides);
+			a_ptr->time.range.dice = 1;			/* constant 1; fix this when bumping internal version */
+		}
 	}
 	else
 	{
-		/* Read the number of artifacts */
-		rd_u16b(&artifact_count);
-
-		/* Alive or cheating death */
-		if (!p_ptr->is_dead || arg_wizard)
+		/* Read the artifacts */
+		for (i = 0; i < artifact_count; i++)
 		{
-			/* Incompatible save files */
-			if (artifact_count > z_info->a_max)
-			{
-				note(format("Too many (%u) random artifacts!", artifact_count));
-				return (-1);
-			}
+			rd_byte(&tmp8u); /* a_ptr->tval */
+			rd_byte(&tmp8u); /* a_ptr->sval */
+			rd_s16b(&tmp16s); /* a_ptr->pval */
 
-			/* Mark the old artifacts as "empty" */
-			for (i = 0; i < z_info->a_max; i++)
-			{
-				artifact_type *a_ptr = &object_type::a_info[i];
-				a_ptr->_name = 0;
-				a_ptr->obj_id.clear();
-			}
+			rd_s16b(&tmp16s); /* a_ptr->to_h */
+			rd_s16b(&tmp16s); /* a_ptr->to_d */
+			rd_s16b(&tmp16s); /* a_ptr->to_a */
+			rd_s16b(&tmp16s); /* a_ptr->ac */
 
-			/* Read the artifacts */
-			for (i = 0; i < artifact_count; i++)
-			{
-				artifact_type *a_ptr = &object_type::a_info[i];
+			rd_byte(&tmp8u); /* a_ptr->dd */
+			rd_byte(&tmp8u); /* a_ptr->ds */
 
-				rd_byte(&a_ptr->obj_id.tval);
-				rd_byte(&a_ptr->obj_id.sval);
-				rd_s16b(&a_ptr->pval);
+			rd_s16b(&tmp16s); /* a_ptr->weight */
 
-				rd_s16b(&a_ptr->to_h);
-				rd_s16b(&a_ptr->to_d);
-				rd_s16b(&a_ptr->to_a);
-				rd_s16b(&a_ptr->ac);
+			rd_s32b(&tmp32s); /* a_ptr->cost */
 
-				rd_byte(&a_ptr->d.dice);
-				rd_byte(&a_ptr->d.sides);
+			rd_u32b(&tmp32u); /* a_ptr->flags1 */
+			rd_u32b(&tmp32u); /* a_ptr->flags2 */
+			rd_u32b(&tmp32u); /* a_ptr->flags3 */
 
-				rd_s16b(&a_ptr->weight);
+			rd_byte(&tmp8u); /* a_ptr->level */
+			rd_byte(&tmp8u); /* a_ptr->rarity */
 
-				rd_s32b(&a_ptr->cost);
-
-				for(j = 0; j < OBJECT_FLAG_STRICT_UB; ++j)
-					rd_u32b(&a_ptr->flags[j]);
-
-				rd_byte(&a_ptr->level);
-				rd_byte(&a_ptr->rarity);
-
-				rd_byte(&a_ptr->activation);
-				rd_u16b(&a_ptr->time.base);
-				rd_u16b(&a_ptr->time.range.sides);
-				a_ptr->time.range.dice = 1;			/* constant 1; fix this when bumping internal version */
-			}
+			rd_byte(&tmp8u); /* a_ptr->activation */
+			rd_u16b(&tmp16u); /* a_ptr->time */
+			rd_u16b(&tmp16u); /* a_ptr->randtime */
 		}
-		else
-		{
-			/* Read the artifacts */
-			for (i = 0; i < artifact_count; i++)
-			{
-				rd_byte(&tmp8u); /* a_ptr->tval */
-				rd_byte(&tmp8u); /* a_ptr->sval */
-				rd_s16b(&tmp16s); /* a_ptr->pval */
-
-				rd_s16b(&tmp16s); /* a_ptr->to_h */
-				rd_s16b(&tmp16s); /* a_ptr->to_d */
-				rd_s16b(&tmp16s); /* a_ptr->to_a */
-				rd_s16b(&tmp16s); /* a_ptr->ac */
-
-				rd_byte(&tmp8u); /* a_ptr->dd */
-				rd_byte(&tmp8u); /* a_ptr->ds */
-
-				rd_s16b(&tmp16s); /* a_ptr->weight */
-
-				rd_s32b(&tmp32s); /* a_ptr->cost */
-
-				rd_u32b(&tmp32u); /* a_ptr->flags1 */
-				rd_u32b(&tmp32u); /* a_ptr->flags2 */
-				rd_u32b(&tmp32u); /* a_ptr->flags3 */
-
-				rd_byte(&tmp8u); /* a_ptr->level */
-				rd_byte(&tmp8u); /* a_ptr->rarity */
-
-				rd_byte(&tmp8u); /* a_ptr->activation */
-				rd_u16b(&tmp16u); /* a_ptr->time */
-				rd_u16b(&tmp16u); /* a_ptr->randtime */
-			}
-		}
-
-		/* Initialize only the randart names */
-		do_randart(seed_randart, FALSE);
 	}
+
+	/* Initialize only the randart names */
+	do_randart(seed_randart, FALSE);
 
 	return (0);
 }
@@ -1464,10 +1174,7 @@ static void rd_messages(void)
 		rd_string(buf, sizeof(buf));
 
 		/* Read the message type */
-		if (!older_than(2, 9, 1))
-			rd_u16b(&tmp16u);
-		else
-			tmp16u = MSG_GENERIC;
+		rd_u16b(&tmp16u);
 
 		/* Save the message */
 		message_add(buf, tmp16u);
@@ -1745,10 +1452,6 @@ static errr rd_dungeon(void)
 
 	/* The dungeon is ready */
 	character_dungeon = TRUE;
-
-	/* Regenerate town in post 2.9.3 versions */
-	if (older_than(2, 9, 4) && (p_ptr->depth == 0))
-		character_dungeon = FALSE;
 
 	/* Success */
 	return (0);
