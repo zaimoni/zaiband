@@ -596,13 +596,9 @@ static void wr_dungeon(void)
 
 	/* Dungeon specific info follows */
 	wr_u16b(p_ptr->depth);
-	wr_u16b(0);
-	wr_u16b(p_ptr->loc.y);
-	wr_u16b(p_ptr->loc.x);
+	wr(p_ptr->loc);
 	wr_u16b(DUNGEON_HGT);
 	wr_u16b(DUNGEON_WID);
-	wr_u16b(0);
-	wr_u16b(0);
 
 
 	/*** Simple "Run-Length-Encoding" of cave ***/
@@ -639,8 +635,8 @@ static void wr_dungeon(void)
 	/* Flush the data (if any) */
 	if (count)
 	{
-		wr_byte((byte)count);
-		wr_byte((byte)prev_char);
+		wr_byte(count);
+		wr_byte(prev_char);
 	}
 
 
@@ -661,8 +657,8 @@ static void wr_dungeon(void)
 			/* If the run is broken, or too full, flush it */
 			if ((tmp8u != prev_char) || (count == UCHAR_MAX))
 			{
-				wr_byte((byte)count);
-				wr_byte((byte)prev_char);
+				wr_byte(count);
+				wr_byte(prev_char);
 				prev_char = tmp8u;
 				count = 1;
 			}
@@ -678,18 +674,15 @@ static void wr_dungeon(void)
 	/* Flush the data (if any) */
 	if (count)
 	{
-		wr_byte((byte)count);
-		wr_byte((byte)prev_char);
+		wr_byte(count);
+		wr_byte(prev_char);
 	}
 
 
 	/*** Compact ***/
 
-	/* Compact the objects */
-	compact_objects(0);
-
-	/* Compact the monsters */
-	compact_monsters(0);
+	compact_objects(0);	/* Compact the objects */
+	compact_monsters(0);	/* Compact the monsters */
 
 
 	/*** Dump objects ***/
@@ -698,13 +691,7 @@ static void wr_dungeon(void)
 	wr_u16b(o_max);
 
 	/* Dump the objects */
-	for (i = 1; i < o_max; i++)
-	{
-		object_type *o_ptr = &o_list[i];
-
-		/* Dump it */
-		wr_item(o_ptr);
-	}
+	for (i = 1; i < o_max; i++) wr_item(o_list+i);
 
 
 	/*** Dump the monsters ***/
@@ -713,13 +700,7 @@ static void wr_dungeon(void)
 	wr_u16b(mon_max);
 
 	/* Dump the monsters */
-	for (i = 1; i < mon_max; i++)
-	{
-		monster_type *m_ptr = &mon_list[i];
-
-		/* Dump it */
-		wr_monster(m_ptr);
-	}
+	for (i = 1; i < mon_max; i++) wr_monster(mon_list+i);
 }
 
 
@@ -746,7 +727,6 @@ static void wr_messages(void)
 static bool wr_savefile_new(void)
 {
 	int i;
-	u16b tmp16u;
 
 
 	/* Guess at the current time */
@@ -792,21 +772,18 @@ static bool wr_savefile_new(void)
 
 
 	/* Dump the monster lore */
-	tmp16u = z_info->r_max;
-	wr_u16b(tmp16u);
-	for (i = 0; i < tmp16u; i++) wr_lore(i);
+	wr_u16b(z_info->r_max);
+	for (i = 0; i < z_info->r_max; i++) wr_lore(i);
 
 
 	/* Dump the object memory */
-	tmp16u = z_info->k_max;
-	wr_u16b(tmp16u);
-	for (i = 0; i < tmp16u; i++) wr_xtra(i);
+	wr_u16b(z_info->k_max);
+	for (i = 0; i < z_info->k_max; i++) wr_xtra(i);
 
 
 	/* Hack -- Dump the quests */
-	tmp16u = MAX_Q_IDX;
-	wr_u16b(tmp16u);
-	for (i = 0; i < tmp16u; i++)
+	wr_u16b(MAX_Q_IDX);
+	for (i = 0; i < MAX_Q_IDX; i++)
 	{
 		wr_byte(q_list[i].level);
 		wr_byte(0);
@@ -815,9 +792,8 @@ static bool wr_savefile_new(void)
 	}
 
 	/* Hack -- Dump the artifacts */
-	tmp16u = z_info->a_max;
-	wr_u16b(tmp16u);
-	for (i = 0; i < tmp16u; i++)
+	wr_u16b(z_info->a_max);
+	for (i = 0; i < z_info->a_max; i++)
 	{
 		artifact_type *a_ptr = &object_type::a_info[i];
 		wr_byte(a_ptr->cur_num);
@@ -832,70 +808,46 @@ static bool wr_savefile_new(void)
 
 
 	/* Dump the "player hp" entries */
-	tmp16u = PY_MAX_LEVEL;
-	wr_u16b(tmp16u);
-	for (i = 0; i < tmp16u; i++)
-	{
-		wr_s16b(p_ptr->player_hp[i]);
-	}
+	wr_u16b(PY_MAX_LEVEL);
+	for (i = 0; i < PY_MAX_LEVEL; i++) wr_s16b(p_ptr->player_hp[i]);
 
 
 	/* Write spell data */
 	wr_u16b(PY_MAX_SPELLS);
-
-	for (i = 0; i < PY_MAX_SPELLS; i++)
-	{
-		wr_byte(p_ptr->spell_flags[i]);
-	}
+	for (i = 0; i < PY_MAX_SPELLS; i++) wr_byte(p_ptr->spell_flags[i]);
 
 	/* Dump the ordered spells */
-	for (i = 0; i < PY_MAX_SPELLS; i++)
-	{
-		wr_byte(p_ptr->spell_order[i]);
-	}
+	for (i = 0; i < PY_MAX_SPELLS; i++) wr_byte(p_ptr->spell_order[i]);
 
 
 	/* Write randart information */
 	if (OPTION(adult_rand_artifacts)) wr_randarts();
 
 
-	/* 
-     * Write the inventory.
-     */ 
+	/* Write the inventory.*/ 
 	for (i = 0; i < INVEN_TOTAL; i++)
 	{
 		const object_type* const o_ptr = &p_ptr->inventory[i];
 
-		/* Skip non-objects */
-		if (!o_ptr->k_idx) continue;
-
-		/* Dump index */
-		wr_u16b((u16b)i);
-
-		/* Dump object */
-		wr_item(o_ptr);
+		if (!o_ptr->k_idx) continue;	/* Skip non-objects */
+		wr_u16b((u16b)i);	/* Dump index */
+		wr_item(o_ptr);	/* Dump object */
 	}
 
 	/* Add a sentinel */
 	wr_u16b(0xFFFF);
 
 
-	/* Note the stores */
-	tmp16u = MAX_STORES;
-	wr_u16b(tmp16u);
-
 	/* Dump the stores */
-	for (i = 0; i < tmp16u; i++) wr_store(&store[i]);
+	wr_u16b(MAX_STORES);
+	for (i = 0; i < MAX_STORES; i++) wr_store(&store[i]);
 
 
 	/* Player is not dead, write the dungeon */
 	if (!p_ptr->is_dead)
 	{
-		/* Dump the dungeon */
-		wr_dungeon();
-
-		/* Dump the ghost */
-		wr_ghost();
+		wr_dungeon();	/* Dump the dungeon */
+		wr_ghost();		/* Dump the ghost */
 	}
 
 

@@ -1205,12 +1205,11 @@ static errr rd_dungeon(void)
 	int i, y, x;
 
 	s16b depth;
-	s16b py, px;
 	s16b ymax, xmax;
+	coord ploc;
 
 	byte count;
 	byte tmp8u;
-	u16b tmp16u;
 
 	u16b limit;
 
@@ -1219,13 +1218,9 @@ static errr rd_dungeon(void)
 
 	/* Header info */
 	rd_s16b(&depth);
-	rd_u16b(&tmp16u);
-	rd_s16b(&py);
-	rd_s16b(&px);
+	rd(ploc);
 	rd_s16b(&ymax);
 	rd_s16b(&xmax);
-	rd_u16b(&tmp16u);
-	rd_u16b(&tmp16u);
 
 
 	/* Ignore illegal dungeons */
@@ -1244,10 +1239,9 @@ static errr rd_dungeon(void)
 	}
 
 	/* Ignore illegal dungeons */
-	if ((px < 0) || (px >= DUNGEON_WID) ||
-	    (py < 0) || (py >= DUNGEON_HGT))
+	if ((ploc.x >= DUNGEON_WID) || (ploc.y >= DUNGEON_HGT))
 	{
-		note(format("Ignoring illegal player location (%d,%d).", py, px));
+		note(format("Ignoring illegal player location (%d,%d).", (int)(ploc.y), (int)(ploc.x)));
 		return (1);
 	}
 
@@ -1315,9 +1309,9 @@ static errr rd_dungeon(void)
 
 
 	/* Place player in dungeon */
-	if (!player_place(py, px))
+	if (!player_place(ploc.y, ploc.x))
 	{
-		note(format("Cannot place player (%d,%d)!", py, px));
+		note(format("Cannot place player (%d,%d)!", ploc.y, ploc.x));
 		return (-1);
 	}
 
