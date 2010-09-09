@@ -95,10 +95,10 @@ static void wr(const coord& loc)
 }
 
 /*! write a tvalsval */
-static void rd(tvalsval& id)
+static void wr(const tvalsval& id)
 {
-	wr_byte(&id.tval);
-	wr_byte(&id.sval);
+	wr_byte(id.tval);
+	wr_byte(id.sval);
 }
 
 /*
@@ -116,7 +116,7 @@ static void wr_item(const object_type *o_ptr)
 	/* Location */
 	wr(o_ptr->loc);
 
-	wr(o_ptr->obj_id)
+	wr(o_ptr->obj_id);
 	wr_s16b(o_ptr->pval);
 
 	wr_byte(o_ptr->pseudo);
@@ -544,7 +544,7 @@ static void wr_randarts(void)
 	{
 		artifact_type *a_ptr = &object_type::a_info[i];
 
-		wr(a_ptr->obj_id)
+		wr(a_ptr->obj_id);
 		wr_s16b(a_ptr->pval);
 
 		wr_s16b(a_ptr->to_h);

@@ -53,7 +53,7 @@
  */
 #define OLD_VERSION_MAJOR	3
 #define OLD_VERSION_MINOR	0
-#define OLD_VERSION_PATCH	8
+#define OLD_VERSION_PATCH	9
 
 
 /*! Local "savefile" pointer */
@@ -258,7 +258,7 @@ static errr rd_item(object_type *o_ptr)
 	rd(o_ptr->loc);
 
 	/* Type/Subtype */
-	rd((o_ptr->obj_id);
+	rd(o_ptr->obj_id);
 
 	/* tval/sval translators go here */
 
@@ -1006,7 +1006,7 @@ static errr rd_randarts(void)
 		{
 			artifact_type *a_ptr = &object_type::a_info[i];
 
-			rd(a_ptr->obj_id)
+			rd(a_ptr->obj_id);
 			rd_s16b(&a_ptr->pval);
 
 			rd_s16b(&a_ptr->to_h);

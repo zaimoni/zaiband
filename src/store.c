@@ -1449,7 +1449,7 @@ static bool item_is_boring_to_player(const object_type *o_ptr)
 		{
 			const object_type* const j_ptr = store[STORE_HOME].stock+i;
 			if (!j_ptr->k_idx) continue;
-			if (TV_DIGGING!=j_ptr->obj_id.tval && TV_HAFTED!=j_ptr->obj_id.tval && TV_POLEARM!=j_ptr->obj_id.tval || TV_SWORD!=j_ptr->obj_id.tval) continue;
+			if (TV_DIGGING!=j_ptr->obj_id.tval && TV_HAFTED!=j_ptr->obj_id.tval && TV_POLEARM!=j_ptr->obj_id.tval && TV_SWORD!=j_ptr->obj_id.tval) continue;
 			if (player_weapon_boring(o_ptr,f_ref,base_dam_rate,ideal_dam_rate,working_speed,canonical_speed,j_ptr)) return TRUE;
 		}
 
@@ -1458,7 +1458,7 @@ static bool item_is_boring_to_player(const object_type *o_ptr)
 		{
 			const object_type* const j_ptr = p_ptr->inventory+i;
 			if (!j_ptr->k_idx) continue;
-			if (TV_DIGGING!=j_ptr->obj_id.tval && TV_HAFTED!=j_ptr->obj_id.tval && TV_POLEARM!=j_ptr->obj_id.tval || TV_SWORD!=j_ptr->obj_id.tval) continue;
+			if (TV_DIGGING!=j_ptr->obj_id.tval && TV_HAFTED!=j_ptr->obj_id.tval && TV_POLEARM!=j_ptr->obj_id.tval && TV_SWORD!=j_ptr->obj_id.tval) continue;
 			if (player_weapon_boring(o_ptr,f_ref,base_dam_rate,ideal_dam_rate,working_speed,canonical_speed,j_ptr)) return TRUE;
 		}
 		break;
