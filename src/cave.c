@@ -759,7 +759,7 @@ void move_cursor_relative(coord g)
  *
  * Note the use of "Term_queue_char()" for efficiency.
  */
-static void print_rel_map(char c, byte a, coord g)
+static void print_rel_map(attr_char n, coord g)
 {
 	coord k;
 
@@ -798,12 +798,12 @@ static void print_rel_map(char c, byte a, coord g)
 		if (k.x >= t->wid) continue;
 
 		/* Hack -- Queue it */
-		Term_queue_char(t, k.x, k.y, a, c, 0, 0);
+		Term_queue_char(t, k.x, k.y, n._attr, n._char, 0, 0);
 
 		if (use_bigtile)
 		{
 			/* Mega-Hack : Queue dummy char */
-			if (a & 0x80)
+			if (n._attr & 0x80)
 				Term_queue_char(t, k.x+1, k.y, 255, -1, 0, 0);
 			else
 				Term_queue_char(t, k.x+1, k.y, TERM_WHITE, ' ', 0, 0);
@@ -830,7 +830,7 @@ void print_rel(attr_char n, coord g)
 	coord k,v;
 
 	/* Print on map sub-windows */
-	print_rel_map(n._char, n._attr, g);
+	print_rel_map(n, g);
 
 	/* Verify location */
 	if (g.y<Term->offset_y || g.x<Term->offset_x) return;
