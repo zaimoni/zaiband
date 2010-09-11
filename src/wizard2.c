@@ -417,7 +417,7 @@ static void strip_name(char *buf, int k_idx)
 	const char* str = k_ptr->name();
 
 	/* If not aware, use flavor */ 
-	if (!OPTION(cheat_know) && !k_ptr->aware && k_ptr->flavor) 
+	if (!OPTION(adult_know) && !k_ptr->aware && k_ptr->flavor) 
 		str = k_ptr->flavor_text(); 
 
 	/* Skip past leading characters */

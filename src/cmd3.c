@@ -818,12 +818,6 @@ void do_cmd_query_symbol(void)
 	/* Get a character, or abort */
 	if (!get_com("Enter character to be identified: ", &sym)) return;
 
-	/* Find that character info, and describe it */
-	for (i = 0; ident_info[i]; ++i)
-	{
-		if (sym == ident_info[i][0]) break;
-	}
-
 	/* Describe */
 	if (sym == KTRL('A'))
 	{
@@ -840,21 +834,17 @@ void do_cmd_query_symbol(void)
 		all = norm = TRUE;
 		strcpy(buf, "Non-unique monster list.");
 	}
-	else if (ident_info[i])
-	{
-		strnfmt(buf, sizeof(buf), "%c - %s.", sym, ident_info[i] + 2);
-	}
 	else
 	{
-		strnfmt(buf, sizeof(buf), "%c - %s.", sym, "Unknown Symbol");
+		/* Find that character info, and describe it */
+		for (i = 0; ident_info[i] && sym != ident_info[i][0]; ++i);
+
+		strnfmt(buf, sizeof(buf), "%c - %s.", sym,
+			(ident_info[i] ? ident_info[i] + 2 : "Unknown Symbol"));
 	}
 
-	/* Display the result */
-	prt(buf, 0, 0);
-
-
-	/* Allocate the "who" array */
-	C_MAKE(who, z_info->r_max, u16b);
+	prt(buf, 0, 0);	/* Display the result */
+	C_MAKE(who, z_info->r_max, u16b);	/* Allocate the "who" array */
 
 	/* Collect matching monsters */
 	for (n = 0, i = 1; i < z_info->r_max - 1; i++)
@@ -863,7 +853,7 @@ void do_cmd_query_symbol(void)
 		monster_lore *l_ptr = &monster_type::l_list[i];
 
 		/* Nothing to recall */
-		if (!OPTION(cheat_know) && !l_ptr->sights) continue;
+		if (!OPTION(adult_know) && !l_ptr->sights) continue;
 
 		/* Require non-unique monsters if needed */
 		if (norm && (r_ptr->flags[0] & RF0_UNIQUE)) continue;
@@ -878,21 +868,14 @@ void do_cmd_query_symbol(void)
 	/* Nothing to recall */
 	if (!n)
 	{
-		/* XXX XXX Free the "who" array */
-		FREE(who);
-
+		FREE(who);	/* Free the "who" array */
 		return;
 	}
 
 
-	/* Prompt */
-	put_str("Recall details? (k/p/y/n): ", 0, 40);
-
-	/* Query */
-	query = inkey();
-
-	/* Restore */
-	prt(buf, 0, 0);
+	put_str("Recall details? (k/p/y/n): ", 0, 40);	/* Prompt */
+	query = inkey();	/* Query */
+	prt(buf, 0, 0);	/* Restore */
 
 
 	/* Sort by kills (and level) */
@@ -912,9 +895,7 @@ void do_cmd_query_symbol(void)
 	/* Catch "escape" */
 	if (query != 'y')
 	{
-		/* XXX XXX Free the "who" array */
-		FREE(who);
-
+		FREE(who);	/* Free the "who" array */
 		return;
 	}
 
@@ -1001,9 +982,6 @@ void do_cmd_query_symbol(void)
 	}
 
 
-	/* Re-display the identity */
-	prt(buf, 0, 0);
-
-	/* Free the "who" array */
-	FREE(who);
+	prt(buf, 0, 0);	/* Re-display the identity */
+	FREE(who);	/* Free the "who" array */
 }

@@ -133,14 +133,14 @@
 #define OPT_birth_smart_packs		(OPT_BIRTH+15)
 #define OPT_birth_smart_learn		(OPT_BIRTH+16)
 #define OPT_birth_smart_cheat		(OPT_BIRTH+17)
+#define OPT_birth_know				(OPT_BIRTH+18)
 
 /* xxx xxx */
 #define OPT_cheat_peek				(OPT_CHEAT+0)
 #define OPT_cheat_hear				(OPT_CHEAT+1)
 #define OPT_cheat_room				(OPT_CHEAT+2)
 #define OPT_cheat_xtra				(OPT_CHEAT+3)
-#define OPT_cheat_know				(OPT_CHEAT+4)
-#define OPT_cheat_live				(OPT_CHEAT+5)
+#define OPT_cheat_live				(OPT_CHEAT+4)
 
 /* adult and score options are mirrors of birth and cheat options, respectively.  They must be synchronized. */
 /* xxx xxx */
@@ -162,13 +162,13 @@
 #define OPT_adult_smart_packs		(OPT_ADULT+15)
 #define OPT_adult_smart_learn		(OPT_ADULT+16)
 #define OPT_adult_smart_cheat		(OPT_ADULT+17)
+#define OPT_adult_know				(OPT_ADULT+18)
 /* xxx xxx */
 #define OPT_score_peek				(OPT_SCORE+0)
 #define OPT_score_hear				(OPT_SCORE+1)
 #define OPT_score_room				(OPT_SCORE+2)
 #define OPT_score_xtra				(OPT_SCORE+3)
-#define OPT_score_know				(OPT_SCORE+4)
-#define OPT_score_live				(OPT_SCORE+5)
+#define OPT_score_live				(OPT_SCORE+4)
 /* xxx xxx */
 
 #ifdef NDEBUG

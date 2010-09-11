@@ -3070,7 +3070,7 @@ static void do_cmd_knowledge_uniques(void)
 		monster_lore *l_ptr = &monster_type::l_list[i];
 
 		/* Require known monsters */
-		if (!OPTION(cheat_know) && !l_ptr->sights) continue;
+		if (!OPTION(adult_know) && !l_ptr->sights) continue;
 
 		/* Require unique monsters */
 		if (!(r_ptr->flags[0] & RF0_UNIQUE)) continue;
@@ -3096,16 +3096,12 @@ static void do_cmd_knowledge_uniques(void)
 		if (dead) killed++;
 
 		/* Print a message */
-		fprintf(fff, "     %-30s is %s\n",
-			    r_ptr->name(),
+		fprintf(fff, "     %-30s is %s\n", r_ptr->name(),
 			    (dead ? "dead" : "alive"));
 	}
 
-	/* Free the "who" array */
-	FREE(who);
-
-	/* Close the file */
-	my_fclose(fff);
+	FREE(who);	/* Free the "who" array */
+	my_fclose(fff);	/* Close the file */
 
 	/* Construct header line */
 	strnfmt(header, sizeof(header), "Uniques: %d known, %d killed", n, killed);

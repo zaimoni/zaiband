@@ -1089,6 +1089,7 @@ static bool player_birth_aux_1(void)
 	ZAIBAND_STATIC_ASSERT(OPT_adult_no_artifacts-OPT_ADULT==OPT_birth_no_artifacts-OPT_BIRTH);
 	ZAIBAND_STATIC_ASSERT(OPT_adult_rand_artifacts-OPT_ADULT==OPT_birth_rand_artifacts-OPT_BIRTH);
 	ZAIBAND_STATIC_ASSERT(OPT_adult_no_stacking-OPT_ADULT==OPT_birth_no_stacking-OPT_BIRTH);
+	ZAIBAND_STATIC_ASSERT(OPT_adult_know-OPT_ADULT==OPT_birth_know-OPT_BIRTH);
 
 	C_COPY(op_ptr->opt+OPT_ADULT,op_ptr->opt+OPT_BIRTH,OPT_CHEAT-OPT_BIRTH);
 
@@ -1098,7 +1099,6 @@ static bool player_birth_aux_1(void)
 	ZAIBAND_STATIC_ASSERT(OPT_score_hear-OPT_SCORE==OPT_cheat_hear-OPT_CHEAT);
 	ZAIBAND_STATIC_ASSERT(OPT_score_room-OPT_SCORE==OPT_cheat_room-OPT_CHEAT);
 	ZAIBAND_STATIC_ASSERT(OPT_score_xtra-OPT_SCORE==OPT_cheat_xtra-OPT_CHEAT);
-	ZAIBAND_STATIC_ASSERT(OPT_score_know-OPT_SCORE==OPT_cheat_know-OPT_CHEAT);
 	ZAIBAND_STATIC_ASSERT(OPT_score_live-OPT_SCORE==OPT_cheat_live-OPT_CHEAT);
 
 	C_COPY(op_ptr->opt+OPT_SCORE,op_ptr->opt+OPT_CHEAT,OPT_ADULT-OPT_CHEAT);

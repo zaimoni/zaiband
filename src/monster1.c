@@ -1030,9 +1030,6 @@ static void cheat_monster_lore(const monster_race& r, monster_lore& lore)
 	int i;
 
 
-	/* Hack -- Maximal kills */
-	lore.tkills = MAX_S16B;
-
 	/* Hack -- Maximal info */
 	lore.wake = lore.ignore = UCHAR_MAX;
 
@@ -1103,7 +1100,7 @@ void describe_monster(int r_idx, bool spoilers)
 	}
 
 	/* Cheat -- know everything */
-	if (OPTION(cheat_know) || spoilers) cheat_monster_lore(*r_ptr, lore);
+	if (OPTION(adult_know) || spoilers) cheat_monster_lore(*r_ptr, lore);
 
 	/* Show kills of monster vs. player(s) */
 	if (!spoilers && OPTION(show_details))

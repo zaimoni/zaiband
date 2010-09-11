@@ -2133,28 +2133,28 @@ void message_pain(const m_idx_type m_idx, int dam)
 	/* Unlike the others, these don't make noise when hit */
 	if (strchr("jmvQ", race_char))
 	{
-		msg_format(jelly_pain_msg[pain_index(percentage)], m_name);
+		msg_format(jelly_pain_msg[pain_level], m_name);
 	}
 
 	/* Dogs and Hounds */
 	else if (strchr("CZ", race_char))
 	{
-		msg_format(hound_pain_msg[pain_index(percentage)], m_name);
-		apply_noise(m_ptr->loc, pain_noise_intensity[pain_index(percentage)]);
+		msg_format(hound_pain_msg[pain_level], m_name);
+		apply_noise(m_ptr->loc, pain_noise_intensity[pain_level]);
 	}
 
 	/* One type of monsters (ignore,squeal,shriek) */
 	else if (strchr("FIKMRSXabclqrst", race_char))
 	{
-		msg_format(squeal_pain_msg[pain_index(percentage)], m_name);
-		apply_noise(m_ptr->loc, pain_noise_intensity[pain_index(percentage)]);
+		msg_format(squeal_pain_msg[pain_level], m_name);
+		apply_noise(m_ptr->loc, pain_noise_intensity[pain_level]);
 	}
 
 	/* Another type of monsters (shrug,cry,scream) */
 	else
 	{
-		msg_format(scream_pain_msg[pain_index(percentage)], m_name);
-		apply_noise(m_ptr->loc, pain_noise_intensity[pain_index(percentage)]);
+		msg_format(scream_pain_msg[pain_level], m_name);
+		apply_noise(m_ptr->loc, pain_noise_intensity[pain_level]);
 	}
 	}
 }

@@ -4,6 +4,9 @@ META: edit format break
 * V SVN 944 breaks top-level Makefile for Zaiband; remember to proofread before release and counter-patch
 
 [resync dirs: src, lib/edit]
+Changes Zaiband 3.0.10
+- Know everything about monsters changed to Ironman (default-true) option from Cheat (default-false) option.
+
 Changes Zaiband 3.0.9
 - The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:
 ** ?Word of Recall
