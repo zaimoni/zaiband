@@ -191,7 +191,7 @@ extern bool no_lite(void);
 extern bool cave_valid_bold(int y, int x);
 extern bool feat_supports_lighting(int feat);
 extern void move_cursor_relative(coord g);
-extern void print_rel(char c, byte a, coord g);
+extern void print_rel(attr_char n, coord g);
 extern void note_spot(coord g);
 extern void lite_spot(coord g);
 extern void prt_map(void);

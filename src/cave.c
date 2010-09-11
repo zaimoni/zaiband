@@ -825,12 +825,12 @@ static void print_rel_map(char c, byte a, coord g)
  *
  * The main screen will always be at least 24x80 in size.
  */
-void print_rel(char c, byte a, coord g)
+void print_rel(attr_char n, coord g)
 {
 	coord k,v;
 
 	/* Print on map sub-windows */
-	print_rel_map(c, a, g);
+	print_rel_map(n._char, n._attr, g);
 
 	/* Verify location */
 	if (g.y<Term->offset_y || g.x<Term->offset_x) return;
@@ -853,12 +853,12 @@ void print_rel(char c, byte a, coord g)
 	if (use_bigtile) v.x += k.x;
 
 	/* Hack -- Queue it */
-	Term_queue_char(Term, v.x, v.y, a, c, 0, 0);
+	Term_queue_char(Term, v.x, v.y, n._attr, n._char, 0, 0);
 
 	if (use_bigtile)
 	{
 		/* Mega-Hack : Queue dummy char */
-		if (a & 0x80)
+		if (n._attr & 0x80)
 			Term_queue_char(Term, v.x+1, v.y, 255, -1, 0, 0);
 		else
 			Term_queue_char(Term, v.x+1, v.y, TERM_WHITE, ' ', 0, 0);

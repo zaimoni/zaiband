@@ -866,7 +866,7 @@ void do_cmd_fire(void)
 		if (player_can_see_bold(t.y, t.x))
 		{
 			/* Visual effects */
-			print_rel(missile._char, missile._attr, t);
+			print_rel(missile, t);
 			move_cursor_relative(t);
 
 			Term_fresh();
@@ -1188,7 +1188,7 @@ void do_cmd_throw(void)
 		if (player_can_see_bold(t.y, t.x))
 		{
 			/* Visual effects */
-			print_rel(missile._char, missile._attr, t);
+			print_rel(missile, t);
 			move_cursor_relative(t);
 
 			Term_fresh();

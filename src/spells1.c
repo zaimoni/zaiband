@@ -3480,11 +3480,8 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 			/* Only do visuals if the player can "see" the bolt */
 			if (player_has_los_bold(g.y, g.x))
 			{
-				/* Obtain the bolt pict */
-				attr_char p = bolt_pict(o.y, o.x, g.y, g.x, typ);
-
 				/* Visual effects */
-				print_rel(p._char, p._attr, g);
+				print_rel(bolt_pict(o.y, o.x, g.y, g.x, typ), g);
 				move_cursor_relative(g);
 
 				Term_fresh();
@@ -3498,11 +3495,8 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 				/* Display "beam" grids */
 				if (flg & (PROJECT_BEAM))
 				{
-					/* Obtain the explosion pict */
-					p = bolt_pict(g.y, g.x, g.y, g.x, typ);
-
 					/* Visual effects */
-					print_rel(p._char, p._attr, g);
+					print_rel(bolt_pict(g.y, g.x, g.y, g.x, typ), g);
 				}
 
 				/* Hack -- Activate delay */
@@ -3572,13 +3566,10 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 				/* Only do visuals if the player can "see" the blast */
 				if (player_has_los_bold(g.y, g.x))
 				{
-					/* Obtain the explosion pict */
-					const attr_char p = bolt_pict(g.y, g.x, g.y, g.x, typ);
-
 					drawn = TRUE;
 
 					/* Visual effects -- Display */
-					print_rel(p._char, p._attr, g);
+					print_rel(bolt_pict(g.y, g.x, g.y, g.x, typ), g);
 				}
 			}
 

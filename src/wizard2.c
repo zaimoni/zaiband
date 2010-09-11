@@ -38,32 +38,17 @@ static void do_cmd_wiz_hack_ben(void)
 		{
 			for (t.x = Term->offset_x; t.x < Term->offset_x + SCREEN_WID; t.x++)
 			{
-				byte a = TERM_RED;
-
 				if (!in_bounds_fully(t.y, t.x)) continue;
 
 				/* Display proper cost */
 				if (cave_cost[t.y][t.x] != relay_flow_depth) continue;
 
 				/* Reliability in yellow */
-				if (cave_when[t.y][t.x] == cave_when[p_ptr->loc.y][p_ptr->loc.x])
-				{
-					a = TERM_YELLOW;
-				}
+				const attr_char n = {(cave_when[t.y][t.x] == cave_when[p_ptr->loc.y][p_ptr->loc.x] ? TERM_YELLOW : TERM_RED),
+						(t==p_ptr->loc ? '@' : cave_floor_bold(t.y, t.x) ? '*' : '#')};
 
-				/* Display player/floors/walls */
-				if (t==p_ptr->loc)
-				{
-					print_rel('@', a, t);
-				}
-				else if (cave_floor_bold(t.y, t.x))
-				{
-					print_rel('*', a, t);
-				}
-				else
-				{
-					print_rel('#', a, t);
-				}
+
+				print_rel(n,t);
 			}
 		}
 
@@ -1376,8 +1361,6 @@ static void do_cmd_wiz_query(void)
 	{
 		for (t.x = Term->offset_x; t.x < Term->offset_x + SCREEN_WID; t.x++)
 		{
-			byte a = TERM_RED;
-
 			if (!in_bounds_fully(t.y, t.x)) continue;
 
 			/* Given mask, show only those grids */
@@ -1387,21 +1370,10 @@ static void do_cmd_wiz_query(void)
 			if (!wiz_mask && (cave_info[t.y][t.x] & (CAVE_MARK))) continue;
 
 			/* Color */
-			if (cave_floor_bold(t.y, t.x)) a = TERM_YELLOW;
+			const attr_char n = {(cave_floor_bold(t.y, t.x) ? TERM_YELLOW :  TERM_RED), 
+					  	(t==p_ptr->loc ? '@' : cave_floor_bold(t.y, t.x) ? '*' : '#')};
 
-			/* Display player/floors/walls */
-			if (t==p_ptr->loc)
-			{
-				print_rel('@', a, t);
-			}
-			else if (cave_floor_bold(t.y, t.x))
-			{
-				print_rel('*', a, t);
-			}
-			else
-			{
-				print_rel('#', a, t);
-			}
+			print_rel(n,t);
 		}
 	}
 
