@@ -1952,7 +1952,7 @@ void do_cmd_visuals(void)
 
 				/* Dump the monster attr/char info */
 				fprintf(fff, "R:%d:0x%02X:0x%02X\n\n", i,
-				        (byte)(r_ptr->x_attr), (byte)(r_ptr->x_char));
+				        (byte)(r_ptr->x._attr), (byte)(r_ptr->x._char));
 			}
 
 			/* All done */
@@ -2020,7 +2020,7 @@ void do_cmd_visuals(void)
 
 				/* Dump the object attr/char info */
 				fprintf(fff, "K:%d:0x%02X:0x%02X\n\n", i,
-				        (byte)(k_ptr->x_attr), (byte)(k_ptr->x_char));
+				        (byte)(k_ptr->x._attr), (byte)(k_ptr->x._char));
 			}
 
 			/* All done */
@@ -2088,7 +2088,7 @@ void do_cmd_visuals(void)
 
 				/* Dump the feature attr/char info */
 				fprintf(fff, "F:%d:0x%02X:0x%02X\n\n", i,
-				        (byte)(f_ptr->x_attr), (byte)(f_ptr->x_char));
+				        (byte)(f_ptr->x._attr), (byte)(f_ptr->x._char));
 			}
 
 			/* All done */
@@ -2153,7 +2153,7 @@ void do_cmd_visuals(void)
 
 				/* Dump the flavor attr/char info */
 				fprintf(fff, "L:%d:0x%02X:0x%02X\n\n", i,
-				        (byte)(flavor_ptr->x_attr), (byte)(flavor_ptr->x_char));
+				        (byte)(flavor_ptr->x._attr), (byte)(flavor_ptr->x._char));
 			}
 
 			/* All done */
@@ -2182,10 +2182,10 @@ void do_cmd_visuals(void)
 			{
 				monster_race *r_ptr = &monster_type::r_info[r];
 
-				byte da = (byte)(r_ptr->d_attr);
-				byte dc = (byte)(r_ptr->d_char);
-				byte ca = (byte)(r_ptr->x_attr);
-				byte cc = (byte)(r_ptr->x_char);
+				byte da = (byte)(r_ptr->d._attr);
+				byte dc = (byte)(r_ptr->d._char);
+				byte ca = (byte)(r_ptr->x._attr);
+				byte cc = (byte)(r_ptr->x._char);
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2233,10 +2233,10 @@ void do_cmd_visuals(void)
 				/* Analyze */
 				if (cx == 'n') r = (r + z_info->r_max + 1) % z_info->r_max;
 				if (cx == 'N') r = (r + z_info->r_max - 1) % z_info->r_max;
-				if (cx == 'a') r_ptr->x_attr = (byte)(ca + 1);
-				if (cx == 'A') r_ptr->x_attr = (byte)(ca - 1);
-				if (cx == 'c') r_ptr->x_char = (byte)(cc + 1);
-				if (cx == 'C') r_ptr->x_char = (byte)(cc - 1);
+				if (cx == 'a') r_ptr->x._attr = (byte)(ca + 1);
+				if (cx == 'A') r_ptr->x._attr = (byte)(ca - 1);
+				if (cx == 'c') r_ptr->x._char = (byte)(cc + 1);
+				if (cx == 'C') r_ptr->x._char = (byte)(cc - 1);
 			}
 		}
 
@@ -2253,10 +2253,10 @@ void do_cmd_visuals(void)
 			{
 				object_kind *k_ptr = &object_type::k_info[k];
 
-				byte da = (byte)(k_ptr->d_attr);
-				byte dc = (byte)(k_ptr->d_char);
-				byte ca = (byte)(k_ptr->x_attr);
-				byte cc = (byte)(k_ptr->x_char);
+				byte da = (byte)(k_ptr->d._attr);
+				byte dc = (byte)(k_ptr->d._char);
+				byte ca = (byte)(k_ptr->x._attr);
+				byte cc = (byte)(k_ptr->x._char);
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2304,10 +2304,10 @@ void do_cmd_visuals(void)
 				/* Analyze */
 				if (cx == 'n') k = (k + z_info->k_max + 1) % z_info->k_max;
 				if (cx == 'N') k = (k + z_info->k_max - 1) % z_info->k_max;
-				if (cx == 'a') object_type::k_info[k].x_attr = (byte)(ca + 1);
-				if (cx == 'A') object_type::k_info[k].x_attr = (byte)(ca - 1);
-				if (cx == 'c') object_type::k_info[k].x_char = (byte)(cc + 1);
-				if (cx == 'C') object_type::k_info[k].x_char = (byte)(cc - 1);
+				if (cx == 'a') object_type::k_info[k].x._attr = (byte)(ca + 1);
+				if (cx == 'A') object_type::k_info[k].x._attr = (byte)(ca - 1);
+				if (cx == 'c') object_type::k_info[k].x._char = (byte)(cc + 1);
+				if (cx == 'C') object_type::k_info[k].x._char = (byte)(cc - 1);
 			}
 		}
 
@@ -2324,10 +2324,10 @@ void do_cmd_visuals(void)
 			{
 				feature_type *f_ptr = &feature_type::f_info[f];
 
-				byte da = (byte)(f_ptr->d_attr);
-				byte dc = (byte)(f_ptr->d_char);
-				byte ca = (byte)(f_ptr->x_attr);
-				byte cc = (byte)(f_ptr->x_char);
+				byte da = (byte)(f_ptr->d._attr);
+				byte dc = (byte)(f_ptr->d._char);
+				byte ca = (byte)(f_ptr->x._attr);
+				byte cc = (byte)(f_ptr->x._char);
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2375,10 +2375,10 @@ void do_cmd_visuals(void)
 				/* Analyze */
 				if (cx == 'n') f = (f + z_info->f_max + 1) % z_info->f_max;
 				if (cx == 'N') f = (f + z_info->f_max - 1) % z_info->f_max;
-				if (cx == 'a') feature_type::f_info[f].x_attr = (byte)(ca + 1);
-				if (cx == 'A') feature_type::f_info[f].x_attr = (byte)(ca - 1);
-				if (cx == 'c') feature_type::f_info[f].x_char = (byte)(cc + 1);
-				if (cx == 'C') feature_type::f_info[f].x_char = (byte)(cc - 1);
+				if (cx == 'a') feature_type::f_info[f].x._attr = (byte)(ca + 1);
+				if (cx == 'A') feature_type::f_info[f].x._attr = (byte)(ca - 1);
+				if (cx == 'c') feature_type::f_info[f].x._char = (byte)(cc + 1);
+				if (cx == 'C') feature_type::f_info[f].x._char = (byte)(cc - 1);
 			}
 		}
 
@@ -2395,10 +2395,10 @@ void do_cmd_visuals(void)
 			{
 				flavor_type *flavor_ptr = &object_kind::flavor_info[f];
 
-				byte da = (byte)(flavor_ptr->d_attr);
-				byte dc = (byte)(flavor_ptr->d_char);
-				byte ca = (byte)(flavor_ptr->x_attr);
-				byte cc = (byte)(flavor_ptr->x_char);
+				byte da = (byte)(flavor_ptr->d._attr);
+				byte dc = (byte)(flavor_ptr->d._char);
+				byte ca = (byte)(flavor_ptr->x._attr);
+				byte cc = (byte)(flavor_ptr->x._char);
 
 				/* Label the object */
 				Term_putstr(5, 17, -1, TERM_WHITE,
@@ -2446,10 +2446,10 @@ void do_cmd_visuals(void)
 				/* Analyze */
 				if (cx == 'n') f = (f + z_info->flavor_max + 1) % z_info->flavor_max;
 				if (cx == 'N') f = (f + z_info->flavor_max - 1) % z_info->flavor_max;
-				if (cx == 'a') object_kind::flavor_info[f].x_attr = (byte)(ca + 1);
-				if (cx == 'A') object_kind::flavor_info[f].x_attr = (byte)(ca - 1);
-				if (cx == 'c') object_kind::flavor_info[f].x_char = (byte)(cc + 1);
-				if (cx == 'C') object_kind::flavor_info[f].x_char = (byte)(cc - 1);
+				if (cx == 'a') object_kind::flavor_info[f].x._attr = (byte)(ca + 1);
+				if (cx == 'A') object_kind::flavor_info[f].x._attr = (byte)(ca - 1);
+				if (cx == 'c') object_kind::flavor_info[f].x._char = (byte)(cc + 1);
+				if (cx == 'C') object_kind::flavor_info[f].x._char = (byte)(cc - 1);
 			}
 		}
 

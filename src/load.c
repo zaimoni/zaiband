@@ -346,7 +346,7 @@ static errr rd_item(object_type *o_ptr)
 
 		/* Get the correct fields */
 		o_ptr->ac = k_ptr->ac;
-		o_ptr->d = k_ptr->d;
+		o_ptr->d = k_ptr->dice;
 
 		/* Get the correct weight */
 		o_ptr->weight = k_ptr->weight;
@@ -380,7 +380,7 @@ static errr rd_item(object_type *o_ptr)
 
 	/* Get the standard fields */
 	o_ptr->ac = k_ptr->ac;
-	o_ptr->d = k_ptr->d;
+	o_ptr->d = k_ptr->dice;
 
 	/* Get the standard weight */
 	o_ptr->weight = k_ptr->weight;

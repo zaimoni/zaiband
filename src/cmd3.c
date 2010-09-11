@@ -862,7 +862,7 @@ void do_cmd_query_symbol(void)
 		if (uniq && !(r_ptr->flags[0] & RF0_UNIQUE)) continue;
 
 		/* Collect "appropriate" monsters */
-		if (all || (r_ptr->d_char == sym)) who[n++] = i;
+		if (all || (r_ptr->d._char == sym)) who[n++] = i;
 	}
 
 	/* Nothing to recall */

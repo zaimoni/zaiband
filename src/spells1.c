@@ -325,14 +325,13 @@ static byte spell_color(int type)
  *
  * If the distance is not "one", we (may) return "*".
  */
-static u16b bolt_pict(int y, int x, int ny, int nx, int typ)
+static attr_char bolt_pict(int y, int x, int ny, int nx, int typ)
 {
 	int base;
 
 	byte k;
 
-	byte a;
-	char c;
+	attr_char ret;
 
 	if (!(use_graphics && (arg_graphics == GRAPHICS_DAVID_GERVAIS)))
 	{
@@ -358,8 +357,8 @@ static u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 		k = spell_color(typ);
 
 		/* Obtain attr/char */
-		a = misc_to_attr[base+k];
-		c = misc_to_char[base+k];
+		ret._attr = misc_to_attr[base+k];
+		ret._char = misc_to_char[base+k];
 	}
 	else
 	{
@@ -387,12 +386,12 @@ static u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 		else k = typ;
 
 		/* Obtain attr/char */
-		a = misc_to_attr[base+k];
-		c = misc_to_char[base+k] + add;
+		ret._attr = misc_to_attr[base+k];
+		ret._char = misc_to_char[base+k] + add;
 	}
 
 	/* Create pict */
-	return (PICT(a,c));
+	return ret;
 }
 
 
@@ -2196,7 +2195,7 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 		case GF_OLD_DRAIN:	/* Drain Life */
 		{
 			if ((r_ptr->flags[2] & (RF2_UNDEAD | RF2_DEMON)) ||
-			    strchr("Egv", r_ptr->d_char))
+			    strchr("Egv", r_ptr->d._char))
 			{
 				if (seen) l_ptr->flags[2] |= (r_ptr->flags[2] & (RF2_UNDEAD | RF2_DEMON));
 
@@ -3481,20 +3480,11 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 			/* Only do visuals if the player can "see" the bolt */
 			if (player_has_los_bold(g.y, g.x))
 			{
-				u16b p;
-
-				byte a;
-				char c;
-
 				/* Obtain the bolt pict */
-				p = bolt_pict(o.y, o.x, g.y, g.x, typ);
-
-				/* Extract attr/char */
-				a = PICT_A(p);
-				c = PICT_C(p);
+				attr_char p = bolt_pict(o.y, o.x, g.y, g.x, typ);
 
 				/* Visual effects */
-				print_rel(c, a, g);
+				print_rel(p._char, p._attr, g);
 				move_cursor_relative(g);
 
 				Term_fresh();
@@ -3511,12 +3501,8 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 					/* Obtain the explosion pict */
 					p = bolt_pict(g.y, g.x, g.y, g.x, typ);
 
-					/* Extract attr/char */
-					a = PICT_A(p);
-					c = PICT_C(p);
-
 					/* Visual effects */
-					print_rel(c, a, g);
+					print_rel(p._char, p._attr, g);
 				}
 
 				/* Hack -- Activate delay */
@@ -3586,22 +3572,13 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 				/* Only do visuals if the player can "see" the blast */
 				if (player_has_los_bold(g.y, g.x))
 				{
-					u16b p;
-
-					byte a;
-					char c;
+					/* Obtain the explosion pict */
+					const attr_char p = bolt_pict(g.y, g.x, g.y, g.x, typ);
 
 					drawn = TRUE;
 
-					/* Obtain the explosion pict */
-					p = bolt_pict(g.y, g.x, g.y, g.x, typ);
-
-					/* Extract attr/char */
-					a = PICT_A(p);
-					c = PICT_C(p);
-
 					/* Visual effects -- Display */
-					print_rel(c, a, g);
+					print_rel(p._char, p._attr, g);
 				}
 			}
 

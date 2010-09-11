@@ -164,11 +164,8 @@ struct feature_type
 
 	s16b unused;		/**< Extra bytes (unused) */
 
-	byte d_attr;		/**< Default feature attribute */
-	char d_char;		/**< Default feature character */
-
-	byte x_attr;		/**< Desired feature attribute */
-	char x_char;		/**< Desired feature character */
+	attr_char d;		/**< Default feature attribute/character */
+	attr_char x;		/**< Desired feature attribute/character */
 
 	const char* name() const {return f_name+_name;};
 	const char* text() const {return f_text+_text;};
@@ -183,11 +180,8 @@ struct flavor_type
 	
 	tvalsval obj_id;	/**< Object kind index */
 
-	byte d_attr;    /* Default flavor attribute */
-	char d_char;    /* Default flavor character */
-
-	byte x_attr;    /* Desired flavor attribute */
-	char x_char;    /* Desired flavor character */
+	attr_char d;	/**< Default flavor attribute/character */
+	attr_char x;	/**< Desired flavor attribute/character */
 
 	const char* text() const {return flavor_text+_text;};
 };
@@ -220,7 +214,7 @@ struct object_kind
 
 	s16b ac;			/**< Base armor */
 
-	dice_sides d;		/**< Damage dice/sides */
+	dice_sides dice;	/**< Damage dice/sides */
 
 	s16b weight;		/**< Weight */
 
@@ -235,12 +229,8 @@ struct object_kind
 	byte extra;			/**< Something */
 
 
-	byte d_attr;		/**< Default object attribute */
-	char d_char;		/**< Default object character */
-
-
-	byte x_attr;		/**< Desired object attribute */
-	char x_char;		/**< Desired object character */
+	attr_char d;		/**< Default object attribute/character */
+	attr_char x;		/**< Desired object attribute/character */
 
 	range_large_spec time;	/**< recharge time; dice defaults to 1 right now, redo later */
 
@@ -255,10 +245,11 @@ struct object_kind
 	const char* flavor_text() const {return object_kind::flavor_info[flavor].text();};
 
 	/* display interpretation */
-	byte attr_user() const {return use_flavor_glyph() ? flavor_info[flavor].x_attr : x_attr;};
-	char char_user() const {return use_flavor_glyph() ? flavor_info[flavor].x_char : x_char;};
-	byte attr_default() const {return use_flavor_glyph() ? flavor_info[flavor].d_attr : d_attr;};
-	char char_default() const {return use_flavor_glyph() ? flavor_info[flavor].d_char : d_char;};
+	attr_char user() const {return use_flavor_glyph() ? flavor_info[flavor].x : x;};
+	byte attr_user() const {return use_flavor_glyph() ? flavor_info[flavor].x._attr : x._attr;};
+	char char_user() const {return use_flavor_glyph() ? flavor_info[flavor].x._char : x._char;};
+	byte attr_default() const {return use_flavor_glyph() ? flavor_info[flavor].d._attr : d._attr;};
+	char char_default() const {return use_flavor_glyph() ? flavor_info[flavor].d._char : d._char;};
 
 	/* more complicated functions */
 /*
@@ -424,11 +415,8 @@ struct monster_race
 	byte level;				/**< Level of creature */
 	byte rarity;			/**< Rarity of creature */
 
-	byte d_attr;			/**< Default monster attribute */
-	char d_char;			/**< Default monster character */
-
-	byte x_attr;			/**< Desired monster attribute */
-	char x_char;			/**< Desired monster character */
+	attr_char d;			/**< Default monster attribute/character */
+	attr_char x;			/**< Desired monster attribute/character */
 
 	byte max_num;			/**< Maximum population allowed per level */
 	byte cur_num;			/**< Monster population on current level */

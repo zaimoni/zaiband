@@ -1498,13 +1498,13 @@ static void build_type4(coord g)
  */
 static bool vault_aux_jelly(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Decline unique monsters */
 	if (r_ptr->flags[0] & RF0_UNIQUE) return (FALSE);
 
 	/* Require icky thing, jelly, mold, or mushroom */
-	if (!strchr("ijm,", r_ptr->d_char)) return (FALSE);
+	if (!strchr("ijm,", r_ptr->d._char)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -1552,13 +1552,13 @@ static bool vault_aux_undead(int r_idx)
  */
 static bool vault_aux_orc(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Decline unique monsters */
 	if (r_ptr->flags[0] & RF0_UNIQUE) return (FALSE);
 
 	/* Hack -- Require "o" monsters */
-	if (!strchr("o", r_ptr->d_char)) return (FALSE);
+	if (!strchr("o", r_ptr->d._char)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -1570,13 +1570,13 @@ static bool vault_aux_orc(int r_idx)
  */
 static bool vault_aux_troll(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Decline unique monsters */
 	if (r_ptr->flags[0] & RF0_UNIQUE) return (FALSE);
 
 	/* Hack -- Require "T" monsters */
-	if (!strchr("T", r_ptr->d_char)) return (FALSE);
+	if (!strchr("T", r_ptr->d._char)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -1588,13 +1588,13 @@ static bool vault_aux_troll(int r_idx)
  */
 static bool vault_aux_giant(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Decline unique monsters */
 	if (r_ptr->flags[0] & RF0_UNIQUE) return (FALSE);
 
 	/* Hack -- Require "P" monsters */
-	if (!strchr("P", r_ptr->d_char)) return (FALSE);
+	if (!strchr("P", r_ptr->d._char)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -1612,13 +1612,13 @@ static u32b vault_aux_dragon_mask0;
  */
 static bool vault_aux_dragon(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Decline unique monsters */
 	if (r_ptr->flags[0] & RF0_UNIQUE) return FALSE;
 
 	/* Hack -- Require "d" or "D" monsters */
-	if (!strchr("Dd", r_ptr->d_char)) return FALSE;
+	if (!strchr("Dd", r_ptr->d._char)) return FALSE;
 
 	/* Hack -- Require correct "breath attack" */
 	if (r_ptr->spell_flags[0] != vault_aux_dragon_mask0) return FALSE;
@@ -1633,13 +1633,13 @@ static bool vault_aux_dragon(int r_idx)
  */
 static bool vault_aux_demon(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Decline unique monsters */
 	if (r_ptr->flags[0] & RF0_UNIQUE) return (FALSE);
 
 	/* Hack -- Require "U" monsters */
-	if (!strchr("U", r_ptr->d_char)) return (FALSE);
+	if (!strchr("U", r_ptr->d._char)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);

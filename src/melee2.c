@@ -2116,7 +2116,7 @@ static void mspell_S_KIN(int m_idx_ok)
 		                ((r_ptr->flags[0] & RF0_UNIQUE) ? "minions" : "kin"));
 
 	/* Hack -- Set the letter of the monsters to summon */
-	summon_kin_type = r_ptr->d_char;
+	summon_kin_type = r_ptr->d._char;
 
 	do	count += summon_specific(m.loc, rlev, SUMMON_KIN);
 	while(0 < --k);

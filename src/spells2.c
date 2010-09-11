@@ -2198,7 +2198,7 @@ bool banishment(void)
 		monster_race* const r_ptr = m_ptr->race();
 		if (	m_ptr->r_idx						/* only live monsters */
 			&& 	!(r_ptr->flags[0] & RF0_UNIQUE)		/* cannot banish uniques */
-			&&	r_ptr->d_char != typ)				/* only the right monsters */
+			&&	r_ptr->d._char != typ)				/* only the right monsters */
 		{
 		delete_monster_idx(i);				/* Delete the monster */
 

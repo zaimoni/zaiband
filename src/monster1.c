@@ -1150,19 +1150,10 @@ void describe_monster(int r_idx, bool spoilers)
  */
 void roff_top(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
-	byte a1, a2;
-	char c1, c2;
-
-
-	/* Get the chars */
-	c1 = r_ptr->d_char;
-	c2 = r_ptr->x_char;
-
-	/* Get the attrs */
-	a1 = r_ptr->d_attr;
-	a2 = r_ptr->x_attr;
+	const attr_char d = r_ptr->d;
+	const attr_char x = r_ptr->x;
 
 
 	/* Clear the top line */
@@ -1182,13 +1173,13 @@ void roff_top(int r_idx)
 
 	/* Append the "standard" attr/char info */
 	Term_addstr(-1, TERM_WHITE, " ('");
-	Term_addch(a1, c1);
+	Term_addch(d._attr, d._char);
 	Term_addstr(-1, TERM_WHITE, "')");
 
 	/* Append the "optional" attr/char info */
 	Term_addstr(-1, TERM_WHITE, "/('");
-	Term_addch(a2, c2);
-	if (use_bigtile && (a2 & 0x80)) Term_addch(255, -1);
+	Term_addch(x._attr, x._char);
+	if (use_bigtile && (x._attr & 0x80)) Term_addch(255, -1);
 	Term_addstr(-1, TERM_WHITE, "'):");
 }
 

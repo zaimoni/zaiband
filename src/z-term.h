@@ -23,7 +23,19 @@
 
 #ifndef __cplusplus
 typedef struct term_win term_win;
+typedef struct attr_char attr_char;
 #endif
+
+/* utility struct */
+struct attr_char
+{
+	byte _attr;	/**< object type */
+	char _char;	/**< object sub-type */
+
+};
+
+inline bool operator==(const attr_char lhs, const attr_char rhs) {return lhs._attr==rhs._attr && lhs._char==rhs._char;}
+inline bool operator!=(const attr_char lhs, const attr_char rhs) {return !(lhs==rhs);}
 
 /**
  * A term_win is a "window" for a Term

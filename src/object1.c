@@ -252,40 +252,28 @@ void reset_visuals(bool unused)
 	for (i = 0; i < z_info->f_max; i++)
 	{
 		feature_type* const f_ptr = &feature_type::f_info[i];
-
-		/* Assume we will use the underlying values */
-		f_ptr->x_attr = f_ptr->d_attr;
-		f_ptr->x_char = f_ptr->d_char;
+		f_ptr->x = f_ptr->d;	/* Default attr/char */
 	}
 
 	/* Extract default attr/char code for objects */
 	for (i = 0; i < z_info->k_max; i++)
 	{
 		object_kind *k_ptr = &object_type::k_info[i];
-
-		/* Default attr/char */
-		k_ptr->x_attr = k_ptr->d_attr;
-		k_ptr->x_char = k_ptr->d_char;
+		k_ptr->x = k_ptr->d;	/* Default attr/char */
 	}
 
 	/* Extract default attr/char code for monsters */
 	for (i = 0; i < z_info->r_max; i++)
 	{
-		monster_race *r_ptr = &monster_type::r_info[i];
-
-		/* Default attr/char */
-		r_ptr->x_attr = r_ptr->d_attr;
-		r_ptr->x_char = r_ptr->d_char;
+		monster_race* const r_ptr = &monster_type::r_info[i];
+		r_ptr->x = r_ptr->d;	/* Default attr/char */
 	}
 
 	/* Extract default attr/char code for flavors */
 	for (i = 0; i < z_info->flavor_max; i++)
 	{
-		flavor_type *flavor_ptr = &object_kind::flavor_info[i];
-
-		/* Default attr/char */
-		flavor_ptr->x_attr = flavor_ptr->d_attr;
-		flavor_ptr->x_char = flavor_ptr->d_char;
+		flavor_type* const flavor_ptr = &object_kind::flavor_info[i];
+		flavor_ptr->x = flavor_ptr->d;	/* Default attr/char */
 	}
 
 	/* Extract attr/chars for inventory objects (by tval) */

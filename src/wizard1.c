@@ -642,7 +642,7 @@ static void spoil_mon_desc(const char* const fname)
 		sprintf(exp, "%ld", (long)(r_ptr->mexp));
 
 		/* Hack -- use visual instead */
-		strnfmt(exp, sizeof(exp), "%s '%c'", attr_to_text(r_ptr->d_attr), r_ptr->d_char);
+		strnfmt(exp, sizeof(exp), "%s '%c'", attr_to_text(r_ptr->d._attr), r_ptr->d._char);
 
 		/* Dump the info */
 		fprintf(fff, "%-40.40s%4s%4s%6s%8s%4s  %11.11s\n",
@@ -759,10 +759,10 @@ static void spoil_mon_info(const char* const fname)
 		text_out(buf);
 
 		/* Color */
-		text_out(attr_to_text(r_ptr->d_attr));
+		text_out(attr_to_text(r_ptr->d._attr));
 
 		/* Symbol --(-- */
-		sprintf(buf, " '%c')\n", r_ptr->d_char);
+		sprintf(buf, " '%c')\n", r_ptr->d._char);
 		text_out(buf);
 
 

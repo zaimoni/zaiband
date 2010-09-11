@@ -250,8 +250,8 @@ errr process_pref_file_command(char *buf)
 			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= (long)z_info->r_max)) return (1);
 			r_ptr = &monster_type::r_info[i];
-			if (n1) r_ptr->x_attr = (byte)n1;
-			if (n2) r_ptr->x_char = (char)n2;
+			if (n1) r_ptr->x._attr = (byte)n1;
+			if (n2) r_ptr->x._char = (char)n2;
 			return (0);
 		}
 	}
@@ -268,8 +268,8 @@ errr process_pref_file_command(char *buf)
 			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= (long)z_info->k_max)) return (1);
 			k_ptr = &object_type::k_info[i];
-			if (n1) k_ptr->x_attr = (byte)n1;
-			if (n2) k_ptr->x_char = (char)n2;
+			if (n1) k_ptr->x._attr = (byte)n1;
+			if (n2) k_ptr->x._char = (char)n2;
 			return (0);
 		}
 	}
@@ -286,8 +286,8 @@ errr process_pref_file_command(char *buf)
 			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= (long)z_info->f_max)) return (1);
 			f_ptr = &feature_type::f_info[i];
-			if (n1) f_ptr->x_attr = (byte)n1;
-			if (n2) f_ptr->x_char = (char)n2;
+			if (n1) f_ptr->x._attr = (byte)n1;
+			if (n2) f_ptr->x._char = (char)n2;
 			return (0);
 		}
 	}
@@ -304,8 +304,8 @@ errr process_pref_file_command(char *buf)
 			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= (long)z_info->flavor_max)) return (1);
 			flavor_ptr = &object_kind::flavor_info[i];
-			if (n1) flavor_ptr->x_attr = (byte)n1;
-			if (n2) flavor_ptr->x_char = (char)n2;
+			if (n1) flavor_ptr->x._attr = (byte)n1;
+			if (n2) flavor_ptr->x._char = (char)n2;
 			return (0);
 		}
 	}

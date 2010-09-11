@@ -91,27 +91,17 @@ bool cave_valid_bold(int y, int x)
 /**
  * Hack -- Hallucinatory monster
  */
-static u16b hallucinatory_monster(void)
+static attr_char hallucinatory_monster(void)
 {
-	monster_race *r_ptr;
-	
-	byte a;
-	char c;
-	
 	while (1)
 	{
 		/* Select a random monster */
-		r_ptr = &monster_type::r_info[rand_int(z_info->r_max)];
+		const monster_race* const r_ptr = &monster_type::r_info[rand_int(z_info->r_max)];
 		
 		/* Skip non-entries */
 		if (!r_ptr->_name) continue;
 		
-		/* Retrieve attr/char */
-		a = r_ptr->x_attr;
-		c = r_ptr->x_char;
-		
-		/* Encode */
-		return (PICT(a,c));
+		return r_ptr->x;
 	}
 }
 
@@ -119,30 +109,21 @@ static u16b hallucinatory_monster(void)
 /**
  * Hack -- Hallucinatory object
  */
-static u16b hallucinatory_object(void)
+static attr_char hallucinatory_object(void)
 {
-	object_kind *k_ptr;
-	
-	byte a;
-	char c;
-	
 	while (1)
 	{
 		/* Select a random object */
-		k_ptr = &object_type::k_info[rand_int(z_info->k_max - 1) + 1];
+		const object_kind* const k_ptr = &object_type::k_info[rand_int(z_info->k_max - 1) + 1];
 		
 		/* Skip non-entries */
 		if (!k_ptr->_name) continue;
 		
-		/* Retrieve attr/char (HACK - without flavors) */
-		a = k_ptr->x_attr;
-		c = k_ptr->x_char;
-		
-		/* HACK - Skip empty entries */
-		if ((a == 0) || (c == 0)) continue;
+		/* Skip empty entries (ignoring flavors) */
+		if ((0 == k_ptr->x._attr) || (0 == k_ptr->x._char)) continue;
 		
 		/* Encode */
-		return (PICT(a,c));
+		return k_ptr->x;
 	}
 }
 
@@ -193,7 +174,7 @@ bool feat_supports_lighting(int feat)
  * for different sets, depending on the tiles available, and their position 
  * in the set.
  */
-static void special_lighting_floor(byte *a, char *c, enum grid_light_level lighting, bool in_view)
+static void special_lighting_floor(attr_char& ref, enum grid_light_level lighting, bool in_view)
 {
 	/* The floor starts off "lit" - i.e. rendered in white or the default 
 	 * tile. */
@@ -209,13 +190,13 @@ static void special_lighting_floor(byte *a, char *c, enum grid_light_level light
 			case GRAPHICS_NONE:
 			case GRAPHICS_PSEUDO:
 				/* Use "yellow" */
-				if (*a == TERM_WHITE) *a = TERM_YELLOW;
+				if (ref._attr == TERM_WHITE) ref._attr = TERM_YELLOW;
 				break;
 			case GRAPHICS_ADAM_BOLT:
-				*c += 2;
+				ref._char += 2;
 				break;
 			case GRAPHICS_DAVID_GERVAIS:
-				*c -= 1;
+				ref._char -= 1;
 						break;
 		}
 	}
@@ -227,11 +208,11 @@ static void special_lighting_floor(byte *a, char *c, enum grid_light_level light
 			case GRAPHICS_NONE:
 			case GRAPHICS_PSEUDO:
 				/* Use "dark gray" */
-				if (*a == TERM_WHITE) *a = TERM_L_DARK;
+				if (ref._attr == TERM_WHITE) ref._attr = TERM_L_DARK;
 				break;
 			case GRAPHICS_ADAM_BOLT:
 			case GRAPHICS_DAVID_GERVAIS:
-				*c += 1;
+				ref._char += 1;
 				break;
 		}
 	}
@@ -248,11 +229,11 @@ static void special_lighting_floor(byte *a, char *c, enum grid_light_level light
 				case GRAPHICS_NONE:
 				case GRAPHICS_PSEUDO:
 					/* Use "gray" */
-					if (*a == TERM_WHITE) *a = TERM_SLATE;
+					if (ref._attr == TERM_WHITE) ref._attr = TERM_SLATE;
 					break;
 				case GRAPHICS_ADAM_BOLT:
 				case GRAPHICS_DAVID_GERVAIS:
-					*c += 1;
+					ref._char += 1;
 					break;
 			}
 		}
@@ -271,7 +252,7 @@ static void special_lighting_floor(byte *a, char *c, enum grid_light_level light
  * for different sets, depending on the tiles available, and their position 
  * in the set.
  */
-static void special_wall_display(byte *a, char *c, bool in_view, int feat)
+static void special_wall_display(attr_char& ref, bool in_view, int feat)
 {
 	/* Grids currently in view are left alone, rendered as "white" */
 	if (in_view) return;
@@ -284,11 +265,11 @@ static void special_wall_display(byte *a, char *c, bool in_view, int feat)
 			case GRAPHICS_NONE:
 			case GRAPHICS_PSEUDO:
 				/* Use "dark gray" */
-				if (*a == TERM_WHITE) *a = TERM_L_DARK;
+				if (ref._attr == TERM_WHITE) ref._attr = TERM_L_DARK;
 				break;
 			case GRAPHICS_ADAM_BOLT:
 			case GRAPHICS_DAVID_GERVAIS:
-				if (feat_supports_lighting(feat)) *c += 1;
+				if (feat_supports_lighting(feat)) ref._char += 1;
 				break;
 		}
 	}
@@ -301,11 +282,11 @@ static void special_wall_display(byte *a, char *c, bool in_view, int feat)
 			case GRAPHICS_NONE:
 			case GRAPHICS_PSEUDO:
 				/* Use "gray" */
-				if (*a == TERM_WHITE) *a = TERM_SLATE;
+				if (ref._attr == TERM_WHITE) ref._attr = TERM_SLATE;
 				break;
 			case GRAPHICS_ADAM_BOLT:
 			case GRAPHICS_DAVID_GERVAIS:
-				if (feat_supports_lighting(feat)) *c += 1;
+				if (feat_supports_lighting(feat)) ref._char += 1;
 				break;
 		}
 	}
@@ -315,10 +296,10 @@ static void special_wall_display(byte *a, char *c, bool in_view, int feat)
 		switch (use_graphics)
 		{
 			case GRAPHICS_ADAM_BOLT:
-				if (feat_supports_lighting(feat)) *c += 2;
+				if (feat_supports_lighting(feat)) ref._char += 2;
 				break;
 			case GRAPHICS_DAVID_GERVAIS:
-				if (feat_supports_lighting(feat)) *c -= 1;
+				if (feat_supports_lighting(feat)) ref._char -= 1;
 				break;
 		}
 	}
@@ -366,32 +347,27 @@ grid_data::as_text(byte& ap, char& cp, byte& tap, char& tcp) const
 	const feature_type* const f_ptr = &feature_type::f_info[f_idx];
 
 	/* Normal attr and char */
-	byte a = f_ptr->x_attr;
-	char c = f_ptr->x_char;
+	attr_char ref = f_ptr->x;
 
 	/* Special lighting effects */
 	if (f_idx <= FEAT_INVIS && OPTION(view_special_lite))
-		special_lighting_floor(&a, &c, lighting, in_view);
+		special_lighting_floor(ref, lighting, in_view);
 
 	/* Special lighting effects (walls only) */
 	if (f_idx > FEAT_INVIS && OPTION(view_granite_lite)) 
-		special_wall_display(&a, &c, in_view, f_idx);
+		special_wall_display(ref, in_view, f_idx);
 
 	/* Save the terrain info for the transparency effects */
-	tap = a;
-	tcp = c;
+	tap = ref._attr;
+	tcp = ref._char;
 
 
 	/* If there's an object, deal with that. */
 	if (first_k_idx)
 	{
 		if (hallucinate)
-		{
-			/* Just pick a random object to display. */
-			int i = hallucinatory_object();
-			
-			a = PICT_A(i);
-			c = PICT_C(i);
+		{	/* Just pick a random object to display. */
+			ref = hallucinatory_object();
 		}
 		else
 		{
@@ -400,8 +376,7 @@ grid_data::as_text(byte& ap, char& cp, byte& tap, char& tcp) const
 													 : first_k_idx];
 			
 			/* Normal attr and char */
-			a = k_ptr->attr_user();
-			c = k_ptr->char_user();
+			ref = k_ptr->user();
 		}
 	}
 
@@ -409,80 +384,63 @@ grid_data::as_text(byte& ap, char& cp, byte& tap, char& tcp) const
 	if (m_idx > 0)
 	{
 		if (hallucinate)
-		{
-			/* Just pick a random monster to display. */
-			int i = hallucinatory_monster();
-			
-			a = PICT_A(i);
-			c = PICT_C(i);
+		{	/* Just pick a random monster to display. */
+			ref = hallucinatory_monster();
 		}
 		else
 		{
 			const monster_race* const r_ptr = m_ptr_from_m_idx(m_idx)->race();
 				
-			byte da;
-			char dc;
-			
 			/* Desired attr & char*/
-			da = r_ptr->x_attr;
-			dc = r_ptr->x_char;
+			attr_char d = r_ptr->x;
 			
 			/* Special attr/char codes */
-			if ((da & 0x80) && (dc & 0x80))
+			if ((d._attr & 0x80) && (d._char & 0x80))
 			{
-				/* Use attr */
-				a = da;
-				
-				/* Use char */
-				c = dc;
+				ref = d;	/* Use attr, char */
 			}
 			
 			/* Multi-hued monster */
 			else if (r_ptr->flags[0] & RF0_ATTR_MULTI)
 			{
 				/* Multi-hued attr */
-				a = randint(15);
+				ref._attr = randint(15);
 				
 				/* Normal char */
-				c = dc;
+				ref._char = d._char;
 			}
 			
 			/* Normal monster (not "clear" in any way) */
 			else if (!(r_ptr->flags[0] & (RF0_ATTR_CLEAR | RF0_CHAR_CLEAR)))
 			{
 				/* Use attr */
-				a = da;
+				ref._attr = d._attr;
 
 				/* Desired attr & char */
-				da = r_ptr->x_attr;
-				dc = r_ptr->x_char;
+				d = r_ptr->x;
 				
 				/* Use char */
-				c = dc;
+				ref._char = d._char;
 			}
 			
 			/* Hack -- Bizarre grid under monster */
-			else if ((a & 0x80) || (c & 0x80))
+			else if ((ref._attr & 0x80) || (ref._char & 0x80))
 			{
-				/* Use attr */
-				a = da;
-				
-				/* Use char */
-				c = dc;
+				ref = d;	/* use attr, char */
 			}
 			
 			/* Normal char, Clear attr, monster */
 			else if (!(r_ptr->flags[0] & RF0_CHAR_CLEAR))
 			{
 				/* Normal char */
-				c = dc;
+				ref._char = d._char;
 			}
 				
 			/* Normal attr, Clear char, monster */
 			else if (!(r_ptr->flags[0] & RF0_ATTR_CLEAR))
 			{
 				/* Normal attr */
-					a = da;
+				ref._attr = d._attr;
 			}
 		}
 	}
@@ -499,7 +457,7 @@ grid_data::as_text(byte& ap, char& cp, byte& tap, char& tcp) const
 		monster_race *r_ptr = &monster_type::r_info[0];
 
 		/* Get the "player" attr */
-		a = r_ptr->x_attr;
+		ref._attr = r_ptr->x._attr;
 #if 0
 		if ((hp_changes_color) && (arg_graphics == GRAPHICS_NONE))
 		{
@@ -546,12 +504,12 @@ grid_data::as_text(byte& ap, char& cp, byte& tap, char& tcp) const
 #endif
 
 		/* Get the "player" char */
-		c = r_ptr->x_char;
+		ref._char = r_ptr->x._char;
 	}
 
 	/* Result */
-	ap = a;
-	cp = c;	
+	ap = ref._attr;
+	cp = ref._char;	
 }
 
 
@@ -1295,7 +1253,7 @@ static byte priority(byte a, char c)
 		f_ptr = &feature_type::f_info[p0];
 
 		/* Check character and attribute, accept matches */
-		if ((f_ptr->x_char == c) && (f_ptr->x_attr == a)) return (p1);
+		if ((f_ptr->x._char == c) && (f_ptr->x._attr == a)) return (p1);
 	}
 
 	/* Default */
@@ -1394,7 +1352,6 @@ void display_map(int *cy, int *cx)
 		Term_putch(x, 0, ta, '-');
 		Term_putch(x, y, ta, '-');
 	}
-
 	/* Draw the vertical edges */
 	for (y = 1; y <= map_hgt; y++)
 	{
@@ -1445,19 +1402,15 @@ void display_map(int *cy, int *cx)
 	row = (py * map_hgt / dungeon_hgt);
 	col = (px * map_wid / dungeon_wid);
 
-	if (use_bigtile)
-		col = col & ~1;
+	if (use_bigtile) col = col & ~1;
 
 	/*** Make sure the player is visible ***/
 
-	/* Get the "player" attr */
-	ta = r_ptr->x_attr;
-
-	/* Get the "player" char */
-	tc = r_ptr->x_char;
+	/* Get the "player" */
+	attr_char t = r_ptr->x;
 
 	/* Draw the player */
-	Term_putch(col + 1, row + 1, ta, tc);
+	Term_putch(col + 1, row + 1, t._attr, t._char);
 
 	/* Return player location */
 	if (cy != NULL) (*cy) = row + 1;

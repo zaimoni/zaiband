@@ -891,25 +891,6 @@ inline bool is_trap(byte x) {	return IS_TRAP(x);	}
 	((item >= 0) ? &p_ptr->inventory[item] : &o_list[0 - item])
 
 /**
- * Convert an "attr"/"char" pair into a "pict" (P)
- */
-#define PICT(A,C) \
-	((((u16b)(A)) << 8) | ((byte)(C)))
-
-/**
- * Convert a "pict" (P) into an "attr" (A)
- */
-#define PICT_A(P) \
-	((byte)((P) >> 8))
-
-/**
- * Convert a "pict" (P) into an "char" (C)
- */
-#define PICT_C(P) \
-	((char)((byte)(P)))
-
-
-/**
  * Determines if a map location is "meaningful"
  */
 #define in_bounds(Y,X) \

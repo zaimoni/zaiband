@@ -696,7 +696,7 @@ static SV_cash get_coin_type(const monster_race *r_ptr)
 	const char* const name = r_ptr->name();
 
 	/* Analyze "coin" monsters */
-	if (r_ptr->d_char == '$')
+	if (r_ptr->d._char == '$')
 	{
 		/* Look for textual clues */
 		if (strstr(name, " copper ")) return SV_COPPER;
@@ -931,7 +931,7 @@ monster_race::is_nonliving() const
 {
 	if (flags[2] & (RF2_DEMON | RF2_UNDEAD)) return true;
 	if (flags[1] & RF1_STUPID) return true;
-	if (strchr("Evg", d_char)) return true;
+	if (strchr("Evg", d._char)) return true;
 	return false;
 }
 

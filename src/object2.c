@@ -1029,9 +1029,9 @@ static s32b object_value_real(const object_type *o_ptr)
 			value += plus_value(o_ptr->to_a);
 
 			/* Hack -- Factor in extra damage dice */
-			if ((o_ptr->d.dice > k_ptr->d.dice) && (o_ptr->d.sides == k_ptr->d.sides))
+			if ((o_ptr->d.dice > k_ptr->dice.dice) && (o_ptr->d.sides == k_ptr->dice.sides))
 			{
-				value += (o_ptr->d.dice - k_ptr->d.dice) * o_ptr->d.sides * 100L;
+				value += (o_ptr->d.dice - k_ptr->dice.dice) * o_ptr->d.sides * 100L;
 			}
 
 			/* Done */
@@ -1051,9 +1051,9 @@ static s32b object_value_real(const object_type *o_ptr)
 			value += plus_value(o_ptr->to_d)/20;
 
 			/* Hack -- Factor in extra damage dice */
-			if ((o_ptr->d.dice > k_ptr->d.dice) && (o_ptr->d.sides == k_ptr->d.sides))
+			if ((o_ptr->d.dice > k_ptr->dice.dice) && (o_ptr->d.sides == k_ptr->dice.sides))
 			{
-				value += (o_ptr->d.dice - k_ptr->d.dice) * o_ptr->d.sides * 5L;
+				value += (o_ptr->d.dice - k_ptr->dice.dice) * o_ptr->d.sides * 5L;
 			}
 
 			/* Done */
@@ -1425,7 +1425,7 @@ void object_prep(object_type *o_ptr, int k_idx)
 
 	/* Default power */
 	o_ptr->ac = k_ptr->ac;
-	o_ptr->d = k_ptr->d;
+	o_ptr->d = k_ptr->dice;
 
 	/* Hack -- worthless items are always "broken" */
 	if (k_ptr->cost <= 0) o_ptr->ident |= (IDENT_BROKEN);

@@ -605,7 +605,7 @@ static void choose_item(int a_idx)
 	a_ptr->to_d = k_ptr->to_d;
 	a_ptr->to_a = k_ptr->to_a;
 	a_ptr->ac = k_ptr->ac;
-	a_ptr->d = k_ptr->d;
+	a_ptr->d = k_ptr->dice;
 	a_ptr->weight = k_ptr->weight;
 	C_COPY(a_ptr->flags,k_ptr->flags,OBJECT_FLAG_STRICT_UB);
 

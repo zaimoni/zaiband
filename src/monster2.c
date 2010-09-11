@@ -544,18 +544,18 @@ void display_monlist(void)
 
 		/* Append the "standard" attr/char info */
 		Term_addstr(-1, TERM_WHITE, " ('");
-		Term_addch(r_ptr->d_attr, r_ptr->d_char);
+		Term_addch(r_ptr->d._attr, r_ptr->d._char);
 		Term_addstr(-1, TERM_WHITE, "')");
 		n += 6;
 
 		/* Append the "optional" attr/char info */
 		Term_addstr(-1, TERM_WHITE, "/('");
 
-		Term_addch(r_ptr->x_attr, r_ptr->x_char);
+		Term_addch(r_ptr->x._attr, r_ptr->x._char);
 
 		if (use_bigtile)
 		{
-			if (r_ptr->x_attr & 0x80)
+			if (r_ptr->x._attr & 0x80)
 				Term_addch(255, -1);
 			else
 				Term_addch(0, ' ');
@@ -1572,7 +1572,7 @@ static bool place_monster_okay(int r_idx)
 	monster_race *z_ptr = &monster_type::r_info[r_idx];
 
 	/* Require similar "race" */
-	if (z_ptr->d_char != r_ptr->d_char) return FALSE;
+	if (z_ptr->d._char != r_ptr->d._char) return FALSE;
 
 	/* Skip more advanced monsters */
 	if (z_ptr->level > r_ptr->level) return FALSE;
@@ -1824,28 +1824,28 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_SPIDER:
 		{
-			okay = ((r_ptr->d_char == 'S') &&
+			okay = ((r_ptr->d._char == 'S') &&
 			        !(r_ptr->flags[0] & RF0_UNIQUE));
 			break;
 		}
 
 		case SUMMON_HOUND:
 		{
-			okay = ((NULL!=strchr("CZ",r_ptr->d_char)) &&
+			okay = ((NULL!=strchr("CZ",r_ptr->d._char)) &&
 			        !(r_ptr->flags[0] & RF0_UNIQUE));
 			break;
 		}
 
 		case SUMMON_HYDRA:
 		{
-			okay = ((r_ptr->d_char == 'M') &&
+			okay = ((r_ptr->d._char == 'M') &&
 			        !(r_ptr->flags[0] & RF0_UNIQUE));
 			break;
 		}
 
 		case SUMMON_ANGEL:
 		{
-			okay = ((r_ptr->d_char == 'A') &&
+			okay = ((r_ptr->d._char == 'A') &&
 			        !(r_ptr->flags[0] & RF0_UNIQUE));
 			break;
 		}
@@ -1873,32 +1873,32 @@ static bool summon_specific_okay(int r_idx)
 
 		case SUMMON_KIN:
 		{
-			okay = ((r_ptr->d_char == summon_kin_type) &&
+			okay = ((r_ptr->d._char == summon_kin_type) &&
 			        !(r_ptr->flags[0] & RF0_UNIQUE));
 			break;
 		}
 
 		case SUMMON_HI_UNDEAD:
 		{
-			okay = (NULL!=strchr("LVW",r_ptr->d_char));
+			okay = (NULL!=strchr("LVW",r_ptr->d._char));
 			break;
 		}
 
 		case SUMMON_HI_DRAGON:
 		{
-			okay = (r_ptr->d_char == 'D');
+			okay = (r_ptr->d._char == 'D');
 			break;
 		}
 
 		case SUMMON_HI_DEMON:
 		{
-			okay = (r_ptr->d_char == 'U');
+			okay = (r_ptr->d._char == 'U');
 			break;
 		}
 
 		case SUMMON_WRAITH:
 		{
-			okay = ((r_ptr->d_char == 'W') &&
+			okay = ((r_ptr->d._char == 'W') &&
 			        (r_ptr->flags[0] & RF0_UNIQUE));
 			break;
 		}
@@ -2125,7 +2125,7 @@ void message_pain(const m_idx_type m_idx, int dam)
 	const long oldhp = newhp + (long)(dam);
 	const int percentage = (int)((newhp * 100L) / oldhp);
 	const int pain_level = pain_index(percentage);
-	const char race_char = m_ptr->race()->d_char;
+	const char race_char = m_ptr->race()->d._char;
 
 	assert((0 <= pain_level) && (7 > pain_level));
 

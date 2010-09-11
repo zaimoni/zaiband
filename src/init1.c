@@ -1157,8 +1157,8 @@ errr parse_f_info(char *buf, header *head)
 		if (d_attr < 0) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		f_ptr->d_attr = d_attr;
-		f_ptr->d_char = d_char;
+		f_ptr->d._attr = d_attr;
+		f_ptr->d._char = d_char;
 	}
 	else
 	{
@@ -1297,8 +1297,8 @@ errr parse_k_info(char *buf, header *head)
 		if (d_attr < 0) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		k_ptr->d_attr = d_attr;
-		k_ptr->d_char = d_char;
+		k_ptr->d._attr = d_attr;
+		k_ptr->d._char = d_char;
 	}
 
 	/* Process 'I' for "Info" (one line only) */
@@ -1385,8 +1385,8 @@ errr parse_k_info(char *buf, header *head)
 			            &ac, &hd1, &hd2, &th, &td, &ta)) return (PARSE_ERROR_GENERIC);
 
 		k_ptr->ac = ac;
-		k_ptr->d.dice = hd1;
-		k_ptr->d.sides = hd2;
+		k_ptr->dice.dice = hd1;
+		k_ptr->dice.sides = hd2;
 		k_ptr->to_h = th;
 		k_ptr->to_d = td;
 		k_ptr->to_a = ta;
@@ -1969,8 +1969,8 @@ errr parse_r_info(char *buf, header *head)
 		if (d_attr < 0) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		r_ptr->d_attr = d_attr;
-		r_ptr->d_char = d_char;
+		r_ptr->d._attr = d_attr;
+		r_ptr->d._char = d_char;
 	}
 
 	/* Process 'I' for "Info" (one line only) */
@@ -2983,8 +2983,8 @@ errr parse_flavor_info(char *buf, header *head)
 		if (d_attr < 0) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		flavor_ptr->d_attr = d_attr;
-		flavor_ptr->d_char = d_char;
+		flavor_ptr->d._attr = d_attr;
+		flavor_ptr->d._char = d_char;
 	}
 
 	/* Process 'D' for "Description" */
