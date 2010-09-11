@@ -1151,9 +1151,6 @@ static void display_player_equippy(int y, int x)
 {
 	int i;
 
-	byte a;
-	char c;
-
 	/* Dump equippy chars */
 	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
 	{	/* Object */
@@ -1163,11 +1160,10 @@ static void display_player_equippy(int y, int x)
 		if (!o_ptr->k_idx) continue;
 
 		/* Get attr/char for display */
-		a = o_ptr->attr_user();
-		c = o_ptr->char_user();
+		const attr_char n = o_ptr->user();
 
 		/* Dump */
-		Term_putch(x+i-INVEN_WIELD, y, a, c);
+		Term_putch(x+i-INVEN_WIELD, y, n._attr, n._char);
 	}
 }
 

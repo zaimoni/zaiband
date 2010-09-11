@@ -417,9 +417,6 @@ static void prt_equippy(int row, int col)
 {
 	int i;
 
-	byte a;
-	char c;
-
 	/* No equippy chars in bigtile mode */
 	if (use_bigtile) return;
 
@@ -429,18 +426,17 @@ static void prt_equippy(int row, int col)
 		/* Object */
 		const object_type* const o_ptr = &p_ptr->inventory[i];
 
-		a = o_ptr->attr_user();
-		c = o_ptr->char_user();
+		attr_char n = o_ptr->user();
 
 		/* Clear the part of the screen */
 		if (!o_ptr->k_idx)
 		{
-			c = ' ';
-			a = TERM_WHITE;
+			n._char = ' ';
+			n._attr = TERM_WHITE;
 		}
 
 		/* Dump */
-		Term_putch(col + i - INVEN_WIELD, row, a, c);
+		Term_putch(col + i - INVEN_WIELD, row, n._attr, n._char);
 	}
 }
 

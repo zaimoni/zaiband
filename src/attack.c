@@ -757,9 +757,6 @@ void do_cmd_fire(void)
 
 	bool hit_body = FALSE;
 
-	byte missile_attr;
-	char missile_char;
-
 	char o_name[80];
 
 	int path_n;
@@ -820,9 +817,7 @@ void do_cmd_fire(void)
 	object_desc(o_name, sizeof(o_name), i_ptr, FALSE, ODESC_FULL);
 
 	/* Find the color and symbol for the object for throwing */
-	missile_attr = i_ptr->attr_user();
-	missile_char = i_ptr->char_user();
-
+	const attr_char missile = i_ptr->user();
 
 	/* Use the proper number of shots */
 	thits = p_ptr->num_fire;
@@ -871,7 +866,7 @@ void do_cmd_fire(void)
 		if (player_can_see_bold(t.y, t.x))
 		{
 			/* Visual effects */
-			print_rel(missile_char, missile_attr, t);
+			print_rel(missile._char, missile._attr, t);
 			move_cursor_relative(t);
 
 			Term_fresh();
@@ -1091,9 +1086,6 @@ void do_cmd_throw(void)
 
 	bool hit_body = FALSE;
 
-	byte missile_attr;
-	char missile_char;
-
 	char o_name[80];
 
 	int path_n;
@@ -1143,8 +1135,7 @@ void do_cmd_throw(void)
 	object_desc(o_name, sizeof(o_name), i_ptr, FALSE, ODESC_FULL);
 
 	/* Find the color and symbol for the object for throwing */
-	missile_attr = i_ptr->attr_user();
-	missile_char = i_ptr->char_user();
+	const attr_char missile = i_ptr->user();
 
 
 	/* Extract a "distance multiplier" */
@@ -1197,7 +1188,7 @@ void do_cmd_throw(void)
 		if (player_can_see_bold(t.y, t.x))
 		{
 			/* Visual effects */
-			print_rel(missile_char, missile_attr, t);
+			print_rel(missile._char, missile._attr, t);
 			move_cursor_relative(t);
 
 			Term_fresh();

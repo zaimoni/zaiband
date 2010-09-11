@@ -246,10 +246,6 @@ struct object_kind
 
 	/* display interpretation */
 	attr_char user() const {return use_flavor_glyph() ? flavor_info[flavor].x : x;};
-	byte attr_user() const {return use_flavor_glyph() ? flavor_info[flavor].x._attr : x._attr;};
-	char char_user() const {return use_flavor_glyph() ? flavor_info[flavor].x._char : x._char;};
-	byte attr_default() const {return use_flavor_glyph() ? flavor_info[flavor].d._attr : d._attr;};
-	char char_default() const {return use_flavor_glyph() ? flavor_info[flavor].d._char : d._char;};
 
 	/* more complicated functions */
 /*
@@ -583,10 +579,7 @@ struct object_type
 	bool tried() const {return k_info[k_idx].tried;};
 	byte level() const {return k_info[k_idx].level;};
 	
-	byte attr_user() const {return k_info[k_idx].attr_user();};
-	char char_user() const {return k_info[k_idx].char_user();};
-	byte attr_default() const {return k_info[k_idx].attr_default();};
-	char char_default() const {return k_info[k_idx].char_default();};
+	attr_char user() const {return k_info[k_idx].user();};
 
 	/* more complicated functions */
 /*
