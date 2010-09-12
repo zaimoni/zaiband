@@ -265,18 +265,20 @@ enum player_gender	{
 /*
  * Indexes used for various "equipment" slots (hard-coded by savefiles, etc).
  */
-#define INVEN_WIELD		24
-#define INVEN_BOW       25
-#define INVEN_LEFT      26
-#define INVEN_RIGHT     27
-#define INVEN_NECK      28
-#define INVEN_LITE      29
-#define INVEN_BODY      30
-#define INVEN_OUTER     31
-#define INVEN_ARM       32
-#define INVEN_HEAD      33
-#define INVEN_HANDS     34
-#define INVEN_FEET      35
+#define INVEN_EQUIP_ORIGIN 24
+#define INVEN_WIELD		(INVEN_EQUIP_ORIGIN+0)
+#define INVEN_BOW       (INVEN_EQUIP_ORIGIN+1)
+#define INVEN_LEFT      (INVEN_EQUIP_ORIGIN+2)
+#define INVEN_RIGHT     (INVEN_EQUIP_ORIGIN+3)
+#define INVEN_NECK      (INVEN_EQUIP_ORIGIN+4)
+#define INVEN_LITE      (INVEN_EQUIP_ORIGIN+5)
+#define INVEN_BODY      (INVEN_EQUIP_ORIGIN+6)
+#define INVEN_OUTER     (INVEN_EQUIP_ORIGIN+7)
+#define INVEN_ARM       (INVEN_EQUIP_ORIGIN+8)
+#define INVEN_HEAD      (INVEN_EQUIP_ORIGIN+9)
+#define INVEN_HANDS     (INVEN_EQUIP_ORIGIN+10)
+#define INVEN_FEET      (INVEN_EQUIP_ORIGIN+11)
+#define INVEN_EQUIP_STRICT_UB (INVEN_EQUIP_ORIGIN+12)
 
 /*
  * Total number of inventory slots (hard-coded).

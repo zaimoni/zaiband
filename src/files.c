@@ -1152,7 +1152,7 @@ static void display_player_equippy(int y, int x)
 	int i;
 
 	/* Dump equippy chars */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; ++i)
 	{	/* Object */
 		const object_type* const o_ptr = &p_ptr->inventory[i];
 
@@ -1163,7 +1163,7 @@ static void display_player_equippy(int y, int x)
 		const attr_char n = o_ptr->user();
 
 		/* Dump */
-		Term_putch(x+i-INVEN_WIELD, y, n._attr, n._char);
+		Term_putch(x+i-INVEN_EQUIP_ORIGIN, y, n._attr, n._char);
 	}
 }
 
@@ -1217,7 +1217,7 @@ static const struct player_flag_record player_flag_table[RES_ROWS*4] =
 	{ "Might",	1, TR1_MIGHT,		0 },
 };
 
-#define RES_COLS (5 + 2 + INVEN_TOTAL - INVEN_WIELD)
+#define RES_COLS (5 + 2 + INVEN_EQUIP_STRICT_UB - INVEN_EQUIP_ORIGIN)
 static const region resist_region[] =
 {
 	{  0*(RES_COLS+1), 11, RES_COLS, RES_ROWS+2 },
@@ -1239,7 +1239,7 @@ static void display_resistance_panel(const struct player_flag_record *resists,
 		byte name_attr = TERM_WHITE;
 		Term_gotoxy(col+6, row);
 		/* repeated extraction of flags is inefficient but more natural */
-		for (j = INVEN_WIELD; j <= INVEN_TOTAL; j++)
+		for (j = INVEN_EQUIP_ORIGIN; j <= INVEN_EQUIP_STRICT_UB; j++)
 		{
 			const object_type* const o_ptr = &p_ptr->inventory[j];
 			byte attr = TERM_WHITE | (j % 2) * 8; /* alternating columns */
@@ -1392,7 +1392,7 @@ static void display_player_sust_info(void)
 	c_put_str(TERM_WHITE, "abcdefghijkl@", row-1, col);
 
 	/* Process equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; ++i)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; ++i)
 	{
 		/* Get the object */
 		const object_type* const o_ptr = &p_ptr->inventory[i];
@@ -1974,7 +1974,7 @@ errr file_character(const char* name, bool full)
 	if (p_ptr->equip_cnt)
 	{
 		fprintf(fff, "  [Character Equipment]\n\n");
-		for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+		for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 		{
 			object_desc(o_name, sizeof(o_name), &p_ptr->inventory[i], TRUE, ODESC_FULL);
 			fprintf(fff, "%c) %s\n",

@@ -421,11 +421,10 @@ static void prt_equippy(int row, int col)
 	if (use_bigtile) return;
 
 	/* Dump equippy chars */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		/* Object */
 		const object_type* const o_ptr = &p_ptr->inventory[i];
-
 		attr_char n = o_ptr->user();
 
 		/* Clear the part of the screen */
@@ -436,7 +435,7 @@ static void prt_equippy(int row, int col)
 		}
 
 		/* Dump */
-		Term_putch(col + i - INVEN_WIELD, row, n._attr, n._char);
+		Term_putch(col + i - INVEN_EQUIP_ORIGIN, row, n._attr, n._char);
 	}
 }
 

@@ -129,7 +129,7 @@ void wield_item(object_type *o_ptr, int item)
 	char o_name[80];
 
 	int slot = wield_slot(o_ptr);
-	assert((INVEN_PACK < slot) && (slot < INVEN_TOTAL) && "retval precondition");
+	assert((INVEN_EQUIP_ORIGIN <= slot) && (slot < INVEN_EQUIP_STRICT_UB) && "retval precondition");
 
 	/* Take a turn */
 	p_ptr->energy_use = 100;

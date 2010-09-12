@@ -262,7 +262,7 @@ static void sense_inventory(void)
 		/* start at INVEN_WIELD nonstrict lower bound because of the 1-in-5 failure on inventory items */
 		if (!p_ptr->cp_ptr->flags & CF_PSEUDO_ID_IMPROV)
 		{
-			for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+			for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 			{
 				object_type* o_ptr = &p_ptr->inventory[i];
 
@@ -599,14 +599,13 @@ static bool recharge_rod_on_ground(object_type& o)
 static void recharge_objects(void)
 {
 	int i;
-
 	int charged = 0;
 
 	assert(0 <= p_ptr->inven_cnt && INVEN_PACK >= p_ptr->inven_cnt && "precondition");
 	assert(p_ptr->inven_cnt_is_strict_UB_of_nonzero_k_idx() && "precondition");
 
 	/* Process equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		/* Get the object */
 		object_type* const o_ptr = &p_ptr->inventory[i];

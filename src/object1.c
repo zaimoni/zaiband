@@ -1603,10 +1603,10 @@ s16b label_to_inven(int c)
  */
 s16b label_to_equip(int c)
 {	/* Convert */
-	const int i = (islower((unsigned char)c) ? A2I(c) : -1) + INVEN_WIELD;
+	const int i = (islower((unsigned char)c) ? A2I(c) : -1) + INVEN_EQUIP_ORIGIN;
 
 	/* Verify the index */
-	if ((i < INVEN_WIELD) || (i >= INVEN_TOTAL)) return (-1);
+	if ((INVEN_EQUIP_ORIGIN > i) || (INVEN_EQUIP_STRICT_UB <= i)) return (-1);
 
 	/* Empty slots can never be chosen */
 	if (!p_ptr->inventory[i].k_idx) return (-1);
@@ -1917,14 +1917,12 @@ void display_equip(void)
 {
 	register int i, n;
 	byte attr;
-
 	char tmp_val[80];
-
 	char o_name[80];
 
 
 	/* Display the equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB ; i++)
 	{
 		/* Examine the item */
 		const object_type* const o_ptr = &p_ptr->inventory[i];
@@ -1943,7 +1941,7 @@ void display_equip(void)
 		}
 
 		/* Display the index (or blank space) */
-		Term_putstr(0, i - INVEN_WIELD, 3, TERM_WHITE, tmp_val);
+		Term_putstr(0, i - INVEN_EQUIP_ORIGIN, 3, TERM_WHITE, tmp_val);
 
 		/* Obtain an item description */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, ODESC_FULL);
@@ -1955,16 +1953,16 @@ void display_equip(void)
 		attr = tval_to_attr[o_ptr->obj_id.tval % N_ELEMENTS(tval_to_attr)];
 
 		/* Display the entry itself */
-		Term_putstr(3, i - INVEN_WIELD, n, attr, o_name);
+		Term_putstr(3, i - INVEN_EQUIP_ORIGIN, n, attr, o_name);
 
 		/* Erase the rest of the line */
-		Term_erase(3+n, i - INVEN_WIELD, 255);
+		Term_erase(3+n, i - INVEN_EQUIP_ORIGIN, 255);
 
 		/* Display the slot description (if needed) */
 		if (OPTION(show_labels))
 		{
-			Term_putstr(61, i - INVEN_WIELD, -1, TERM_WHITE, "<--");
-			Term_putstr(65, i - INVEN_WIELD, -1, TERM_WHITE, mention_use(i));
+			Term_putstr(61, i - INVEN_EQUIP_ORIGIN, -1, TERM_WHITE, "<--");
+			Term_putstr(65, i - INVEN_EQUIP_ORIGIN, -1, TERM_WHITE, mention_use(i));
 		}
 
 		/* Display the weight (if needed) */
@@ -1973,12 +1971,12 @@ void display_equip(void)
 			int wgt = o_ptr->weight * o_ptr->number;
 			int col = (OPTION(show_labels) ? 52 : 71);
 			sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
-			Term_putstr(col, i - INVEN_WIELD, -1, TERM_WHITE, tmp_val);
+			Term_putstr(col, i - INVEN_EQUIP_ORIGIN, -1, TERM_WHITE, tmp_val);
 		}
 	}
 
 	/* Erase the rest of the window */
-	for (i = INVEN_TOTAL - INVEN_WIELD; i < Term->hgt; i++)
+	for (i = INVEN_EQUIP_STRICT_UB - INVEN_EQUIP_ORIGIN; i < Term->hgt; i++)
 	{
 		/* Clear that line */
 		Term_erase(0, i, 255);
@@ -2115,7 +2113,7 @@ void show_equip(void)
 	if (OPTION(show_weights)) lim -= 9;
 
 	/* Scan the equipment list */
-	for (k = 0, i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (k = 0, i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		const object_type* const o_ptr = &p_ptr->inventory[i];
 
@@ -2125,11 +2123,8 @@ void show_equip(void)
 		/* Description */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, ODESC_FULL);
 
-		/* Truncate the description */
-		o_name[lim] = 0;
-
-		/* Save the index */
-		out_index[k] = i;
+		o_name[lim] = 0; /* Truncate the description */
+		out_index[k] = i; /* Save the index */
 
 		/* Get inventory color */
 		out_color[k] = tval_to_attr[o_ptr->obj_id.tval % N_ELEMENTS(tval_to_attr)];

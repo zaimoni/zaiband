@@ -566,12 +566,10 @@ static void calc_torch(void)
 	p_ptr->cur_lite = 0;
 
 	/* Loop through all wielded items */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		const object_type* const o_ptr = &p_ptr->inventory[i];
-
-		/* Skip empty slots */
-		if (!o_ptr->k_idx) continue;
+		if (!o_ptr->k_idx) continue;	/* Skip empty slots */
 
 		/* Examine actual lites */
 		if (o_ptr->obj_id.tval == TV_LITE)
@@ -986,7 +984,7 @@ static void calc_bonuses(void)
 	/*** Analyze equipment ***/
 
 	/* Scan the equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		o_ptr = &p_ptr->inventory[i];
 

@@ -281,7 +281,7 @@ static void uncurse_object(object_type *o_ptr)
 }
 
 
-/*
+/*!
  * Removes curses from items in inventory.
  *
  * Note that Items which are "Perma-Cursed" (The One Ring,
@@ -296,20 +296,16 @@ static int remove_curse_aux(bool all)
 	int i, cnt = 0;
 
 	/* Attempt to uncurse items being worn */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		u32b f[OBJECT_FLAG_STRICT_UB];
 
 		object_type* const o_ptr = &p_ptr->inventory[i];
 
-		/* Skip non-objects */
-		if (!o_ptr->k_idx) continue;
+		if (!o_ptr->k_idx) continue; /* Skip non-objects */
+		if (!o_ptr->is_cursed()) continue; /* Uncursed already */
 
-		/* Uncursed already */
-		if (!o_ptr->is_cursed()) continue;
-
-		/* Extract the flags */
-		object_flags(o_ptr, f);
+		object_flags(o_ptr, f); /* Extract the flags */
 
 		/* Heavily Cursed Items need a special spell */
 		if (!all && (f[2] & (TR3_HEAVY_CURSE))) continue;
@@ -317,17 +313,10 @@ static int remove_curse_aux(bool all)
 		/* Perma-Cursed Items can NEVER be uncursed */
 		if (f[2] & (TR3_PERMA_CURSE)) continue;
 
-		/* Uncurse the object */
-		uncurse_object(o_ptr);
-
-		/* Recalculate the bonuses */
-		p_ptr->update |= (PU_BONUS);
-
-		/* Window stuff */
-		p_ptr->redraw |= (PR_EQUIP);
-
-		/* Count the uncursings */
-		cnt++;
+		uncurse_object(o_ptr); /* Uncurse the object */
+		p_ptr->update |= (PU_BONUS); /* Recalculate the bonuses */
+		p_ptr->redraw |= (PR_EQUIP); /* Window stuff */
+		cnt++; /* Count the uncursings */
 	}
 
 	/* Return "something uncursed" */
@@ -335,7 +324,7 @@ static int remove_curse_aux(bool all)
 }
 
 
-/*
+/*!
  * Remove most curses
  */
 bool remove_curse(void)
@@ -343,7 +332,7 @@ bool remove_curse(void)
 	return (remove_curse_aux(FALSE));
 }
 
-/*
+/*!
  * Remove all curses
  */
 bool remove_all_curse(void)
@@ -396,148 +385,56 @@ void self_knowledge(void)
 {
 	int i = 0, j, k;
 	int max_x = Term->hgt - 2;
-
 	u32b f[OBJECT_FLAG_STRICT_UB];
-
 	const object_type* o_ptr;
-
 	const char* info[128];
 
 
 	/* Get item flags from equipment */
-	for (k = INVEN_WIELD; k < INVEN_TOTAL; k++)
+	for (k = INVEN_EQUIP_ORIGIN; k < INVEN_EQUIP_STRICT_UB; k++)
 	{
 		u32b t[OBJECT_FLAG_STRICT_UB];
-
 		o_ptr = &p_ptr->inventory[k];
 
-		/* Skip non-objects */
-		if (!o_ptr->k_idx) continue;
-
-		/* Extract the flags */
-		object_flags(o_ptr, t);
+		if (!o_ptr->k_idx) continue; /* Skip non-objects */
+		object_flags(o_ptr, t); /* Extract the flags */
 
 		/* Extract flags */
-		for (i = 0; i < OBJECT_FLAG_STRICT_UB; ++i)
-			f[i] |= t[i];
+		for (i = 0; i < OBJECT_FLAG_STRICT_UB; ++i) f[i] |= t[i];
 	}
 
 
-	if (p_ptr->timed[TMD_BLIND])
-	{
-		info[i++] = "You cannot see.";
-	}
-	if (p_ptr->timed[TMD_CONFUSED])
-	{
-		info[i++] = "You are confused.";
-	}
-	if (p_ptr->timed[TMD_AFRAID])
-	{
-		info[i++] = "You are terrified.";
-	}
-	if (p_ptr->timed[TMD_CUT])
-	{
-		info[i++] = "You are bleeding.";
-	}
-	if (p_ptr->timed[TMD_STUN])
-	{
-		info[i++] = "You are stunned.";
-	}
-	if (p_ptr->timed[TMD_POISONED])
-	{
-		info[i++] = "You are poisoned.";
-	}
-	if (p_ptr->timed[TMD_IMAGE])
-	{
-		info[i++] = "You are hallucinating.";
-	}
+	if (p_ptr->timed[TMD_BLIND]) info[i++] = "You cannot see.";
+	if (p_ptr->timed[TMD_CONFUSED]) info[i++] = "You are confused.";
+	if (p_ptr->timed[TMD_AFRAID]) info[i++] = "You are terrified.";
+	if (p_ptr->timed[TMD_CUT]) info[i++] = "You are bleeding.";
+	if (p_ptr->timed[TMD_STUN]) info[i++] = "You are stunned.";
+	if (p_ptr->timed[TMD_POISONED]) info[i++] = "You are poisoned.";
+	if (p_ptr->timed[TMD_IMAGE]) info[i++] = "You are hallucinating.";
 
-	if (p_ptr->aggravate)
-	{
-		info[i++] = "You aggravate monsters.";
-	}
-	if (p_ptr->teleport)
-	{
-		info[i++] = "Your position is very uncertain.";
-	}
+	if (p_ptr->aggravate) info[i++] = "You aggravate monsters.";
+	if (p_ptr->teleport) info[i++] = "Your position is very uncertain.";
 
-	if (p_ptr->timed[TMD_BLESSED])
-	{
-		info[i++] = "You feel righteous.";
-	}
-	if (p_ptr->timed[TMD_HERO])
-	{
-		info[i++] = "You feel heroic.";
-	}
-	if (p_ptr->timed[TMD_SHERO])
-	{
-		info[i++] = "You are in a battle rage.";
-	}
-	if (p_ptr->timed[TMD_PROTEVIL])
-	{
-		info[i++] = "You are protected from evil.";
-	}
-	if (p_ptr->timed[TMD_SHIELD])
-	{
-		info[i++] = "You are protected by a mystic shield.";
-	}
-	if (p_ptr->timed[TMD_INVULN])
-	{
-		info[i++] = "You are temporarily invulnerable.";
-	}
-	if (p_ptr->confusing)
-	{
-		info[i++] = "Your hands are glowing dull red.";
-	}
-	if (p_ptr->searching)
-	{
-		info[i++] = "You are looking around very carefully.";
-	}
-	if (p_ptr->new_spells)
-	{
-		info[i++] = "You can learn some spells/prayers.";
-	}
-	if (p_ptr->word_recall)
-	{
-		info[i++] = "You will soon be recalled.";
-	}
-	if (p_ptr->see_infra)
-	{
-		info[i++] = "Your eyes are sensitive to infrared light.";
-	}
+	if (p_ptr->timed[TMD_BLESSED]) info[i++] = "You feel righteous.";
+	if (p_ptr->timed[TMD_HERO]) info[i++] = "You feel heroic.";
+	if (p_ptr->timed[TMD_SHERO]) info[i++] = "You are in a battle rage.";
+	if (p_ptr->timed[TMD_PROTEVIL]) info[i++] = "You are protected from evil.";
+	if (p_ptr->timed[TMD_SHIELD]) info[i++] = "You are protected by a mystic shield.";
+	if (p_ptr->timed[TMD_INVULN]) info[i++] = "You are temporarily invulnerable.";
+	if (p_ptr->confusing) info[i++] = "Your hands are glowing dull red.";
+	if (p_ptr->searching) info[i++] = "You are looking around very carefully.";
+	if (p_ptr->new_spells) info[i++] = "You can learn some spells/prayers.";
+	if (p_ptr->word_recall) info[i++] = "You will soon be recalled.";
+	if (p_ptr->see_infra) info[i++] = "Your eyes are sensitive to infrared light.";
 
-	if (p_ptr->slow_digest)
-	{
-		info[i++] = "Your appetite is small.";
-	}
-	if (p_ptr->ffall)
-	{
-		info[i++] = "You land gently.";
-	}
-	if (p_ptr->lite)
-	{
-		info[i++] = "You are glowing with light.";
-	}
-	if (p_ptr->regenerate)
-	{
-		info[i++] = "You regenerate quickly.";
-	}
-	if (p_ptr->telepathy)
-	{
-		info[i++] = "You have ESP.";
-	}
-	if (p_ptr->see_inv)
-	{
-		info[i++] = "You can see invisible creatures.";
-	}
-	if (p_ptr->free_act)
-	{
-		info[i++] = "You have free action.";
-	}
-	if (p_ptr->hold_life)
-	{
-		info[i++] = "You have a firm hold on your life force.";
-	}
+	if (p_ptr->slow_digest) info[i++] = "Your appetite is small.";
+	if (p_ptr->ffall) info[i++] = "You land gently.";
+	if (p_ptr->lite) info[i++] = "You are glowing with light.";
+	if (p_ptr->regenerate) info[i++] = "You regenerate quickly.";
+	if (p_ptr->telepathy) info[i++] = "You have ESP.";
+	if (p_ptr->see_inv) info[i++] = "You can see invisible creatures.";
+	if (p_ptr->free_act) info[i++] = "You have free action.";
+	if (p_ptr->hold_life) info[i++] = "You have a firm hold on your life force.";
 
 	if (p_ptr->immune_acid)
 	{
@@ -600,134 +497,41 @@ void self_knowledge(void)
 		info[i++] = "You are resistant to poison.";
 	}
 
-	if (p_ptr->resist_fear)
-	{
-		info[i++] = "You are completely fearless.";
-	}
+	if (p_ptr->resist_fear) info[i++] = "You are completely fearless.";
 
-	if (p_ptr->resist_lite)
-	{
-		info[i++] = "You are resistant to bright light.";
-	}
-	if (p_ptr->resist_dark)
-	{
-		info[i++] = "You are resistant to darkness.";
-	}
-	if (p_ptr->resist_blind)
-	{
-		info[i++] = "Your eyes are resistant to blindness.";
-	}
-	if (p_ptr->resist_confu)
-	{
-		info[i++] = "You are resistant to confusion.";
-	}
-	if (p_ptr->resist_sound)
-	{
-		info[i++] = "You are resistant to sonic attacks.";
-	}
-	if (p_ptr->resist_shard)
-	{
-		info[i++] = "You are resistant to blasts of shards.";
-	}
-	if (p_ptr->resist_nexus)
-	{
-		info[i++] = "You are resistant to nexus attacks.";
-	}
-	if (p_ptr->resist_nethr)
-	{
-		info[i++] = "You are resistant to nether forces.";
-	}
-	if (p_ptr->resist_chaos)
-	{
-		info[i++] = "You are resistant to chaos.";
-	}
-	if (p_ptr->resist_disen)
-	{
-		info[i++] = "You are resistant to disenchantment.";
-	}
+	if (p_ptr->resist_lite) info[i++] = "You are resistant to bright light.";
+	if (p_ptr->resist_dark) info[i++] = "You are resistant to darkness.";
+	if (p_ptr->resist_blind) info[i++] = "Your eyes are resistant to blindness.";
+	if (p_ptr->resist_confu) info[i++] = "You are resistant to confusion.";
+	if (p_ptr->resist_sound) info[i++] = "You are resistant to sonic attacks.";
+	if (p_ptr->resist_shard) info[i++] = "You are resistant to blasts of shards.";
+	if (p_ptr->resist_nexus) info[i++] = "You are resistant to nexus attacks.";
+	if (p_ptr->resist_nethr) info[i++] = "You are resistant to nether forces.";
+	if (p_ptr->resist_chaos) info[i++] = "You are resistant to chaos.";
+	if (p_ptr->resist_disen) info[i++] = "You are resistant to disenchantment.";
 
-	if (p_ptr->sustain[A_STR])
-	{
-		info[i++] = "Your strength is sustained.";
-	}
-	if (p_ptr->sustain[A_INT])
-	{
-		info[i++] = "Your intelligence is sustained.";
-	}
-	if (p_ptr->sustain[A_WIS])
-	{
-		info[i++] = "Your wisdom is sustained.";
-	}
-	if (p_ptr->sustain[A_CON])
-	{
-		info[i++] = "Your constitution is sustained.";
-	}
-	if (p_ptr->sustain[A_DEX])
-	{
-		info[i++] = "Your dexterity is sustained.";
-	}
-	if (p_ptr->sustain[A_CHR])
-	{
-		info[i++] = "Your charisma is sustained.";
-	}
+	if (p_ptr->sustain[A_STR]) info[i++] = "Your strength is sustained.";
+	if (p_ptr->sustain[A_INT]) info[i++] = "Your intelligence is sustained.";
+	if (p_ptr->sustain[A_WIS]) info[i++] = "Your wisdom is sustained.";
+	if (p_ptr->sustain[A_CON]) info[i++] = "Your constitution is sustained.";
+	if (p_ptr->sustain[A_DEX]) info[i++] = "Your dexterity is sustained.";
+	if (p_ptr->sustain[A_CHR]) info[i++] = "Your charisma is sustained.";
 
-	if (f[0] & (TR1_STR))
-	{
-		info[i++] = "Your strength is affected by your equipment.";
-	}
-	if (f[0] & (TR1_INT))
-	{
-		info[i++] = "Your intelligence is affected by your equipment.";
-	}
-	if (f[0] & (TR1_WIS))
-	{
-		info[i++] = "Your wisdom is affected by your equipment.";
-	}
-	if (f[0] & (TR1_DEX))
-	{
-		info[i++] = "Your dexterity is affected by your equipment.";
-	}
-	if (f[0] & (TR1_CON))
-	{
-		info[i++] = "Your constitution is affected by your equipment.";
-	}
-	if (f[0] & (TR1_CHR))
-	{
-		info[i++] = "Your charisma is affected by your equipment.";
-	}
+	if (f[0] & (TR1_STR)) info[i++] = "Your strength is affected by your equipment.";
+	if (f[0] & (TR1_INT)) info[i++] = "Your intelligence is affected by your equipment.";
+	if (f[0] & (TR1_WIS)) info[i++] = "Your wisdom is affected by your equipment.";
+	if (f[0] & (TR1_DEX)) info[i++] = "Your dexterity is affected by your equipment.";
+	if (f[0] & (TR1_CON)) info[i++] = "Your constitution is affected by your equipment.";
+	if (f[0] & (TR1_CHR)) info[i++] = "Your charisma is affected by your equipment.";
 
-	if (f[0] & (TR1_STEALTH))
-	{
-		info[i++] = "Your stealth is affected by your equipment.";
-	}
-	if (f[0] & (TR1_SEARCH))
-	{
-		info[i++] = "Your searching ability is affected by your equipment.";
-	}
-	if (f[0] & (TR1_INFRA))
-	{
-		info[i++] = "Your infravision is affected by your equipment.";
-	}
-	if (f[0] & (TR1_TUNNEL))
-	{
-		info[i++] = "Your digging ability is affected by your equipment.";
-	}
-	if (f[0] & (TR1_SPEED))
-	{
-		info[i++] = "Your speed is affected by your equipment.";
-	}
-	if (f[0] & (TR1_BLOWS))
-	{
-		info[i++] = "Your attack speed is affected by your equipment.";
-	}
-	if (f[0] & (TR1_SHOTS))
-	{
-		info[i++] = "Your shooting speed is affected by your equipment.";
-	}
-	if (f[0] & (TR1_MIGHT))
-	{
-		info[i++] = "Your shooting might is affected by your equipment.";
-	}
+	if (f[0] & (TR1_STEALTH)) info[i++] = "Your stealth is affected by your equipment.";
+	if (f[0] & (TR1_SEARCH)) info[i++] = "Your searching ability is affected by your equipment.";
+	if (f[0] & (TR1_INFRA)) info[i++] = "Your infravision is affected by your equipment.";
+	if (f[0] & (TR1_TUNNEL)) info[i++] = "Your digging ability is affected by your equipment.";
+	if (f[0] & (TR1_SPEED)) info[i++] = "Your speed is affected by your equipment.";
+	if (f[0] & (TR1_BLOWS)) info[i++] = "Your attack speed is affected by your equipment.";
+	if (f[0] & (TR1_SHOTS)) info[i++] = "Your shooting speed is affected by your equipment.";
+	if (f[0] & (TR1_MIGHT)) info[i++] = "Your shooting might is affected by your equipment.";
 
 
 	/* Get the current weapon */
@@ -737,96 +541,38 @@ void self_knowledge(void)
 	if (o_ptr->k_idx)
 	{
 		/* Special "Attack Bonuses" */
-		if (f[0] & (TR1_BRAND_ACID))
-		{
-			info[i++] = "Your weapon melts your foes.";
-		}
-		if (f[0] & (TR1_BRAND_ELEC))
-		{
-			info[i++] = "Your weapon shocks your foes.";
-		}
-		if (f[0] & (TR1_BRAND_FIRE))
-		{
-			info[i++] = "Your weapon burns your foes.";
-		}
-		if (f[0] & (TR1_BRAND_COLD))
-		{
-			info[i++] = "Your weapon freezes your foes.";
-		}
-		if (f[0] & (TR1_BRAND_POIS))
-		{
-			info[i++] = "Your weapon poisons your foes.";
-		}
+		if (f[0] & (TR1_BRAND_ACID)) info[i++] = "Your weapon melts your foes.";
+		if (f[0] & (TR1_BRAND_ELEC)) info[i++] = "Your weapon shocks your foes.";
+		if (f[0] & (TR1_BRAND_FIRE)) info[i++] = "Your weapon burns your foes.";
+		if (f[0] & (TR1_BRAND_COLD)) info[i++] = "Your weapon freezes your foes.";
+		if (f[0] & (TR1_BRAND_POIS)) info[i++] = "Your weapon poisons your foes.";
 
 		/* Special "slay" flags */
-		if (f[0] & (TR1_SLAY_ANIMAL))
-		{
-			info[i++] = "Your weapon strikes at animals with extra force.";
-		}
-		if (f[0] & (TR1_SLAY_EVIL))
-		{
-			info[i++] = "Your weapon strikes at evil with extra force.";
-		}
-		if (f[0] & (TR1_SLAY_UNDEAD))
-		{
-			info[i++] = "Your weapon strikes at undead with holy wrath.";
-		}
-		if (f[0] & (TR1_SLAY_DEMON))
-		{
-			info[i++] = "Your weapon strikes at demons with holy wrath.";
-		}
-		if (f[0] & (TR1_SLAY_ORC))
-		{
-			info[i++] = "Your weapon is especially deadly against orcs.";
-		}
-		if (f[0] & (TR1_SLAY_TROLL))
-		{
-			info[i++] = "Your weapon is especially deadly against trolls.";
-		}
-		if (f[0] & (TR1_SLAY_GIANT))
-		{
-			info[i++] = "Your weapon is especially deadly against giants.";
-		}
-		if (f[0] & (TR1_SLAY_DRAGON))
-		{
-			info[i++] = "Your weapon is especially deadly against dragons.";
-		}
+		if (f[0] & (TR1_SLAY_ANIMAL)) info[i++] = "Your weapon strikes at animals with extra force.";
+		if (f[0] & (TR1_SLAY_EVIL)) info[i++] = "Your weapon strikes at evil with extra force.";
+		if (f[0] & (TR1_SLAY_UNDEAD)) info[i++] = "Your weapon strikes at undead with holy wrath.";
+		if (f[0] & (TR1_SLAY_DEMON)) info[i++] = "Your weapon strikes at demons with holy wrath.";
+		if (f[0] & (TR1_SLAY_ORC)) info[i++] = "Your weapon is especially deadly against orcs.";
+		if (f[0] & (TR1_SLAY_TROLL)) info[i++] = "Your weapon is especially deadly against trolls.";
+		if (f[0] & (TR1_SLAY_GIANT)) info[i++] = "Your weapon is especially deadly against giants.";
+		if (f[0] & (TR1_SLAY_DRAGON)) info[i++] = "Your weapon is especially deadly against dragons.";
 
 		/* Special "kill" flags */
-		if (f[0] & (TR1_KILL_DRAGON))
-		{
-			info[i++] = "Your weapon is a great bane of dragons.";
-		}
-		if (f[0] & (TR1_KILL_DEMON))
-		{
-			info[i++] = "Your weapon is a great bane of demons.";
-		}
-		if (f[0] & (TR1_KILL_UNDEAD))
-		{
-			info[i++] = "Your weapon is a great bane of undead.";
-		}
+		if (f[0] & (TR1_KILL_DRAGON)) info[i++] = "Your weapon is a great bane of dragons.";
+		if (f[0] & (TR1_KILL_DEMON)) info[i++] = "Your weapon is a great bane of demons.";
+		if (f[0] & (TR1_KILL_UNDEAD)) info[i++] = "Your weapon is a great bane of undead.";
 
 
 		/* Indicate Blessing */
-		if (f[2] & (TR3_BLESSED))
-		{
-			info[i++] = "Your weapon has been blessed by the gods.";
-		}
+		if (f[2] & (TR3_BLESSED)) info[i++] = "Your weapon has been blessed by the gods.";
 
 		/* Hack */
-		if (f[2] & (TR3_IMPACT))
-		{
-			info[i++] = "Your weapon can induce earthquakes.";
-		}
+		if (f[2] & (TR3_IMPACT)) info[i++] = "Your weapon can induce earthquakes.";
 	}
 
 
-	/* Save screen */
-	screen_save();
-
-
-	/* Clear the screen */
-	Term_clear();
+	screen_save();	/* Save screen */
+	Term_clear();	/* Clear the screen */
 
 	/* Label the information */
 	prt("     Your Attributes:", 1, 0);
@@ -858,14 +604,8 @@ void self_knowledge(void)
 	prt("[Press any key to continue]", k, 0);
 	(void)inkey();
 
-
-	/* Load screen */
-	screen_load();
+	screen_load();	/* Load screen */
 }
-
-
-
-
 
 
 /*

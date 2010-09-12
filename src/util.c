@@ -2451,20 +2451,13 @@ void request_command(bool shopping)
 			/* Start using the buffer */
 			inkey_next = request_command_buffer;
 
-			/* Continue */
-			continue;
+			continue;	/* Continue */
 		}
 
 
-		/* Paranoia */
-		if (ch == '\0') continue;
-
-
-		/* Use command */
-		p_ptr->command_cmd = ch;
-
-		/* Done */
-		break;
+		if (ch == '\0') continue;	/* Paranoia */
+		p_ptr->command_cmd = ch;	/* Use command */
+		break;	/* Done */
 	}
 
 	/* Hack -- Auto-repeat certain commands */
@@ -2498,12 +2491,10 @@ void request_command(bool shopping)
 
 
 	/* Hack -- Scan equipment */
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
+	for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)
 	{
 		const object_type* const o_ptr = &p_ptr->inventory[i];
-
-		/* Skip non-objects */
-		if (!o_ptr->k_idx) continue;
+		if (!o_ptr->k_idx) continue;	/* Skip non-objects */
 
 		if (check_for_inscrip(o_ptr,"^*"))
 		{
@@ -2516,9 +2507,7 @@ void request_command(bool shopping)
 		};
 	}
 
-
-	/* Hack -- erase the message line. */
-	prt("", 0, 0);
+	prt("", 0, 0);	/* erase the message line. */
 }
 
 
