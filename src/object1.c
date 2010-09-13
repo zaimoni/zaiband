@@ -1581,7 +1581,7 @@ char index_to_label(int i)
  *
  * Return "-1" if the label does not indicate a real item.
  */
-s16b label_to_inven(int c)
+static s16b label_to_inven(int c)
 {	/* Convert */
 	const int i = (islower((unsigned char)c) ? A2I(c) : -1);
 
@@ -1589,7 +1589,7 @@ s16b label_to_inven(int c)
 	if ((i < 0) || (i > INVEN_PACK)) return (-1);
 
 	/* Empty slots can never be chosen */
-	if (!p_ptr->inventory[i].k_idx) return (-1);
+	if (!p_ptr->inventory[i+INVEN_ORIGIN].k_idx) return (-1);
 
 	/* Return the index */
 	return (i);
@@ -1601,7 +1601,7 @@ s16b label_to_inven(int c)
  *
  * Return "-1" if the label does not indicate a real item.
  */
-s16b label_to_equip(int c)
+static s16b label_to_equip(int c)
 {	/* Convert */
 	const int i = (islower((unsigned char)c) ? A2I(c) : -1) + INVEN_EQUIP_ORIGIN;
 
@@ -2518,12 +2518,12 @@ bool get_item(int *cp, const char* pmt, const char* str, int mode)
 	bool toggle = FALSE;
 
 	/* default to full inventory if allowed, disabled otherwise */
-	int i1 = 0;
-	int i2 = (use_inven) ? INVEN_PACK - 1 : -1;
+	int i1 = INVEN_ORIGIN;
+	int i2 = (use_inven) ? INVEN_OVERFLOW - 1 : -1;
 
 	/* default to full equipment if allowed, disabled otherwise */
-	int e1 = INVEN_WIELD;
-	int e2 = (use_equip) ? INVEN_TOTAL - 1 : -1;
+	int e1 = INVEN_EQUIP_ORIGIN;
+	int e2 = (use_equip) ? INVEN_EQUIP_STRICT_UB - 1 : -1;
 
 	/* default to full floor if allowed, disabled otherwise */
 	int f1 = 0;

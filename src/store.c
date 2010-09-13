@@ -3259,8 +3259,6 @@ void do_cmd_store(void)
 	int py = p_ptr->loc.y;
 	int px = p_ptr->loc.x;
 
-	int tmp_chr;
-
 
 	/* Verify a store */
 	ZAIBAND_STATIC_ASSERT((FEAT_SHOP_TAIL-FEAT_SHOP_HEAD+1)==MAX_STORES);
@@ -3305,7 +3303,7 @@ void do_cmd_store(void)
 		prt("", 1, 0);
 
 		/* Hack -- Check the charisma */
-		tmp_chr = p_ptr->stat_use[A_CHR];
+		const int tmp_chr = p_ptr->stat_use[A_CHR];
 
 		/* Clear */
 		clear_from(21);
@@ -3329,25 +3327,16 @@ void do_cmd_store(void)
 		else
 			prt(" l) Look at an item.", 22, 56);
 
-		/* Prompt */
-		prt("You may: ", 21, 0);
-
-		/* Get a command */
-		request_command(TRUE);
-
-		/* Process the command */
-		store_process_command();
-
-		/* Notice stuff */
-		notice_stuff();
-
-		/* Handle stuff */
-		handle_stuff();
+		prt("You may: ", 21, 0); /* Prompt */
+		request_command(TRUE); /* Get a command */
+		store_process_command(); /* Process the command */
+		notice_stuff(); /* Notice stuff */
+		handle_stuff(); /* Handle stuff */
 
 		/* Pack Overflow XXX XXX XXX */
-		if (p_ptr->inventory[INVEN_PACK].k_idx)
+		if (p_ptr->inventory[INVEN_OVERFLOW].k_idx)
 		{
-			const object_type* const o_ptr = &p_ptr->inventory[INVEN_PACK];
+			const object_type* const o_ptr = &p_ptr->inventory[INVEN_OVERFLOW];
 
 			/* Hack -- Flee from the store */
 			if (store_num != STORE_HOME)
@@ -3355,8 +3344,7 @@ void do_cmd_store(void)
 				/* Message */
 				msg_print("Your pack is so full that you flee the store...");
 
-				/* Leave */
-				leave_store = TRUE;
+				leave_store = TRUE; /* Leave */
 			}
 
 			/* Hack -- Flee from the home */
@@ -3365,49 +3353,37 @@ void do_cmd_store(void)
 				/* Message */
 				msg_print("Your pack is so full that you flee your home...");
 
-				/* Leave */
-				leave_store = TRUE;
+				leave_store = TRUE; /* Leave */
 			}
 
 			/* Hack -- Drop items into the home */
 			else
 			{
-				int item_pos;
-
-				object_type object_type_body;
-				object_type *i_ptr = &object_type_body;	/* Get local object */
-
 				char o_name[80];
-
 
 				/* Give a message */
 				msg_print("Your pack overflows!");
 
+				{
 				/* Grab a copy of the object */
-				*i_ptr = *o_ptr;
+				object_type tmp = *o_ptr;
 
 				/* Describe it */
-				object_desc(o_name, sizeof(o_name), i_ptr, TRUE, ODESC_FULL);
+				object_desc(o_name, sizeof(o_name), &tmp, TRUE, ODESC_FULL);
 
 				/* Message */
-				msg_format("You drop %s (%c).", o_name, index_to_label(INVEN_PACK));
+				msg_format("You drop %s (%c).", o_name, index_to_label(INVEN_OVERFLOW));
 
 				/* Remove it from the players inventory */
-				inven_item_increase(INVEN_PACK, -255);
-				inven_item_describe(INVEN_PACK);
-				inven_item_optimize(INVEN_PACK);
+				inven_item_increase(INVEN_OVERFLOW, -255);
+				inven_item_describe(INVEN_OVERFLOW);
+				inven_item_optimize(INVEN_OVERFLOW);
 
 				/* Handle stuff */
 				handle_stuff();
 
-				/* Let the home carry it */
-				item_pos = home_carry(i_ptr);
-
-				/* Redraw the home */
-				if (item_pos >= 0)
-				{
-					/* Redisplay wares */
-					display_inventory();
+				/* If the home carries it: redraw home, redisplay wares */
+				if (0 <= home_carry(&tmp)) display_inventory();
 				}
 			}
 		}
@@ -3420,27 +3396,12 @@ void do_cmd_store(void)
 		}
 	}
 
-	/* Leave the store sound */
-	sound(MSG_STORE_LEAVE);
-
-
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
-
-	/* Hack -- Cancel automatic command */
-	p_ptr->command_new = 0;
-
-	/* Flush messages XXX XXX XXX */
-	message_flush();
-
-
-	/* Hack -- Decrease "icky" depth */
-	character_icky--;
-
-
-	/* Clear the screen */
-	Term_clear();
+	sound(MSG_STORE_LEAVE); /* Leave the store sound */
+	p_ptr->energy_use = 100; /* Take a turn */
+	p_ptr->command_new = 0; /* Hack -- Cancel automatic command */
+	message_flush(); /* Flush messages XXX XXX XXX */
+	character_icky--; /* Hack -- Decrease "icky" depth */
+	Term_clear(); /* Clear the screen */
 
 
 	/* Update the visuals */

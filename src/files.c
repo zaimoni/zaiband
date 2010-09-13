@@ -1988,7 +1988,7 @@ errr file_character(const char* name, bool full)
 
 	/* Dump the inventory */
 	fprintf(fff, "  [Character Inventory]\n\n");
-	for (i = 0; i < INVEN_PACK; i++)
+	for (i = INVEN_ORIGIN; i < INVEN_OVERFLOW; i++)
 	{
 		if (!p_ptr->inventory[i].k_idx) break;
 

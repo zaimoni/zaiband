@@ -2175,29 +2175,24 @@ static void process_player(void)
 		/* Notice stuff (if needed) */
 		if (p_ptr->notice) notice_stuff();
 
-		/* Handle stuff */
-		handle_stuff();
+		handle_stuff(); /* Handle stuff */
 
 		/* Place the cursor on the player */
 		move_cursor_relative(p_ptr->loc);
 
-		/* Refresh */
-		Term_fresh();
+		Term_fresh(); /* Refresh */
 
 
 		/* Hack -- Pack Overflow */
-		if (p_ptr->inventory[INVEN_PACK].k_idx)
+		if (p_ptr->inventory[INVEN_OVERFLOW].k_idx)
 		{
 			char o_name[80];
 
 			/* Get the slot to be dropped */
-			object_type* const o_ptr = &p_ptr->inventory[INVEN_PACK];
+			object_type* const o_ptr = &p_ptr->inventory[INVEN_OVERFLOW];
 
-			/* Disturbing */
-			disturb(0, 0);
-
-			/* Warning */
-			msg_print("Your pack overflows!");
+			disturb(0, 0); /* Disturbing */
+			msg_print("Your pack overflows!"); /* Warning */
 
 			/* Describe */
 			object_desc(o_name, sizeof(o_name), o_ptr, TRUE, ODESC_FULL);
@@ -2209,9 +2204,9 @@ static void process_player(void)
 			drop_near(o_ptr, 0, p_ptr->loc);
 
 			/* Modify, Describe, Optimize */
-			inven_item_increase(INVEN_PACK, -255);
-			inven_item_describe(INVEN_PACK);
-			inven_item_optimize(INVEN_PACK);
+			inven_item_increase(INVEN_OVERFLOW, -255);
+			inven_item_describe(INVEN_OVERFLOW);
+			inven_item_optimize(INVEN_OVERFLOW);
 
 			/* Notice stuff (if needed) */
 			if (p_ptr->notice) notice_stuff();

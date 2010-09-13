@@ -388,8 +388,6 @@ extern void object_desc_spoil(char *buf, size_t max, const object_type *o_ptr, b
 extern void describe_item_activation(const object_type *o_ptr);
 extern void identify_random_gen(const object_type *o_ptr);
 extern char index_to_label(int i);
-extern s16b label_to_inven(int c);
-extern s16b label_to_equip(int c);
 extern s16b wield_slot(const object_type *o_ptr);
 extern const char* mention_use(int i);
 extern const char* describe_use(int i);

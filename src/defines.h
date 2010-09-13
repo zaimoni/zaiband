@@ -260,7 +260,10 @@ enum player_gender	{
  * Note that "INVEN_PACK" is probably hard-coded by its use in savefiles, and
  * by the fact that the screen can only show 23 items plus a one-line prompt.
  */
-#define INVEN_PACK		23
+#define INVEN_ORIGIN	0
+#define INVEN_STRICT_UB	24
+#define INVEN_PACK		(INVEN_STRICT_UB-INVEN_ORIGIN-1)
+#define INVEN_OVERFLOW	(INVEN_STRICT_UB-1)
 
 /*
  * Indexes used for various "equipment" slots (hard-coded by savefiles, etc).

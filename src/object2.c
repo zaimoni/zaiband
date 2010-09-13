@@ -3418,9 +3418,9 @@ bool player_type::inven_cnt_is_strict_UB_of_nonzero_k_idx() const
 {
 	char buf[10];
 	int i;
-	for (i = 0; i < INVEN_PACK; ++i)
+	for (i = INVEN_ORIGIN; i < INVEN_OVERFLOW; ++i)
 	{
-		if (p_ptr->inven_cnt<=i)
+		if (p_ptr->inven_cnt<=i-INVEN_ORIGIN)
 		{
 			if (0!=inventory[i].k_idx) {plog("non-zero"); plog(ltoa(i,buf,10)); return FALSE;};
 		}
@@ -3624,7 +3624,7 @@ s16b inven_carry(object_type *o_ptr)
 	j = 0;
 	while(j < p_ptr->inven_cnt)
 	{
-		j_ptr = &p_ptr->inventory[j];
+		j_ptr = &p_ptr->inventory[j+INVEN_ORIGIN];
 
 		/* Check if the two items can be combined */
 		if (object_similar(j_ptr, o_ptr))
@@ -3660,7 +3660,7 @@ s16b inven_carry(object_type *o_ptr)
 		j = -1;
 		while(++j < p_ptr->inven_cnt)
 		{
-			j_ptr = &p_ptr->inventory[j];
+			j_ptr = &p_ptr->inventory[j+INVEN_ORIGIN];
 
 			/* Hack -- readable books always come first */
 			if (o_ptr->obj_id.tval == p_ptr->spell_book())
@@ -3702,23 +3702,19 @@ s16b inven_carry(object_type *o_ptr)
 			if (o_value < j_value) continue;
 		}
 
-		/* Use that slot */
-		i = j;
+		i = j; /* Use that slot */
 
 		/* Slide objects */
-		if (n >= i) C_COPY(p_ptr->inventory + i + 1, p_ptr->inventory + i, n - i + 1);
+		if (n >= i) C_COPY(p_ptr->inventory + i + 1 +INVEN_ORIGIN, p_ptr->inventory + i +INVEN_ORIGIN, n - i + 1);
 	}
 
-	/* Copy the item */
-	p_ptr->inventory[i] = *o_ptr;
-
-	/* Count the items */
-	++p_ptr->inven_cnt;
+	p_ptr->inventory[i+INVEN_ORIGIN] = *o_ptr; /* Copy the item */
+	++p_ptr->inven_cnt; /* Count the items */
 
 	assert(p_ptr->inven_cnt_is_strict_UB_of_nonzero_k_idx() && "postcondition");
 
 	/* Get the new object */
-	j_ptr = &p_ptr->inventory[i];
+	j_ptr = &p_ptr->inventory[i+INVEN_ORIGIN];
 
 	j_ptr->next_o_idx = 0;	/* Forget stack */
 	j_ptr->held_m_idx = 0;	/* Forget monster */
@@ -3728,17 +3724,13 @@ s16b inven_carry(object_type *o_ptr)
 	/* Increase the weight */
 	p_ptr->total_weight += (j_ptr->number * j_ptr->weight);
 
-	/* Recalculate bonuses */
-	p_ptr->update |= (PU_BONUS);
+	p_ptr->update |= (PU_BONUS); /* Recalculate bonuses */
 
 	/* Combine and Reorder pack */
 	p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
-	/* Window stuff */
-	p_ptr->redraw |= (PR_INVEN);
-
-	/* Return the slot */
-	return (i);
+	p_ptr->redraw |= (PR_INVEN); /* Window stuff */
+	return i+INVEN_ORIGIN; /* Return the slot */
 }
 
 
@@ -3898,19 +3890,18 @@ void combine_pack(void)
 	for (i = p_ptr->inven_cnt-1; i > 0; i--)
 	{
 		/* Get the item */
-		object_type* const o_ptr = &p_ptr->inventory[i];
+		object_type* const o_ptr = &p_ptr->inventory[i+INVEN_ORIGIN];
 
 		/* Scan the items above that item */
 		for (j = 0; j < i; j++)
 		{
 			/* Get the item */
-			object_type* const j_ptr = &p_ptr->inventory[j];
+			object_type* const j_ptr = &p_ptr->inventory[j+INVEN_ORIGIN];
 
 			/* Can we drop "o_ptr" onto "j_ptr"? */
 			if (object_similar(j_ptr, o_ptr))
 			{
-				/* Take note */
-				flag = TRUE;
+				flag = TRUE; /* Take note */
 
 				/* Add together the item counts */
 				object_absorb(j_ptr, o_ptr);
@@ -3919,18 +3910,17 @@ void combine_pack(void)
 				p_ptr->inven_cnt--;
 
 				/* Slide everything down */
-				if (i < INVEN_PACK) C_COPY(p_ptr->inventory + i, p_ptr->inventory + i + 1, INVEN_PACK - i);
+				if (i < INVEN_PACK) C_COPY(p_ptr->inventory + i +INVEN_ORIGIN, p_ptr->inventory + i + 1 +INVEN_ORIGIN, INVEN_PACK - i);
 
 				/* Hack -- wipe hole */
-				WIPE(&p_ptr->inventory[INVEN_PACK]);
+				WIPE(&p_ptr->inventory[INVEN_OVERFLOW]);
 
 				assert(p_ptr->inven_cnt_is_strict_UB_of_nonzero_k_idx() && "postcondition");
 
 				/* Window stuff */
 				p_ptr->redraw |= (PR_INVEN);
 
-				/* Done */
-				break;
+				break; /* Done */
 			}
 		}
 	}
