@@ -2072,17 +2072,17 @@ static void mspell_TELE_LEVEL(int m_idx_ok)
 	update_smart_learn(m_idx_ok, DRS_RES_NEXUS);
 }
 
-static void mspell_DARKNESS(int m_idx_ok)
+static void mspell_DARKNESS(int)
 {
 	unlite_area(0, 3);
 }
 
-static void mspell_TRAPS(int m_idx_ok)
+static void mspell_TRAPS(int)
 {
 	trap_creation();
 }
 
-static void mspell_FORGET(int m_idx_ok)
+static void mspell_FORGET(int)
 {
 	if (p_ptr->std_save())
 	{

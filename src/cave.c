@@ -2358,11 +2358,12 @@ void update_view(void)
 {
 	/* set up coordinate lists */
 	/* perhaps these should be explicit caches in p_ptr? */
-	coord* coord_list = (coord*)calloc(squares_in_view_octagon(MAX_SIGHT),sizeof(coord));
-	coord* old_seen_list = (coord*)calloc(squares_in_view_octagon(MAX_SIGHT),sizeof(coord));
+	const size_t coord_strict_ub = squares_in_view_octagon(MAX_SIGHT);
+	coord* coord_list = (coord*)calloc(coord_strict_ub,sizeof(coord));
+	coord* old_seen_list = (coord*)calloc(coord_strict_ub,sizeof(coord));
 	size_t StrictUB = 0;	/* technically redundant, will be set correctly anyway later */
 	size_t StrictUB_old_seen = 0;
-	size_t Idx;
+	size_t i;
 	coord g;
 	byte info;
 
@@ -2381,7 +2382,7 @@ void update_view(void)
 				info |= (CAVE_TEMP);
 
 				/* Save grid for later */
-				old_seen_list[StrictUB_old_seen++] = g;
+				C_ARRAY_PUSH(old_seen_list,StrictUB_old_seen,g,coord_strict_ub);
 			}
 
 			/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
@@ -2399,16 +2400,16 @@ void update_view(void)
 	assert(coord_list[0]==p_ptr->loc);
 
 	/* Process "new" grids */
-	Idx = StrictUB;
-	while(0<Idx)
+	i = StrictUB;
+	while(0<i)
 	{
-		--Idx;
-		info = cave_info[coord_list[Idx].y][coord_list[Idx].x];
+		--i;
+		info = cave_info[coord_list[i].y][coord_list[i].x];
 		info |= (CAVE_VIEW);	/* Assume viewable */
 		if (!p_ptr->timed[TMD_BLIND])
 		{
 			if (	(info & (CAVE_GLOW))	/* perma-lit grid */
-				||	(distance(p_ptr->loc.y,p_ptr->loc.x,coord_list[Idx].y,coord_list[Idx].x)<=p_ptr->cur_lite))	/* torch-lit grid */
+				||	(distance(p_ptr->loc.y,p_ptr->loc.x,coord_list[i].y,coord_list[i].x)<=p_ptr->cur_lite))	/* torch-lit grid */
 			{
 				/* Mark as "CAVE_SEEN" */
 				info |= (CAVE_SEEN);
@@ -2416,38 +2417,34 @@ void update_view(void)
 		}
 
 		/* Save cave info */
-		cave_info[coord_list[Idx].y][coord_list[Idx].x] = info;
+		cave_info[coord_list[i].y][coord_list[i].x] = info;
 
 		/* Was not "CAVE_SEEN", is now "CAVE_SEEN" */
 		if ((info & (CAVE_SEEN)) && !(info & (CAVE_TEMP)))
 		{
 			/* Note */
-			note_spot(coord_list[Idx]);
+			note_spot(coord_list[i]);
 
 			/* Redraw */
-			lite_spot(coord_list[Idx]);
+			lite_spot(coord_list[i]);
 		}
 	}
 
 	/* Process "old" grids */
-	Idx = StrictUB_old_seen;
-	while(0<Idx)
+	i = StrictUB_old_seen;
+	while(0<i)
 	{
-		--Idx;
-		info = cave_info[old_seen_list[Idx].y][old_seen_list[Idx].x];
+		--i;
+		info = cave_info[old_seen_list[i].y][old_seen_list[i].x];
 
 		/* Clear "CAVE_TEMP" flag */
 		info &= ~(CAVE_TEMP);
 
 		/* Save cave info */
-		cave_info[old_seen_list[Idx].y][old_seen_list[Idx].x] = info;
+		cave_info[old_seen_list[i].y][old_seen_list[i].x] = info;
 
-		/* Was "CAVE_SEEN", is now not "CAVE_SEEN" */
-		if (!(info & (CAVE_SEEN)))
-		{
-			/* Redraw */
-			lite_spot(old_seen_list[Idx]);
-		}
+		/* Was "CAVE_SEEN", is now not "CAVE_SEEN": Redraw */
+		if (!(info & (CAVE_SEEN))) lite_spot(old_seen_list[i]);
 	}
 
 	free(coord_list);

@@ -1568,6 +1568,7 @@ void identify_random_gen(const object_type *o_ptr)
  */
 char index_to_label(int i)
 {
+	assert(INVEN_ORIGIN<=i && INVEN_TOTAL>i);
 	/* inven index */
 	if ((INVEN_ORIGIN <= i) && (INVEN_STRICT_UB > i))
 	{

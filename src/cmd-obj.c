@@ -30,7 +30,7 @@ static bool obj_has_inscrip(const object_type *o_ptr)
 }
 
 /* Remove inscription */
-static void obj_uninscribe(object_type *o_ptr, int item)
+static void obj_uninscribe(object_type *o_ptr, int)
 {
 	o_ptr->note = 0;
 	msg_print("Inscription removed.");
@@ -41,7 +41,7 @@ static void obj_uninscribe(object_type *o_ptr, int item)
 }
 
 /* Add inscription */
-static void obj_inscribe(object_type *o_ptr, int item)
+static void obj_inscribe(object_type *o_ptr, int)
 {
 	char o_name[80];
 	char tmp[80] = "";
@@ -67,7 +67,7 @@ static void obj_inscribe(object_type *o_ptr, int item)
 
 
 /*** Examination ***/
-static void obj_examine(object_type *o_ptr, int item)
+static void obj_examine(object_type *o_ptr, int)
 {
     object_info_screen(o_ptr);
 }
@@ -90,9 +90,9 @@ static bool obj_can_wear(const object_type *o_ptr)
 
 
 /* Take off an item */
-static void obj_takeoff(object_type *o_ptr, int item)
+static void obj_takeoff(object_type*, int item)
 {
-	(void)inven_takeoff(item, 255);
+	inven_takeoff(item, 255);
 	p_ptr->energy_use = 50;
 }
 
@@ -224,22 +224,20 @@ static bool obj_study_pre(void)
 
 
 /* Peruse spells in a book */
-static void obj_browse(object_type *o_ptr, int item)
+static void obj_browse(object_type *o_ptr, int)
 {
 	do_cmd_browse_aux(o_ptr);
 }
 
 /* Study a book to gain a new spell */
-static void obj_study(object_type *o_ptr, int item)
+static void obj_study(object_type *o_ptr, int)
 {
-	int spell;
-
 	/* Track the object kind */
 	object_kind_track(o_ptr->k_idx);
 	handle_stuff();
 
 	/* Choose a spell to study */
-	spell = spell_choose_new(o_ptr);
+	const int spell = spell_choose_new(o_ptr);
 	if (spell < 0) return;
 
 	/* Learn the spell */
@@ -248,9 +246,8 @@ static void obj_study(object_type *o_ptr, int item)
 }
 
 /* Cast a spell from a book */
-static void obj_cast(object_type *o_ptr, int item)
+static void obj_cast(object_type *o_ptr, int)
 {
-	int spell;
 	const char* const verb = ((p_ptr->spell_book() == TV_MAGIC_BOOK) ? "cast" : "recite");
 
 	/* Track the object kind */
@@ -258,7 +255,7 @@ static void obj_cast(object_type *o_ptr, int item)
 	handle_stuff();
 
 	/* Ask for a spell */
-	spell = get_spell(o_ptr, verb, TRUE);
+	const int spell = get_spell(o_ptr, verb, TRUE);
 	if (spell < 0)
 	{
 		const char* const p = ((p_ptr->spell_book() == TV_MAGIC_BOOK) ? "spell" : "prayer");

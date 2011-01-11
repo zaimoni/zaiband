@@ -746,8 +746,6 @@ void do_cmd_fire(void)
 	coord t, tt;
 	int dir, item;
 	int i, j;
-	int tdam, tdis, thits, tmul;
-	int bonus, chance;
 
 	object_type object_type_body;
 
@@ -808,9 +806,7 @@ void do_cmd_fire(void)
 		floor_item_optimize(0 - item);
 	}
 
-
-	/* Sound */
-	sound(MSG_SHOOT);
+	sound(MSG_SHOOT); /* Sound */
 
 
 	/* Describe the object */
@@ -820,23 +816,23 @@ void do_cmd_fire(void)
 	const attr_char missile = i_ptr->user();
 
 	/* Use the proper number of shots */
-	thits = p_ptr->num_fire;
+	const int thits = p_ptr->num_fire;
 
 	/* Base damage from thrown object plus launcher bonus */
-	tdam = i_ptr->d.damroll() + i_ptr->to_d + j_ptr->to_d;
+	int tdam = i_ptr->d.damroll() + i_ptr->to_d + j_ptr->to_d;
 
 	/* Actually "fire" the object */
-	bonus = (p_ptr->to_h + i_ptr->to_h + j_ptr->to_h);
-	chance = (p_ptr->skills[SKILL_TO_HIT_BOW] + (bonus * BTH_PLUS_ADJ));
+	const int bonus = (p_ptr->to_h + i_ptr->to_h + j_ptr->to_h);
+	const int chance = (p_ptr->skills[SKILL_TO_HIT_BOW] + (bonus * BTH_PLUS_ADJ));
 
 	/* Assume a base multiplier */
-	tmul = p_ptr->ammo_mult;
+	const int tmul = p_ptr->ammo_mult;
 
 	/* Boost the damage */
 	tdam *= tmul;
 
 	/* Base range XXX XXX */
-	tdis = 10 + 5 * tmul;
+	const int tdis = 10 + 5 * tmul;
 
 
 	/* Take a (partial) turn */

@@ -853,12 +853,11 @@ static const struct side_handler_t
  * important lower numbers.  As the screen gets smaller, the rows start to
  * disappear in the order of lowest to highest importance.
  */
-static void update_sidebar(game_event_type type, game_event_data *data, void *user)
+static void update_sidebar(game_event_type type, game_event_data*, void*)
 {
 	int x, y, row;
 	int max_priority;
 	size_t i;
-
 
 	Term_get_size(&x, &y);
 
@@ -896,7 +895,7 @@ static void update_sidebar(game_event_type type, game_event_data *data, void *us
 	}
 }
 
-static void hp_colour_change(game_event_type type, game_event_data *data, void *user)
+static void hp_colour_change(game_event_type, game_event_data*, void*)
 {
 	/*
 	 * hack:  redraw player, since the player's color
@@ -1209,7 +1208,7 @@ status_f *status_handlers[] =
 /*
  * Print the status line.
  */
-static void update_statusline(game_event_type type, game_event_data *data, void *user)
+static void update_statusline(game_event_type, game_event_data*, void*)
 {
 	int row = Term->hgt - 1;
 	int col = 13;
@@ -1241,7 +1240,7 @@ static void trace_map_updates(game_event_type type, game_event_data *data, void 
 }
 #endif
 
-static void update_maps(game_event_type type, game_event_data *data, void *user)
+static void update_maps(game_event_type, game_event_data *data, void *user)
 {
 	term *t = (term*)user;
 
@@ -1327,8 +1326,7 @@ static void update_maps(game_event_type type, game_event_data *data, void *user)
  */
 static bool flip_inven = false;
 
-static void update_inven_subwindow(game_event_type type, game_event_data *data,
-				       void *user)
+static void update_inven_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = (term*)user;
@@ -1348,8 +1346,7 @@ static void update_inven_subwindow(game_event_type type, game_event_data *data,
 	Term_activate(old);
 }
 
-static void update_equip_subwindow(game_event_type type, game_event_data *data,
-				   void *user)
+static void update_equip_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = reinterpret_cast<term*>(user);
@@ -1376,7 +1373,7 @@ void toggle_inven_equip(void)
 	flip_inven = !flip_inven;
 }
 
-static void update_monlist_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_monlist_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = (term*)user;
@@ -1392,7 +1389,7 @@ static void update_monlist_subwindow(game_event_type type, game_event_data *data
 }
 
 
-static void update_monster_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_monster_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = reinterpret_cast<term*>(user);
@@ -1410,7 +1407,7 @@ static void update_monster_subwindow(game_event_type type, game_event_data *data
 	Term_activate(old);
 }
 
-static void update_object_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_object_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = reinterpret_cast<term*>(user);
@@ -1429,7 +1426,7 @@ static void update_object_subwindow(game_event_type type, game_event_data *data,
 }
 
 
-static void update_messages_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_messages_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = reinterpret_cast<term*>(user);
@@ -1480,7 +1477,7 @@ static struct minimap_flags
 	bool needs_redraw;
 } minimap_data[ANGBAND_TERM_MAX];
 
-static void update_minimap_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_minimap_subwindow(game_event_type type, game_event_data*, void *user)
 {
 	minimap_flags* flags = reinterpret_cast<minimap_flags*>(user);
 
@@ -1511,7 +1508,7 @@ static void update_minimap_subwindow(game_event_type type, game_event_data *data
 /*
  * Hack -- display player in sub-windows (mode 0)
  */
-static void update_player0_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_player0_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = reinterpret_cast<term*>(user);
@@ -1521,7 +1518,6 @@ static void update_player0_subwindow(game_event_type type, game_event_data *data
 
 	/* Display flags */
 	display_player(0);
-
 	Term_fresh();
 	
 	/* Restore */
@@ -1531,7 +1527,7 @@ static void update_player0_subwindow(game_event_type type, game_event_data *data
 /*
  * Hack -- display player in sub-windows (mode 1)
  */
-static void update_player1_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_player1_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *inv_term = reinterpret_cast<term*>(user);
@@ -1552,7 +1548,7 @@ static void update_player1_subwindow(game_event_type type, game_event_data *data
 /*
  * Display the left-hand-side of the main term, in more compact fashion.
  */
-static void update_player_compact_subwindow(game_event_type type, game_event_data *data, void *user)
+static void update_player_compact_subwindow(game_event_type, game_event_data*, void *user)
 {
 	int row = 0;
 	int col = 0;
@@ -1615,14 +1611,13 @@ static void update_player_compact_subwindow(game_event_type type, game_event_dat
 }
 
 
-static void flush_subwindow(game_event_type type, game_event_data *data, void *user)
+static void flush_subwindow(game_event_type, game_event_data*, void *user)
 {
 	term *old = Term;
 	term *t = reinterpret_cast<term*>(user);
 
 	/* Activate */
 	Term_activate(t);
-
 	Term_fresh();
 	
 	/* Restore */
@@ -1832,14 +1827,14 @@ static void init_angband_aux(const char* const why)
 /*
  * Hack -- take notes on line 23
  */
-static void splashscreen_note(game_event_type type, game_event_data *data, void *user)
+static void splashscreen_note(game_event_type, game_event_data *data, void*)
 {
 	Term_erase(0, 23, 255);
 	Term_putstr(20, 23, -1, TERM_WHITE, format("[%s]", data->string));
 	Term_fresh();
 }
 
-static void show_splashscreen(game_event_type type, game_event_data *data, void *user)
+static void show_splashscreen(game_event_type, game_event_data*, void*)
 {
 	int fd;
 	FILE *fp;
@@ -1943,7 +1938,7 @@ static void show_splashscreen(game_event_type type, game_event_data *data, void 
 /* ------------------------------------------------------------------------
  * Temporary (hopefully) hackish solutions.
  * ------------------------------------------------------------------------ */
-static void check_panel(game_event_type type, game_event_data *data, void *user)
+static void check_panel(game_event_type, game_event_data*, void*)
 {
 	verify_panel();
 }

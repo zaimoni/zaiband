@@ -524,6 +524,14 @@ typedef unsigned char byte;
 # define AUDIT_STATEMENT(A) A
 #endif
 
+/* validated array access */
+#ifndef NDEBUG
+# define C_ARRAY_PUSH(ARRAY,INDEX,SRC,STRICT_UB) ((ARRAY)[(assert((STRICT_UB)>(INDEX)),(INDEX)++)] = (SRC))
+#else
+# define C_ARRAY_PUSH(ARRAY,INDEX,SRC,STRICT_UB) (ARRAY)[(INDEX)++] = (SRC)
+#endif
+
+
 /* delayed concatenation */
 #define ANG_CONCAT(A,B) A##B
 #define ANG_EVAL(A) A

@@ -220,9 +220,13 @@ size_t squares_in_view_octagon(int range)
  */
 void check_these_for_view(coord* coord_list,coord src, int range, size_t& StrictUB, int height, int width)
 {
-	assert(NULL!=coord_list);
+	assert(coord_list);
 	assert(0<range);
-	/* can't check that coord_list is large enough at runtime from here */
+	/* 
+     * can't check that coord_list is large enough at runtime from here,
+     * but it should be this
+     */
+	const size_t coord_strict_ub = squares_in_view_octagon(range);
 
 	int radius = 2;
 	int i;
@@ -239,12 +243,12 @@ void check_these_for_view(coord* coord_list,coord src, int range, size_t& Strict
 
 	/* radius 0: src */
 	StrictUB = 0;
-	coord_list[StrictUB++] = src;
+	C_ARRAY_PUSH(coord_list,StrictUB,src,coord_strict_ub);
 
 	/* radius 1 is special */
 	for(i=0; i<KEYPAD_DIR_MAX; ++i)
 	{
-		coord_list[StrictUB++] = src+dd_coord_ddd[i];
+		C_ARRAY_PUSH(coord_list,StrictUB,src+dd_coord_ddd[i],coord_strict_ub);
 	}
 
 	while(radius<=range)
@@ -256,29 +260,29 @@ void check_these_for_view(coord* coord_list,coord src, int range, size_t& Strict
 		for(i=0; i<KEYPAD_CARDINAL_DIR_MAX; ++i)
 		{
 			/* XXX should have proper * operator for coord_delta XXX */
-			if (step_back<=clipped[i]) coord_list[StrictUB++] = src+coord_delta(radius*dd_coord_ddd[i].x,radius*dd_coord_ddd[i].y);
+			C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(radius*dd_coord_ddd[i].x,radius*dd_coord_ddd[i].y),coord_strict_ub);
 		}
 
 		while(spread<step_back)
 		{
-			if (step_back<=clipped[2] && spread<=clipped[0]) coord_list[StrictUB++] = src+coord_delta(step_back,spread);
-			if (step_back<=clipped[2] && spread<=clipped[1]) coord_list[StrictUB++] = src+coord_delta(step_back,-spread);
-			if (step_back<=clipped[3] && spread<=clipped[0]) coord_list[StrictUB++] = src+coord_delta(-step_back,spread);
-			if (step_back<=clipped[3] && spread<=clipped[1]) coord_list[StrictUB++] = src+coord_delta(-step_back,-spread);
+			if (step_back<=clipped[2] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(step_back,spread),coord_strict_ub);
+			if (step_back<=clipped[2] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(step_back,-spread),coord_strict_ub);
+			if (step_back<=clipped[3] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-step_back,spread),coord_strict_ub);
+			if (step_back<=clipped[3] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-step_back,-spread),coord_strict_ub);
 
-			if (spread<=clipped[2] && step_back<=clipped[0]) coord_list[StrictUB++] = src+coord_delta(spread,step_back);
-			if (spread<=clipped[2] && step_back<=clipped[1]) coord_list[StrictUB++] = src+coord_delta(spread,-step_back);
-			if (spread<=clipped[3] && step_back<=clipped[0]) coord_list[StrictUB++] = src+coord_delta(-spread,step_back);
-			if (spread<=clipped[3] && step_back<=clipped[1]) coord_list[StrictUB++] = src+coord_delta(-spread,-step_back);
+			if (spread<=clipped[2] && step_back<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,step_back),coord_strict_ub);
+			if (spread<=clipped[2] && step_back<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,-step_back),coord_strict_ub);
+			if (spread<=clipped[3] && step_back<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,step_back),coord_strict_ub);
+			if (spread<=clipped[3] && step_back<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,-step_back),coord_strict_ub);
 
 			if (0 == ++spread%2) --step_back;
 		}
 		if (spread==step_back)
 		{	/* diagonal */
-			if (spread<=clipped[2] && spread<=clipped[0]) coord_list[StrictUB++] = src+coord_delta(spread,spread);
-			if (spread<=clipped[2] && spread<=clipped[1]) coord_list[StrictUB++] = src+coord_delta(spread,-spread);
-			if (spread<=clipped[3] && spread<=clipped[0]) coord_list[StrictUB++] = src+coord_delta(-spread,spread);
-			if (spread<=clipped[3] && spread<=clipped[1]) coord_list[StrictUB++] = src+coord_delta(-spread,-spread);
+			if (spread<=clipped[2] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,spread),coord_strict_ub);
+			if (spread<=clipped[2] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,-spread),coord_strict_ub) ;
+			if (spread<=clipped[3] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,spread),coord_strict_ub);
+			if (spread<=clipped[3] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,-spread),coord_strict_ub);
 		}
 		
 		++radius;
@@ -351,7 +355,7 @@ static int project_path_aux_pathtest(const coord* gp, const coord g1, const coor
 	return n;
 }
 
-static int project_path_aux(coord* gp, const coord g1, coord_delta s, int range, const coord g2, bool stop_dest, coord_action* stop_terrain)
+static int project_path_aux(coord* gp, const coord g1, coord_delta s, const int range, const coord g2, bool stop_dest, coord_action* stop_terrain)
 {
 	int i;
 	int n = 0;
@@ -405,8 +409,8 @@ static int project_path_aux(coord* gp, const coord g1, coord_delta s, int range,
 	project_path_aux_pathgen(gp, g1, range, a, s, x_init, y_init);
 
 	/* g2 should be at the obvious location of the path */
-	assert(g2==gp[g2_offset]);
-	if (g2!=gp[g2_offset]) return 1;
+	assert(range<=g2_offset || g2==gp[g2_offset]);
+	if (range<=g2_offset || g2!=gp[g2_offset]) return 1;
 
 	/* now have default path, determine whether it works */
 	n = project_path_aux_pathtest(gp, g1, g2, range, stop_dest, stop_terrain);
