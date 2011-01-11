@@ -1111,10 +1111,10 @@ static errr rd_inventory(void)
 		if (!i_ptr->k_idx) return (-1);
 
 		/* Verify slot */
-		if (n >= INVEN_TOTAL) return (-1);
+		if (n > INVEN_TOTAL) return (-1);
 
 		/* Wield equipment */
-		if (n >= INVEN_WIELD)
+		if ((INVEN_EQUIP_ORIGIN <= n) && (INVEN_EQUIP_STRICT_UB > n))
 		{
 			/* Copy object */
 			p_ptr->inventory[n] = *i_ptr;

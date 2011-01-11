@@ -2742,7 +2742,7 @@ static void store_sell(void)
 	o_ptr = get_o_ptr_from_inventory_or_floor(item);
 
 	/* Hack -- Cannot remove cursed objects */
-	if ((item >= INVEN_WIELD) && o_ptr->is_cursed())
+	if ((INVEN_EQUIP_ORIGIN <= item) && (INVEN_EQUIP_STRICT_UB > item) && o_ptr->is_cursed())
 	{
 		/* Oops */
 		msg_print("Hmmm, it seems to be cursed.");

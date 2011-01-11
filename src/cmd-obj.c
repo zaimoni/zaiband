@@ -85,7 +85,7 @@ static bool obj_can_takeoff(const object_type *o_ptr)
 /* Can only put on wieldable items */
 static bool obj_can_wear(const object_type *o_ptr)
 {
-	return (wield_slot(o_ptr) >= INVEN_WIELD);
+	return 0<=wield_slot(o_ptr);
 }
 
 
@@ -133,13 +133,13 @@ static void obj_wear(object_type *o_ptr, int item)
 /* Drop an item */
 static void obj_drop(object_type *o_ptr, int item)
 {
-	int amt;
-
-	amt = get_quantity(NULL, o_ptr->number);
+	int amt = get_quantity(NULL, o_ptr->number);
 	if (amt <= 0) return;
 
 	/* Hack -- Cannot remove cursed items */
-	if ((item >= INVEN_WIELD) && o_ptr->is_cursed())
+	if (   (INVEN_EQUIP_ORIGIN <= item)
+		&& (INVEN_EQUIP_STRICT_UB > item)
+		&& o_ptr->is_cursed())
 	{
 		msg_print("Hmmm, it seems to be cursed.");
 		return;

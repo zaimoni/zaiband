@@ -162,7 +162,7 @@ static bool full_sense(object_type* o_ptr,int feel)
 	/* Message (equipment) */
 	sound(MSG_PSEUDOID);
 
-	if (i >= INVEN_WIELD)
+	if ((INVEN_EQUIP_ORIGIN <= i) && (INVEN_EQUIP_STRICT_UB > i))
 	{
 		msg_format("You feel the %s (%c) you are %s %s %s...",
 		           o_name, index_to_label(i), describe_use(i),
@@ -234,7 +234,7 @@ static void sense_inventory(void)
 		if (!sensable(o_ptr)) continue;
 
 		/* Occasional failure on inventory items */
-		if ((i < INVEN_WIELD) && !one_in_(5)) continue;
+		if ((INVEN_ORIGIN <= i) && (INVEN_STRICT_UB > i) && !one_in_(5)) continue;
 
 		/* Indestructible objects are either excellent or terrible */
 		if (o_ptr->pseudo == INSCRIP_INDESTRUCTIBLE)
@@ -259,7 +259,7 @@ static void sense_inventory(void)
 		p_ptr->redraw |= (PR_INVEN | PR_EQUIP);
 
 		/* if player has weak psuedo-id, do a second pass to catch wielded average items */
-		/* start at INVEN_WIELD nonstrict lower bound because of the 1-in-5 failure on inventory items */
+		/* check equipment first, because of the 1-in-5 failure on inventory items */
 		if (!p_ptr->cp_ptr->flags & CF_PSEUDO_ID_IMPROV)
 		{
 			for (i = INVEN_EQUIP_ORIGIN; i < INVEN_EQUIP_STRICT_UB; i++)

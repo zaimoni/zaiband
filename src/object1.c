@@ -1568,11 +1568,17 @@ void identify_random_gen(const object_type *o_ptr)
  */
 char index_to_label(int i)
 {
-	/* Indexes for "inven" are easy */
-	if (i < INVEN_WIELD) return (I2A(i));
+	/* inven index */
+	if ((INVEN_ORIGIN <= i) && (INVEN_STRICT_UB > i))
+	{
+		return I2A(i-INVEN_ORIGIN);
+	}
 
-	/* Indexes for "equip" are offset */
-	return (I2A(i - INVEN_WIELD));
+	/* equip index */
+	if ((INVEN_EQUIP_ORIGIN <= i) && (INVEN_EQUIP_STRICT_UB > i))
+	{
+		return I2A(i-INVEN_EQUIP_ORIGIN);
+	}
 }
 
 
@@ -2892,7 +2898,7 @@ bool get_item(int *cp, const char* pmt, const char* str, int mode)
 				}
 
 				/* Hack -- Validate the item */
-				if ((k < INVEN_WIELD) ? !allow_inven : !allow_equip)
+				if (((INVEN_ORIGIN <= k) && (INVEN_STRICT_UB > k)) ? !allow_inven : !allow_equip)
 				{
 					bell("Illegal object choice (tag)!");
 					break;

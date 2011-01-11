@@ -3449,7 +3449,7 @@ void inven_item_optimize(int item)
 	if (o_ptr->number) return;
 
 	/* The item is in the pack */
-	if (item <= INVEN_PACK)
+	if ((INVEN_ORIGIN <= item) && (INVEN_STRICT_UB > item))
 	{
 		assert(0 < p_ptr->inven_cnt && INVEN_PACK >= p_ptr->inven_cnt && "precondition");
 		assert(p_ptr->inven_cnt_is_strict_UB_of_nonzero_k_idx() && "precondition");
@@ -3459,10 +3459,10 @@ void inven_item_optimize(int item)
 		p_ptr->inven_cnt--;
 
 		/* Slide everything down */
-		if (item < INVEN_PACK) C_COPY(p_ptr->inventory + item, p_ptr->inventory + item + 1, INVEN_PACK - item);
+		if (item < INVEN_OVERFLOW) C_COPY(p_ptr->inventory + item + INVEN_ORIGIN, p_ptr->inventory + item + INVEN_ORIGIN + 1, INVEN_PACK - item);
 
 		/* Hack -- wipe hole */
-		WIPE(&p_ptr->inventory[INVEN_PACK]);
+		WIPE(&p_ptr->inventory[INVEN_OVERFLOW]);
 
 		assert(p_ptr->inven_cnt_is_strict_UB_of_nonzero_k_idx() && "postcondition");
 
@@ -3822,8 +3822,6 @@ void inven_drop(int item, int amt)
 {
 	assert((0 <= item) && (item < INVEN_TOTAL) && "precondition");
 
-	object_type object_type_body;
-	object_type *i_ptr = &object_type_body;			/* Get local object */
 	object_type *o_ptr = &p_ptr->inventory[item];	/* Get the original object */
 
 	char o_name[80];
@@ -3836,7 +3834,7 @@ void inven_drop(int item, int amt)
 
 
 	/* Take off equipment */
-	if (item >= INVEN_WIELD)
+	if ((INVEN_EQUIP_ORIGIN <= item) && (INVEN_EQUIP_STRICT_UB > item))
 	{
 		/* Take off first */
 		item = inven_takeoff(item, amt);
@@ -3846,23 +3844,25 @@ void inven_drop(int item, int amt)
 	}
 
 
+	{
 	/* Obtain local object */
-	*i_ptr = *o_ptr;
+	object_type tmp = *o_ptr;
 
 	/* Distribute charges of wands, staves, or rods */
-	distribute_charges(o_ptr, i_ptr, amt);
+	distribute_charges(o_ptr, &tmp, amt);
 
 	/* Modify quantity */
-	i_ptr->number = amt;
+	tmp.number = amt;
 
 	/* Describe local object */
-	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, ODESC_FULL);
+	object_desc(o_name, sizeof(o_name), &tmp, TRUE, ODESC_FULL);
 
 	/* Message */
 	msg_format("You drop %s (%c).", o_name, index_to_label(item));
 
 	/* Drop it near the player */
-	drop_near(i_ptr, 0, p_ptr->loc);
+	drop_near(&tmp, 0, p_ptr->loc);
+	}
 
 	/* Modify, Describe, Optimize */
 	inven_item_increase(item, -amt);

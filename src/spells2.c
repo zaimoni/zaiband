@@ -1522,7 +1522,7 @@ bool ident_spell(void)
 	}
 
 	/* Describe */
-	if (item >= INVEN_WIELD)
+	if ((INVEN_EQUIP_ORIGIN <= item) && (INVEN_EQUIP_STRICT_UB > item))
 	{
 		msg_format("%^s: %s (%c).",
 		           describe_use(item), o_name, index_to_label(item));
@@ -1609,7 +1609,7 @@ bool identify_fully(void)
 	}
 
 	/* Describe */
-	if (item >= INVEN_WIELD)
+	if ((INVEN_EQUIP_ORIGIN <= item) && (INVEN_EQUIP_STRICT_UB > item))
 	{
 		msg_format("%^s: %s (%c).",
 		           describe_use(item), o_name, index_to_label(item));
