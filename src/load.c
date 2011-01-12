@@ -1501,12 +1501,8 @@ static errr rd_savefile_new_aux(void)
 		return (-1);
 	}
 
-	/* Read the available records */
-	for (i = 0; i < tmp16u; i++)
-	{
-		/* Read the lore */
-		rd_lore(i);
-	}
+	/* Read the available lore records */
+	for (i = 0; i < tmp16u; i++) rd_lore(i);
 	if (arg_fiddle) note("Loaded Monster Memory");
 
 
