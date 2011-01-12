@@ -235,7 +235,18 @@ static void strip_bytes(int n)
 	while (n--) rd_byte(&tmp8u);
 }
 
-
+/*!
+ * read core agent info
+ */
+static void rd_agent(agent_type& src)
+{
+	rd(src.loc);
+	rd_s16b(&src.chp);
+	rd_s16b(&src.mhp);
+	rd_byte(&src.speed);
+	rd_byte(&src.energy);	
+}
+ 
 /*
  * Read an object
  *
@@ -447,27 +458,20 @@ static errr rd_item(object_type *o_ptr)
 
 
 
-/*
+/*!
  * Read a monster
  */
 static void rd_monster(monster_type *m_ptr)
 {
-	byte tmp8u;
-
 	/* Read the monster race */
 	rd_s16b(&m_ptr->r_idx);
 
 	/* Read the other information */
-	rd(m_ptr->loc);
-	rd_s16b(&m_ptr->chp);
-	rd_s16b(&m_ptr->mhp);
+	rd_agent(*m_ptr);
 	rd_s16b(&m_ptr->csleep);
-	rd_byte(&m_ptr->speed);
-	rd_byte(&m_ptr->energy);
 	rd_byte(&m_ptr->stunned);
 	rd_byte(&m_ptr->confused);
 	rd_byte(&m_ptr->monfear);
-	rd_byte(&tmp8u);
 }
 
 

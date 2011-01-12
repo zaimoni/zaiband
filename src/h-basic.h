@@ -526,9 +526,9 @@ typedef unsigned char byte;
 
 /* validated array access */
 #ifndef NDEBUG
-# define C_ARRAY_PUSH(ARRAY,INDEX,SRC,STRICT_UB) ((ARRAY)[(assert((STRICT_UB)>(INDEX)),(INDEX)++)] = (SRC))
+# define C_ARRAY_PUSH(ARRAY,STRICT_UB,INDEX,SRC) ((ARRAY)[(assert((STRICT_UB)>(INDEX)),(INDEX)++)] = (SRC))
 #else
-# define C_ARRAY_PUSH(ARRAY,INDEX,SRC,STRICT_UB) (ARRAY)[(INDEX)++] = (SRC)
+# define C_ARRAY_PUSH(ARRAY,STRICT_UB,INDEX,SRC) (ARRAY)[(INDEX)++] = (SRC)
 #endif
 
 

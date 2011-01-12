@@ -105,6 +105,17 @@ static void wr(const tvalsval& id)
  * These functions write info in larger logical records
  */
 
+/*!
+ * write core agent info
+ */
+static void wr_agent(const agent_type& src)
+{
+	wr(src.loc);
+	wr_s16b(src.chp);
+	wr_s16b(src.mhp);
+	wr_byte(src.speed);
+	wr_byte(src.energy);	
+} 
 
 /*
  * Write an "item" record
@@ -157,22 +168,17 @@ static void wr_item(const object_type *o_ptr)
 }
 
 
-/*
+/*!
  * Write a "monster" record
  */
 static void wr_monster(const monster_type *m_ptr)
 {
 	wr_s16b(m_ptr->r_idx);
-	wr(m_ptr->loc);
-	wr_s16b(m_ptr->chp);
-	wr_s16b(m_ptr->mhp);
+	wr_agent(*m_ptr);
 	wr_s16b(m_ptr->csleep);
-	wr_byte(m_ptr->speed);
-	wr_byte(m_ptr->energy);
 	wr_byte(m_ptr->stunned);
 	wr_byte(m_ptr->confused);
 	wr_byte(m_ptr->monfear);
-	wr_byte(0);
 }
 
 

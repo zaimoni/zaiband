@@ -627,23 +627,18 @@ struct monster_type : public agent_type
 	static monster_race *r_info;
 	static monster_lore *l_list;
 
-
+	/* these are saved */
 	s16b r_idx;			/**< Monster race index */
-
 	s16b csleep;		/**< Inactive counter */
-
 	byte stunned;		/**< Monster is stunned */
 	byte confused;		/**< Monster is confused */
 	byte monfear;		/**< Monster is afraid */
 
+	/* following are not saved */
 	byte cdis;			/**< Current dis from player */
-
 	byte mflag;			/**< Extra monster flags */
-
 	bool ml;			/**< Monster is "visible" */
-
 	s16b hold_o_idx;	/**< First object being held (if any) */
-
 	u32b smart;			/**< Field for "smart_learn" */
 
 

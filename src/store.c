@@ -1555,6 +1555,7 @@ static bool black_market_emergency_stock(void)
 								}
 		};
 
+		typedef char word_of_recall_overflowed[N_ELEMENTS(kind_stack)>=3U ? 1 : -1];
 		/* does @ need this */
 		while(0<kinds_used)
 			if (some_legal_store_has_item_type(kind_stack[--kinds_used]) || player_owns_item_type(kind_stack[kinds_used]) || black_market_has_item_type(kind_stack[kinds_used]))
@@ -1637,6 +1638,7 @@ static bool black_market_emergency_stock(void)
 					}
 			};
 
+			typedef char restore_stat_overflowed[N_ELEMENTS(kind_stack)>=8U ? 1 : -1];
 			/* does @ need this */
 			while(0<kinds_used)
 				if (some_legal_store_has_item_type(kind_stack[--kinds_used]) || player_owns_item_type(kind_stack[kinds_used]) || black_market_has_item_type(kind_stack[kinds_used]))
@@ -1678,7 +1680,7 @@ static bool black_market_emergency_stock(void)
 		kind_stack[kinds_used++] = lookup_kind2(TV_POTION,SV_POTION_EXPERIENCE);
 		assert(0<kind_stack[kinds_used-1]);
 
-		kind_stack[kinds_used++] = lookup_kind2(TV_ROD,SV_ROD_RESTORATION);	/* XXX optimization target XXX */
+		kind_stack[kinds_used++] = lookup_kind2(TV_ROD,SV_ROD_RESTORATION); /* XXX optimization target XXX */
 		assert(0<kind_stack[kinds_used-1]);
 
 		if (TV_PRAYER_BOOK == p_ptr->spell_book())
@@ -1691,6 +1693,7 @@ static bool black_market_emergency_stock(void)
 				}
 		};
 
+		typedef char restore_experience_overflowed[N_ELEMENTS(kind_stack)>=5U ? 1 : -1];
 		/* does @ need this */
 		while(0<kinds_used)
 			if (some_legal_store_has_item_type(kind_stack[--kinds_used]) || player_owns_item_type(kind_stack[kinds_used]) || black_market_has_item_type(kind_stack[kinds_used]))

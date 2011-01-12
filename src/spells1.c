@@ -3450,7 +3450,7 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 	g = g1;				/* Initial grid */
 
 	/* Collect beam grids */
-	if (flg & (PROJECT_BEAM)) zap_g[grids++] = g;
+	if (flg & (PROJECT_BEAM)) C_ARRAY_PUSH(zap_g,N_ELEMENTS(zap_g),grids,g);
 
 	/* Calculate the projection path */
 	path_n = project_path(path_g, MAX_RANGE, g1, g2, !(flg & (PROJECT_THRU)),((flg & (PROJECT_STOP)) ? &wall_mon_stop : &wall_stop));
@@ -3472,7 +3472,7 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 		g = n;
 
 		/* Collect beam grids */
-		if (flg & (PROJECT_BEAM)) zap_g[grids++] = g;
+		if (flg & (PROJECT_BEAM)) C_ARRAY_PUSH(zap_g,N_ELEMENTS(zap_g),grids,g);
 
 		/* Only do visuals if requested */
 		if (!blind && !(flg & (PROJECT_HIDE)))
@@ -3538,7 +3538,7 @@ bool project(int who, int rad, coord g, int dam, int typ, int flg)
 				if (!los(g2, g)) continue;
 
 				/* Save this grid */
-				zap_g[grids++] = g;
+				C_ARRAY_PUSH(zap_g,N_ELEMENTS(zap_g),grids,g);
 			}
 		}
 

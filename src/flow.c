@@ -243,12 +243,12 @@ void check_these_for_view(coord* coord_list,coord src, int range, size_t& Strict
 
 	/* radius 0: src */
 	StrictUB = 0;
-	C_ARRAY_PUSH(coord_list,StrictUB,src,coord_strict_ub);
+	C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src);
 
 	/* radius 1 is special */
 	for(i=0; i<KEYPAD_DIR_MAX; ++i)
 	{
-		C_ARRAY_PUSH(coord_list,StrictUB,src+dd_coord_ddd[i],coord_strict_ub);
+		C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+dd_coord_ddd[i]);
 	}
 
 	while(radius<=range)
@@ -260,29 +260,29 @@ void check_these_for_view(coord* coord_list,coord src, int range, size_t& Strict
 		for(i=0; i<KEYPAD_CARDINAL_DIR_MAX; ++i)
 		{
 			/* XXX should have proper * operator for coord_delta XXX */
-			C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(radius*dd_coord_ddd[i].x,radius*dd_coord_ddd[i].y),coord_strict_ub);
+			C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(radius*dd_coord_ddd[i].x,radius*dd_coord_ddd[i].y));
 		}
 
 		while(spread<step_back)
 		{
-			if (step_back<=clipped[2] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(step_back,spread),coord_strict_ub);
-			if (step_back<=clipped[2] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(step_back,-spread),coord_strict_ub);
-			if (step_back<=clipped[3] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-step_back,spread),coord_strict_ub);
-			if (step_back<=clipped[3] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-step_back,-spread),coord_strict_ub);
+			if (step_back<=clipped[2] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(step_back,spread));
+			if (step_back<=clipped[2] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(step_back,-spread));
+			if (step_back<=clipped[3] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(-step_back,spread));
+			if (step_back<=clipped[3] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(-step_back,-spread));
 
-			if (spread<=clipped[2] && step_back<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,step_back),coord_strict_ub);
-			if (spread<=clipped[2] && step_back<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,-step_back),coord_strict_ub);
-			if (spread<=clipped[3] && step_back<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,step_back),coord_strict_ub);
-			if (spread<=clipped[3] && step_back<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,-step_back),coord_strict_ub);
+			if (spread<=clipped[2] && step_back<=clipped[0]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(spread,step_back));
+			if (spread<=clipped[2] && step_back<=clipped[1]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(spread,-step_back));
+			if (spread<=clipped[3] && step_back<=clipped[0]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(-spread,step_back));
+			if (spread<=clipped[3] && step_back<=clipped[1]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(-spread,-step_back));
 
 			if (0 == ++spread%2) --step_back;
 		}
 		if (spread==step_back)
 		{	/* diagonal */
-			if (spread<=clipped[2] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,spread),coord_strict_ub);
-			if (spread<=clipped[2] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(spread,-spread),coord_strict_ub) ;
-			if (spread<=clipped[3] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,spread),coord_strict_ub);
-			if (spread<=clipped[3] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,StrictUB,src+coord_delta(-spread,-spread),coord_strict_ub);
+			if (spread<=clipped[2] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(spread,spread));
+			if (spread<=clipped[2] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(spread,-spread));
+			if (spread<=clipped[3] && spread<=clipped[0]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(-spread,spread));
+			if (spread<=clipped[3] && spread<=clipped[1]) C_ARRAY_PUSH(coord_list,coord_strict_ub,StrictUB,src+coord_delta(-spread,-spread));
 		}
 		
 		++radius;

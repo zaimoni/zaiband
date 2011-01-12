@@ -2382,7 +2382,7 @@ void update_view(void)
 				info |= (CAVE_TEMP);
 
 				/* Save grid for later */
-				C_ARRAY_PUSH(old_seen_list,StrictUB_old_seen,g,coord_strict_ub);
+				C_ARRAY_PUSH(old_seen_list,coord_strict_ub,StrictUB_old_seen,g);
 			}
 
 			/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */

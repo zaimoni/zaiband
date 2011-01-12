@@ -491,7 +491,7 @@ static int wiz_create_itemtype(void)
 	Term_clear();
 
 	/* We have to search the whole itemlist. */
-	for (num = 0, i = 1; (num < 60) && (i < z_info->k_max); i++)
+	for (num = 0, i = 1; (num < N_ELEMENTS(choice)) && (i < z_info->k_max); i++)
 	{
 		object_kind *k_ptr = &object_type::k_info[i];
 

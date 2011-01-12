@@ -622,15 +622,10 @@ static void do_cmd_pref_file_hack(int row)
 static void do_cmd_options_aux(int page, const char* const info)
 {
 	char ch;
-
 	int i, k = 0, n = 0;
-
 	int opt[OPT_PAGE_PER];
-
 	char buf[80];
-
 	int dir;
-
 
 	/* Scan the options */
 	for (i = 0; i < OPT_PAGE_PER; i++)

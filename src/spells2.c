@@ -2625,7 +2625,7 @@ static void cave_temp_room_aux(coord g)
 	if (!(cave_info[g.y][g.x] & (CAVE_ROOM))) return;
 
 	/* Paranoia -- verify space */
-	if (temp_n == TEMP_MAX) return;
+	if (temp_n >= TEMP_MAX) return;
 
 	/* Mark the grid as "seen" */
 	cave_info[g.y][g.x] |= (CAVE_TEMP);

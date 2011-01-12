@@ -248,7 +248,7 @@ void display_koff(int k_idx)
 		int spell;
 		int num = 0;
 
-		byte spells[PY_MAX_SPELLS];
+		byte spells[SPELLS_PER_BOOK];
 
 
 		/* Extract spells */
@@ -285,7 +285,7 @@ int get_spell(const object_type *o_ptr, const char* const prompt, bool known)
 	int spell;
 	int num = 0;
 
-	byte spells[PY_MAX_SPELLS];
+	byte spells[SPELLS_PER_BOOK];
 
 	bool verify;
 
@@ -456,7 +456,7 @@ void do_cmd_browse_aux(const object_type *o_ptr)
 	int spell;
 	int num = 0;
 
-	byte spells[PY_MAX_SPELLS];
+	byte spells[SPELLS_PER_BOOK];
 
 
 	/* Track the object kind */

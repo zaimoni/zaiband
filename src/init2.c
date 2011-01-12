@@ -1452,7 +1452,6 @@ static errr init_other(void)
 			/* Add that item index to the table */
 			st_ptr->table[st_ptr->table_num++] = k_idx;
 		}
-
 	}
 
 
@@ -1465,22 +1464,15 @@ static errr init_other(void)
 		op_ptr->opt[i] = options[i].norm;
 	}
 
-	/* Initialize the window flags */
-	for (i = 0; i < ANGBAND_TERM_MAX; i++)
-	{
-		/* Assume no flags */
-		op_ptr->window_flag[i] = 0L;
-	}
-
+	/* Initialize the window flags to no flags */
+	C_WIPE(op_ptr->window_flag,ANGBAND_TERM_MAX);
 
 	/*** Pre-allocate space for the "format()" buffer ***/
 
 	/* Hack -- Just call the "format()" function */
 	(void)format("%s", MAINTAINER);
 
-
-	/* Success */
-	return (0);
+	return 0;	/* Success */
 }
 
 
@@ -1491,17 +1483,11 @@ static errr init_other(void)
 static errr init_alloc(void)
 {
 	int i, j;
-
 	object_kind *k_ptr;
-
 	monster_race *r_ptr;
-
 	ego_item_type *e_ptr;
-
 	alloc_entry *table;
-
 	s16b num[MAX_DEPTH];
-
 	s16b aux[MAX_DEPTH];
 
 

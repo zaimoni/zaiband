@@ -1967,24 +1967,18 @@ void clear_from(int row)
 bool askfor_aux(char *buf, size_t len)
 {
 	int y, x;
-
 	size_t k = 0;
-
 	char ch = '\0';
-
 	bool done = FALSE;
-
 
 	/* Locate the cursor */
 	Term_locate(&x, &y);
 
-
 	/* Paranoia */
 	if ((x < 0) || (x >= 80)) x = 0;
 
-
 	/* Restrict the length */
-	if (x + len > 80) len = 80 - x;
+	if (80U - x < len) len = 80 - x;
 
 	/* Truncate the default entry */
 	buf[len-1] = '\0';
