@@ -731,23 +731,6 @@ static void rd_options(void)
 }
 
 
-/*
- * Hack -- strip the "ghost" info
- *
- * XXX XXX XXX This is such a nasty hack it hurts.
- */
-static void rd_ghost(void)
-{
-	char buf[64];
-
-	/* Strip name */
-	rd_string(buf, 64);
-
-	/* Strip old data */
-	strip_bytes(60);
-}
-
-
 static u32b randart_version;
 
 
@@ -1635,9 +1618,6 @@ static errr rd_savefile_new_aux(void)
 			note("Error reading dungeon data");
 			return (-1);
 		}
-
-		/* Read the ghost info */
-		rd_ghost();
 	}
 
 

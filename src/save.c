@@ -406,21 +406,6 @@ static void wr_options(void)
 
 
 /*
- * Hack -- Write the "ghost" info
- */
-static void wr_ghost(void)
-{
-	int i;
-
-	/* Name */
-	wr_string("Broken Ghost");
-
-	/* Hack -- stupid data */
-	for (i = 0; i < 60; i++) wr_byte(0);
-}
-
-
-/*
  * Write some "extra" info
  */
 static void wr_extra(void)
@@ -853,7 +838,6 @@ static bool wr_savefile_new(void)
 	if (!p_ptr->is_dead)
 	{
 		wr_dungeon();	/* Dump the dungeon */
-		wr_ghost();		/* Dump the ghost */
 	}
 
 
