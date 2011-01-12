@@ -718,20 +718,11 @@ static void wr_messages(void)
 static bool wr_savefile_new(void)
 {
 	int i;
+	u32b now = time((time_t *)0); /* Guess at the current time */
 
-
-	/* Guess at the current time */
-	u32b now = time((time_t *)0);
-
-
-	/* Note the operating system */
-	sf_xtra = 0L;
-
-	/* Note when the file was saved */
-	sf_when = now;
-
-	/* Note the number of saves */
-	sf_saves++;
+	sf_xtra = 0L; /* Note the operating system */
+	sf_when = now; /* Note when the file was saved */
+	sf_saves++; /* Note the number of saves */
 
 
 	/*** Actually write the file ***/
@@ -750,7 +741,6 @@ static bool wr_savefile_new(void)
 	/* Reset the checksum */
 	v_stamp = 0L;
 	x_stamp = 0L;
-
 
 	wr_u32b(sf_xtra);	/* Operating system */
 	wr_u32b(sf_when);	/* Time file last saved */
