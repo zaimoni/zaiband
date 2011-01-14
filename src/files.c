@@ -1582,7 +1582,7 @@ static const char *show_weapon(const object_type *o_ptr)
 	int hit = p_ptr->dis_to_h;
 	int dam = p_ptr->dis_to_d;
 	const bool is_bow = (o_ptr->obj_id.tval == TV_BOW);
-	if (o_ptr->known())
+	if (p_ptr->known(*o_ptr))
 	{
 		hit += o_ptr->to_h;
 		if (!is_bow) dam += o_ptr->to_d;

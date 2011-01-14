@@ -277,7 +277,7 @@ void do_cmd_destroy(void)
 		msg_format("You cannot destroy %s.", o_name);
 
 		/* Don't mark id'ed objects */
-		if (o_ptr->known()) return;
+		if (p_ptr->known(*o_ptr)) return;
 
 		/* It has already been sensed */
 		if (o_ptr->ident & (IDENT_SENSE))

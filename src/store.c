@@ -215,7 +215,7 @@ static bool store_will_buy(int store_num, const object_type *o_ptr)
 				case TV_HAFTED:		return TRUE;
 				case TV_POLEARM:
 				case TV_SWORD:		/* Known blessed blades are accepted too */
-									if (is_blessed(o_ptr) && o_ptr->known()) return TRUE;
+									if (is_blessed(o_ptr) && p_ptr->known(*o_ptr)) return TRUE;
 				default:			return FALSE;
 			}
 			break;
@@ -783,16 +783,16 @@ static int home_carry(object_type *o_ptr)
 		if (o_ptr->obj_id.tval < j_ptr->obj_id.tval) continue;
 
 		/* Can happen in the home */
-		if (!o_ptr->aware()) continue;
-		if (!j_ptr->aware()) break;
+		if (!p_ptr->aware(*o_ptr)) continue;
+		if (!p_ptr->aware(*j_ptr)) break;
 
 		/* Objects sort by increasing sval */
 		if (o_ptr->obj_id.sval < j_ptr->obj_id.sval) break;
 		if (o_ptr->obj_id.sval > j_ptr->obj_id.sval) continue;
 
 		/* Objects in the home can be unknown */
-		if (!o_ptr->known()) continue;
-		if (!j_ptr->known()) break;
+		if (!p_ptr->known(*o_ptr)) continue;
+		if (!p_ptr->known(*j_ptr)) break;
 
 		/* Objects sort by decreasing value */
 		j_value = object_value(j_ptr);

@@ -80,13 +80,6 @@ typedef struct flavor_type flavor_type;
 /* Get the Boost-licensed types */
 #include "types2.h"
 
-/*
- * KRB: redefine of constant from tvalsval.h .
- *
- * As long as this agrees with tvalsval.h, there won't be any errors or warnings.
- */
-#define TV_SCROLL       70
-
 /* utility struct */
 struct tvalsval
 {
@@ -112,7 +105,7 @@ struct maxima
 	u32b fake_name_size;
 
 	u16b f_max;		/**< Max size for "f_info[]" */ /* verified */
-	u16b k_max;		/**< Max size for "k_info[]" */
+	u16b k_max;		/**< Max size for "k_info[]", "p_ptr->object_awareness[]" */
 	u16b a_max;		/**< Max size for "a_info[]" */
 	u16b e_max;		/**< Max size for "e_info[]" */
 	u16b r_max;		/**< Max size for "r_info[]" */
@@ -236,24 +229,12 @@ struct object_kind
 
 	u16b flavor;		/**< Special object flavor (or zero) */
 
-	/* next two could be per-character ... */
-	bool aware;			/**< The player is "aware" of the item's effects */
-	bool tried;			/**< The player has "tried" one of the items */
-
 	const char* name() const {return k_name+_name;};
 	const char* text() const {return k_text+_text;};
 	const char* flavor_text() const {return object_kind::flavor_info[flavor].text();};
 
 	/* display interpretation */
-	attr_char user() const {return use_flavor_glyph() ? flavor_info[flavor].x : x;};
-
-	/* more complicated functions */
-/*
- * Determine if the attr and char should consider the item's flavor.
- *
- * Identified scrolls should use their own tile.
- */
-	bool use_flavor_glyph() const {return flavor &&  !(TV_SCROLL==obj_id.tval && aware);};
+	attr_char user() const {return flavor ? flavor_info[flavor].x : x;};
 };
 
 
@@ -575,19 +556,9 @@ struct object_type
 	void sense(byte new_pseudo) { pseudo = new_pseudo; ident |= (IDENT_SENSE);};
 
 	/* k_info reflection functions */
-	bool aware() const {return k_info[k_idx].aware;};
-	bool tried() const {return k_info[k_idx].tried;};
 	byte level() const {return k_info[k_idx].level;};
 	
 	attr_char user() const {return k_info[k_idx].user();};
-
-	/* more complicated functions */
-/*
- * Determine if a given inventory item is "known"
- * Test One -- Check for special "known" tag
- * Test Two -- Check for "Easy Know" + "Aware"
- */
-	bool known() const {return (ident & IDENT_KNOWN) || ((k_info[k_idx].flags[2] & TR3_EASY_KNOW) && aware());};
 };
 
 typedef bool object_action(object_type& o);
@@ -966,7 +937,8 @@ struct player_type : public agent_type
 	bool wizard;			/**< Player is in wizard mode */
 
 	object_type* inventory;	/**< Array[INVEN_TOTAL] of objects in the player's inventory */
-
+	byte* object_awareness;	/**< Array[z_info->k_max] of object kind awareness */
+	
 	/*** Temporary fields ***/
 
 	bool playing;			/**< True if player is playing */
@@ -1192,6 +1164,23 @@ private:
 	/* pointers to player information */
 	const player_sex *sp_ptr;
 	const player_magic *mp_ptr;
+
+public:	
+	/* object knowledge */
+	bool aware(const object_type& o) const {assert(0<o.k_idx && z_info->k_max>o.k_idx); return object_awareness[o.k_idx] & PY_OBJECT_AWARE;};
+	bool tried(const object_type& o) const {assert(0<o.k_idx && z_info->k_max>o.k_idx); return object_awareness[o.k_idx] & PY_OBJECT_TRIED;};
+	bool aware(s16b k_idx) const {assert(0<k_idx && z_info->k_max>k_idx); return object_awareness[k_idx] & PY_OBJECT_AWARE;};
+	bool tried(s16b k_idx) const {assert(0<k_idx && z_info->k_max>k_idx); return object_awareness[k_idx] & PY_OBJECT_TRIED;};
+
+	bool be_aware(s16b k_idx) {assert(0<k_idx && z_info->k_max>k_idx); object_awareness[k_idx] |= PY_OBJECT_AWARE;};
+	
+/*
+ * Determine if a given inventory item is "known"
+ * Test One -- Check for special "known" tag
+ * Test Two -- Check for "Easy Know" + "Aware"
+ */
+ 	bool known(const object_type& o) const {return (o.ident & IDENT_KNOWN) || ((object_type::k_info[o.k_idx].flags[2] & TR3_EASY_KNOW) && aware(o));};
+ 	bool aware_or_known(const object_type& o) const {return aware(o) || (o.ident & IDENT_KNOWN);};
 };
 
 

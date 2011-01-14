@@ -141,7 +141,7 @@ static bool sensable(object_type* o_ptr)
 	if (o_ptr->ident & (IDENT_SENSE)) return FALSE;
 
 	/* It is known, no information needed */
-	if (o_ptr->known()) return FALSE;
+	if (p_ptr->known(*o_ptr)) return FALSE;
 
 	return TRUE;
 }

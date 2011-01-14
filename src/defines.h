@@ -234,6 +234,12 @@ enum player_gender	{
 #define PY_FOOD_STARVE	100		/* Food value (Starving) */
 
 /*
+ * Flags for player_type.object_awareness[]
+ */
+#define PY_OBJECT_AWARE 0x01
+#define PY_OBJECT_TRIED 0x02 
+
+/*
  * Maximum number of players spells
  */
 #define PY_MAX_SPELLS 64

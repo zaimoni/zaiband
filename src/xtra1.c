@@ -1089,7 +1089,7 @@ static void calc_bonuses(void)
 		p_ptr->to_a += o_ptr->to_a;
 
 		/* Apply the mental bonuses to armor class, if known */
-		if (o_ptr->known()) p_ptr->dis_to_a += o_ptr->to_a;
+		if (p_ptr->known(*o_ptr)) p_ptr->dis_to_a += o_ptr->to_a;
 
 		/* Hack -- do not apply "weapon" bonuses */
 		if (i == INVEN_WIELD) continue;
@@ -1102,7 +1102,7 @@ static void calc_bonuses(void)
 		p_ptr->to_d += o_ptr->to_d;
 
 		/* Apply the mental bonuses to hit/damage, if known */
-		if (o_ptr->known())
+		if (p_ptr->known(*o_ptr))
 			{
 			p_ptr->dis_to_h += o_ptr->to_h;
 			p_ptr->dis_to_d += o_ptr->to_d;

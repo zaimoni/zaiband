@@ -1408,6 +1408,11 @@ static errr init_other(void)
 	C_MAKE(q_list, MAX_Q_IDX, quest);
 
 
+	/*** Prepare the player object awareness ***/
+
+	/* Allocate it */
+	C_MAKE(p_ptr->object_awareness, z_info->k_max, byte);
+
 	/*** Prepare the inventory ***/
 
 	/* Allocate it */
@@ -1932,6 +1937,9 @@ void cleanup_angband(void)
 
 	/* Free the player inventory */
 	FREE(p_ptr->inventory);
+
+	/* Free the player object awareness */
+	FREE(p_ptr->object_awareness);
 
 	/* Free the quest list */
 	FREE(q_list);

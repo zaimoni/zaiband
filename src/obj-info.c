@@ -422,7 +422,7 @@ static bool describe_misc_magic(const object_type *o_ptr, u32b f3)
 	{
 		if (f3 & (TR3_PERMA_CURSE)) bad[bc++] = "is permanently cursed";
 		else if (f3 & (TR3_HEAVY_CURSE)) bad[bc++] = "is heavily cursed";
-		else if (o_ptr->known()) bad[bc++] = "is cursed";
+		else if (p_ptr->known(*o_ptr)) bad[bc++] = "is cursed";
 	}
 
 	/* Describe */
@@ -538,7 +538,7 @@ bool object_info_out(const object_type *o_ptr)
 	if (describe_ignores(o_ptr, f[2])) something = TRUE;
 
 	/* Unknown extra powers (ego-item with random extras or artifact) */
-	if (o_ptr->known() && (!(o_ptr->ident & IDENT_MENTAL)) &&
+	if (p_ptr->known(*o_ptr) && (!(o_ptr->ident & IDENT_MENTAL)) &&
 	    ((o_ptr->xtra1) || o_ptr->is_artifact()))
 	{
 		/* Hack -- Put this in a separate paragraph if screen dump */
@@ -579,7 +579,7 @@ static bool screen_out_head(const object_type *o_ptr)
 
 	/* Display the known artifact description */
 	if (!OPTION(adult_rand_artifacts) && o_ptr->name1 &&
-	    o_ptr->known() && object_type::a_info[o_ptr->name1]._text)
+	    p_ptr->aware(*o_ptr) && object_type::a_info[o_ptr->name1]._text)
 	{
 		p_text_out("\n\n   ");
 		p_text_out(object_type::a_info[o_ptr->name1].text());
@@ -587,7 +587,7 @@ static bool screen_out_head(const object_type *o_ptr)
 	}
 
 	/* Display the known object description */
-	else if (o_ptr->aware() || o_ptr->known())
+	else if (p_ptr->aware_or_known(*o_ptr))
 	{
 		if (object_type::k_info[o_ptr->k_idx]._text)
 		{
@@ -597,7 +597,7 @@ static bool screen_out_head(const object_type *o_ptr)
 		}
 
 		/* Display an additional ego-item description */
-		if (o_ptr->name2 && o_ptr->known() && object_type::e_info[o_ptr->name2]._text)
+		if (o_ptr->name2 && p_ptr->known(*o_ptr) && object_type::e_info[o_ptr->name2]._text)
 		{
 			p_text_out("\n\n   ");
 			p_text_out(object_type::e_info[o_ptr->name2].text());
@@ -631,7 +631,7 @@ void object_info_screen(const object_type *o_ptr)
 	has_info = object_info_out(o_ptr);
 	new_paragraph = FALSE;
 
-	if (!o_ptr->known())
+	if (!p_ptr->known(*o_ptr))
 		p_text_out("\n\n   This item has not been identified.");
 	else if (!has_description && !has_info)
 		p_text_out("\n\n   This item does not seem to possess any special abilities.");

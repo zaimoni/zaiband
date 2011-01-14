@@ -394,7 +394,7 @@ static bool kill_object_invisibly(object_type& o)
 	if (!character_dungeon || OPTION(adult_preserve))
 	{
 		/* Hack -- Preserve unknown artifacts */
-		if (o.is_artifact() && !o.known())
+		if (o.is_artifact() && !p_ptr->known(o))
 		{
 			/* Mega-Hack -- Preserve the artifact */
 			object_type::a_info[o.name1].cur_num = 0;
@@ -743,10 +743,7 @@ void object_known(object_type *o_ptr)
 void object_aware(object_type *o_ptr)
 {
 	/* Fully aware of the effects */
-	object_type::k_info[o_ptr->k_idx].aware = TRUE;
-
-	/* MEGA-HACK - scrolls can change the graphics when becoming aware */
-	if (o_ptr->obj_id.tval == TV_SCROLL) p_ptr->redraw |= (PR_MAP);
+	p_ptr->object_awareness[o_ptr->k_idx] |= PY_OBJECT_AWARE;
 }
 
 
@@ -757,7 +754,7 @@ void object_aware(object_type *o_ptr)
 void object_tried(object_type *o_ptr)
 {
 	/* Mark it as tried (even if "aware") */
-	object_type::k_info[o_ptr->k_idx].tried = TRUE;
+	p_ptr->object_awareness[o_ptr->k_idx] |= PY_OBJECT_TRIED;
 }
 
 
@@ -797,7 +794,7 @@ static s32b object_value_base(const object_type *o_ptr)
 	object_kind *k_ptr = &object_type::k_info[o_ptr->k_idx];
 
 	/* Use template cost for aware or known objects */
-	if (o_ptr->aware() || o_ptr->known()) return (k_ptr->cost);
+	if (p_ptr->aware_or_known(*o_ptr)) return k_ptr->cost;
 
 	/* Analyze the type */
 	return lookup(value_base+0, sizeof(value_base), o_ptr->obj_id.tval);
@@ -1083,7 +1080,7 @@ s32b object_value(const object_type *o_ptr)
 
 
 	/* Known items -- acquire the actual value */
-	if (o_ptr->known())
+	if (p_ptr->known(*o_ptr))
 	{
 		/* Broken items -- worthless */
 		/* Cursed items -- worthless */
@@ -1154,9 +1151,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		{
 			/* Require either knowledge or known empty for both wands/staves */
 			if ((!(o_ptr->ident & (IDENT_EMPTY)) &&
-				!o_ptr->known()) ||
+				!p_ptr->known(*o_ptr)) ||
 				(!(j_ptr->ident & (IDENT_EMPTY)) &&
-				!j_ptr->known())) return(0);
+				!p_ptr->known(*j_ptr))) return(0);
 
 			/* Assume okay */
 			break;
@@ -1187,7 +1184,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_LITE:
 		{
 			/* Require both items to be known */
-			if (!o_ptr->known() || !j_ptr->known()) return (0);
+			if (!p_ptr->known(*o_ptr) || !p_ptr->known(*j_ptr)) return (0);
 
 			/* Fall through */
 		}
@@ -1198,7 +1195,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_SHOT:
 		{
 			/* Require identical knowledge of both items */
-			if (o_ptr->known() != j_ptr->known()) return (0);
+			if (p_ptr->known(*o_ptr) != p_ptr->known(*j_ptr)) return (0);
 
 			/* Require identical "bonuses" */
 			if (o_ptr->to_h != j_ptr->to_h) return (FALSE);
@@ -1232,7 +1229,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		default:
 		{
 			/* Require knowledge */
-			if (!o_ptr->known() || !j_ptr->known()) return (0);
+			if (!p_ptr->known(*o_ptr) || !p_ptr->known(*j_ptr)) return (0);
 
 			/* Probably okay */
 			break;
@@ -1315,7 +1312,7 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr)
 	o_ptr->number = ((total < MAX_STACK_SIZE) ? total : (MAX_STACK_SIZE - 1));
 
 	/* Hack -- Blend "known" status */
-	if (j_ptr->known()) object_known(o_ptr);
+	if (p_ptr->known(*j_ptr)) object_known(o_ptr);
 
 	/* Hack -- Blend store status */
 	if (j_ptr->ident & (IDENT_STORE)) o_ptr->ident |= (IDENT_STORE);
@@ -3335,7 +3332,7 @@ void inven_item_charges(int item)
 	if ((o_ptr->obj_id.tval != TV_STAFF) && (o_ptr->obj_id.tval != TV_WAND)) return;
 
 	/* Require known item */
-	if (!o_ptr->known()) return;
+	if (!p_ptr->known(*o_ptr)) return;
 
 	/* Print a message */
 	msg_format("You have %d charge%s remaining.", o_ptr->pval,
@@ -3353,7 +3350,7 @@ void inven_item_describe(int item)
 
 	char o_name[80];
 
-	if (o_ptr->is_artifact() && o_ptr->known())
+	if (o_ptr->is_artifact() && p_ptr->known(*o_ptr))
 	{
 		/* Get a description */
 		object_desc(o_name, sizeof(o_name), o_ptr, FALSE, ODESC_FULL);
@@ -3499,7 +3496,7 @@ void floor_item_charges(int item)
 	if ((o_ptr->obj_id.tval != TV_STAFF) && (o_ptr->obj_id.tval != TV_WAND)) return;
 
 	/* Require known item */
-	if (!o_ptr->known()) return;
+	if (!p_ptr->known(*o_ptr)) return;
 
 	/* Print a message */
 	msg_format("There are %d charge%s remaining.", o_ptr->pval,
@@ -3676,16 +3673,16 @@ s16b inven_carry(object_type *o_ptr)
 			if (o_ptr->obj_id.tval < j_ptr->obj_id.tval) continue;
 
 			/* Non-aware (flavored) items always come last */
-			if (!o_ptr->aware()) continue;
-			if (!j_ptr->aware()) break;
+			if (!p_ptr->aware(*o_ptr)) continue;
+			if (!p_ptr->aware(*j_ptr)) break;
 
 			/* Objects sort by increasing sval */
 			if (o_ptr->obj_id.sval < j_ptr->obj_id.sval) break;
 			if (o_ptr->obj_id.sval > j_ptr->obj_id.sval) continue;
 
 			/* Unidentified objects always come last */
-			if (!o_ptr->known()) continue;
-			if (!j_ptr->known()) break;
+			if (!p_ptr->known(*o_ptr)) continue;
+			if (!p_ptr->known(*j_ptr)) break;
 
 			/* Lites sort by decreasing fuel */
 			if (o_ptr->obj_id.tval == TV_LITE)
@@ -3974,16 +3971,16 @@ void reorder_pack(void)
 			if (o_ptr->obj_id.tval < j_ptr->obj_id.tval) continue;
 
 			/* Non-aware (flavored) items always come last */
-			if (!o_ptr->aware()) continue;
-			if (!j_ptr->aware()) break;
+			if (!p_ptr->aware(*o_ptr)) continue;
+			if (!p_ptr->aware(*j_ptr)) break;
 
 			/* Objects sort by increasing sval */
 			if (o_ptr->obj_id.sval < j_ptr->obj_id.sval) break;
 			if (o_ptr->obj_id.sval > j_ptr->obj_id.sval) continue;
 
 			/* Unidentified objects always come last */
-			if (!o_ptr->known()) continue;
-			if (!j_ptr->known()) break;
+			if (!p_ptr->known(*o_ptr)) continue;
+			if (!p_ptr->known(*j_ptr)) break;
 
 			/* Lites sort by decreasing fuel */
 			if (o_ptr->obj_id.tval == TV_LITE)

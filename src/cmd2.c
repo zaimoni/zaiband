@@ -25,8 +25,7 @@
 /**
  * chance to disarm, after difficulty
  */
-int
-player_type::disarm_skill() const
+int player_type::disarm_skill() const
 {
 	/* Get the "disarm" factor */
 	int i = p_ptr->skills[SKILL_DISARM];
@@ -38,8 +37,7 @@ player_type::disarm_skill() const
 	return i;
 }
 
-bool
-player_type::disarm_trap(int power) const
+bool player_type::disarm_trap(int power) const
 {
 	int j = disarm_skill()-power;
 
@@ -216,22 +214,21 @@ static s16b chest_check(coord g)
  * chest is based on the "power" of the chest, which is in turn based
  * on the level on which the chest is generated.
  */
-static void chest_death(coord t, s16b o_idx)
+static void chest_death(coord t, object_type& o)
 {
-	object_type *o_ptr = &o_list[o_idx];	/* Get the chest */
 	object_type object_type_body;
 	object_type *i_ptr = &object_type_body; /* Get local object */
-	bool tiny = (o_ptr->obj_id.sval < SV_CHEST_MIN_LARGE);	/* Small chests often hold "gold" */
-	int number = (o_ptr->obj_id.sval % SV_CHEST_MIN_LARGE) * 2;	/* Determine how much to drop (see above) */
+	bool tiny = (o.obj_id.sval < SV_CHEST_MIN_LARGE);	/* Small chests often hold "gold" */
+	int number = (o.obj_id.sval % SV_CHEST_MIN_LARGE) * 2;	/* Determine how much to drop (see above) */
 
 	/* Zero pval means empty chest */
-	if (!o_ptr->pval) number = 0;
+	if (!o.pval) number = 0;
 
 	/* Opening a chest */
 	opening_chest = TRUE;
 
 	/* Determine the "value" of the items */
-	object_level = ABS(o_ptr->pval) + 10;
+	object_level = ABS(o.pval) + 10;
 
 	/* Drop some objects (non-chests) */
 	for (; number > 0; --number)
@@ -257,17 +254,10 @@ static void chest_death(coord t, s16b o_idx)
 		drop_near(i_ptr, -1, t);
 	}
 
-	/* Reset the object level */
-	object_level = p_ptr->depth;
-
-	/* No longer opening a chest */
-	opening_chest = FALSE;
-
-	/* Empty */
-	o_ptr->pval = 0;
-
-	/* Known */
-	object_known(o_ptr);
+	object_level = p_ptr->depth; /* Reset the object level */
+	opening_chest = FALSE; /* No longer opening a chest */
+	o.pval = 0; /* Empty */
+	object_known(&o); /* Known */
 }
 
 
@@ -277,25 +267,20 @@ static void chest_death(coord t, s16b o_idx)
  * Exploding chest destroys contents (and traps).
  * Note that the chest itself is never destroyed.
  */
-static void chest_trap(coord g, s16b o_idx)
+static void chest_trap(coord g, object_type& o)
 {
-	int i, trap;
-
-	object_type *o_ptr = &o_list[o_idx];
-
-
 	/* Ignore disarmed chests */
-	if (o_ptr->pval <= 0) return;
+	if (o.pval <= 0) return;
 
 	/* Obtain the traps */
-	trap = chest_traps[o_ptr->pval];
+	const int trap = chest_traps[o.pval];
 
 	/* Lose strength */
 	if (trap & (CHEST_LOSE_STR))
 	{
 		msg_print("A small needle has pricked you!");
 		take_hit(NdS(1, 4), "a poison needle");
-		(void)do_dec_stat(A_STR);
+		do_dec_stat(A_STR);
 	}
 
 	/* Lose constitution */
@@ -303,7 +288,7 @@ static void chest_trap(coord g, s16b o_idx)
 	{
 		msg_print("A small needle has pricked you!");
 		take_hit(NdS(1, 4), "a poison needle");
-		(void)do_dec_stat(A_CON);
+		do_dec_stat(A_CON);
 	}
 
 	/* Poison */
@@ -312,7 +297,7 @@ static void chest_trap(coord g, s16b o_idx)
 		msg_print("A puff of green gas surrounds you!");
 		if (!(p_ptr->resist_pois || p_ptr->timed[TMD_OPP_POIS]))
 		{
-			(void)p_ptr->inc_timed<TMD_POISONED>(10 + randint(20));
+			p_ptr->inc_timed<TMD_POISONED>(10 + randint(20));
 		}
 	}
 
@@ -322,19 +307,20 @@ static void chest_trap(coord g, s16b o_idx)
 		msg_print("A puff of yellow gas surrounds you!");
 		if (!p_ptr->free_act)
 		{
-			(void)p_ptr->inc_timed<TMD_PARALYZED>(10 + randint(20));
+			p_ptr->inc_timed<TMD_PARALYZED>(10 + randint(20));
 		}
 	}
 
 	/* Summon monsters */
 	if (trap & (CHEST_SUMMON))
 	{
+		int i;
 		int num = 2 + randint(3);
 		msg_print("You are enveloped in a cloud of smoke!");
 		sound(MSG_SUM_MONSTER);
 		for (i = 0; i < num; i++)
 		{
-			(void)summon_specific(g, p_ptr->depth, 0);
+			summon_specific(g, p_ptr->depth, 0);
 		}
 	}
 
@@ -343,7 +329,7 @@ static void chest_trap(coord g, s16b o_idx)
 	{
 		msg_print("There is a sudden explosion!");
 		msg_print("Everything inside the chest is destroyed!");
-		o_ptr->pval = 0;
+		o.pval = 0;
 		take_hit(NdS(5, 8), "an exploding chest");
 	}
 }
@@ -356,21 +342,19 @@ static void chest_trap(coord g, s16b o_idx)
  *
  * \return TRUE if repeated commands may continue
  */
-static bool do_cmd_open_chest(coord g, s16b o_idx)
+static bool do_cmd_open_chest(coord g, object_type& o)
 {
 	bool flag = TRUE;
 	bool more = FALSE;
-	object_type *o_ptr = &o_list[o_idx];
-
 
 	/* Attempt to unlock it */
-	if (o_ptr->pval > 0)
+	if (o.pval > 0)
 	{
 		/* Assume locked, and thus not open */
 		flag = FALSE;
 
 		/* Success -- May still have traps */
-		if (p_ptr->disarm_trap(o_ptr->pval))
+		if (p_ptr->disarm_trap(o.pval))
 		{
 			message(MSG_LOCKPICK, 0, "You have picked the lock.");
 			gain_exp(1);
@@ -391,10 +375,10 @@ static bool do_cmd_open_chest(coord g, s16b o_idx)
 	if (flag)
 	{
 		/* Apply chest traps, if any */
-		chest_trap(g, o_idx);
+		chest_trap(g, o);
 
 		/* Let the Chest drop items */
-		chest_death(g, o_idx);
+		chest_death(g, o);
 	}
 
 	/* Result */
@@ -409,42 +393,35 @@ static bool do_cmd_open_chest(coord g, s16b o_idx)
  *
  * \return TRUE if repeated commands may continue
  */
-static bool do_cmd_disarm_chest(coord g, s16b o_idx)
+static bool do_cmd_disarm_chest(coord g, object_type& o)
 {
-	int i;
-
 	bool more = FALSE;
-
-	object_type *o_ptr = &o_list[o_idx];
-
-
-	/* Get the "disarm" factor */
-	i = p_ptr->disarm_skill();
+	int i = p_ptr->disarm_skill(); /* Get the "disarm" factor */
 
 	/* Must find the trap first. */
-	if (!o_ptr->known())
+	if (!p_ptr->known(o))
 	{
 		msg_print("I don't see any traps.");
 	}
 
 	/* Already disarmed/unlocked */
-	else if (o_ptr->pval <= 0)
+	else if (o.pval <= 0)
 	{
 		msg_print("The chest is not trapped.");
 	}
 
 	/* No traps to find. */
-	else if (!chest_traps[o_ptr->pval])
+	else if (!chest_traps[o.pval])
 	{
 		msg_print("The chest is not trapped.");
 	}
 
 	/* Success (get a lot of experience) */
-	else if (p_ptr->disarm_trap(o_ptr->pval))
+	else if (p_ptr->disarm_trap(o.pval))
 	{
 		message(MSG_DISARM, 0, "You have disarmed the chest.");
-		gain_exp(o_ptr->pval);
-		o_ptr->pval = (0 - o_ptr->pval);
+		gain_exp(o.pval);
+		o.pval = (0 - o.pval);
 	}
 
 	/* Failure -- Keep trying */
@@ -460,7 +437,7 @@ static bool do_cmd_disarm_chest(coord g, s16b o_idx)
 	else
 	{
 		msg_print("You set off a trap!");
-		chest_trap(g, o_idx);
+		chest_trap(g, o);
 	}
 
 	/* Result */
@@ -573,7 +550,7 @@ static int count_chests(coord& g, bool trapped)
 
 		/* No (known) traps here */
 		if (trapped &&
-		    (!o_ptr->known() ||
+		    (!p_ptr->known(*o_ptr) ||
 		     (o_ptr->pval < 0) ||
 		     !chest_traps[o_ptr->pval]))
 		{
@@ -802,7 +779,7 @@ void do_cmd_open(void)
 	else if (o_idx)
 	{
 		/* Open the chest */
-		more = do_cmd_open_chest(g, o_idx);
+		more = do_cmd_open_chest(g, o_list[o_idx]);
 	}
 
 	/* Door */
@@ -1479,7 +1456,7 @@ void do_cmd_disarm(void)
 	else if (o_idx)
 	{
 		/* Disarm the chest */
-		more = do_cmd_disarm_chest(g, o_idx);
+		more = do_cmd_disarm_chest(g, o_list[o_idx]);
 	}
 
 	/* Disarm trap */

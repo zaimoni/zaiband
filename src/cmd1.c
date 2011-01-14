@@ -86,7 +86,7 @@ void search(void)
 					if (!chest_traps[o_ptr->pval]) continue;
 
 					/* Identify once */
-					if (!o_ptr->known())
+					if (!p_ptr->known(*o_ptr))
 					{
 						/* Message */
 						msg_print("You have discovered a trap on the chest!");

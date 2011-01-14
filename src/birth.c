@@ -446,23 +446,25 @@ static void player_wipe(void)
 {
 	int i;
 
-	/* Backup the player choices */
+	{ /* Backup the player choices */
 	byte psex = p_ptr->psex;
 	byte prace = p_ptr->prace;
 	byte pclass = p_ptr->pclass;
 
-	/* back up the inventory pointer...or crash */
+	/* back up the pointers...or crash */
 	object_type *InventoryBackup = p_ptr->inventory;
-	p_ptr->inventory = NULL;
+	byte* AwarenessBackup = p_ptr->object_awareness;
 
-	(void)WIPE(p_ptr);					/* Wipe the player */
+	WIPE(p_ptr);					/* Wipe the player */
 	p_ptr->inventory = InventoryBackup;	/* restore inventory space from backup */
+	p_ptr->object_awareness = AwarenessBackup;	/* restore object awareness from backup */
 
 	/* Restore the choices */
 	p_ptr->psex = psex;
 	p_ptr->prace = prace;
 	p_ptr->pclass = pclass;
-
+	}
+	
 	/* Clear the inventory */
 	C_WIPE(p_ptr->inventory,INVEN_TOTAL);
 
@@ -475,10 +477,7 @@ static void player_wipe(void)
 
 
 	/* Start with no quests */
-	for (i = 0; i < MAX_Q_IDX; i++)
-	{
-		q_list[i].level = 0;
-	}
+	for (i = 0; i < MAX_Q_IDX; i++) q_list[i].level = 0;
 
 	ZAIBAND_STATIC_ASSERT(2<=MAX_Q_IDX);
 	q_list[0].level = 99;	/* Add a special quest */
@@ -486,14 +485,7 @@ static void player_wipe(void)
 
 
 	/* Reset the "objects" */
-	for (i = 1; i < z_info->k_max; i++)
-	{
-		object_kind *k_ptr = &object_type::k_info[i];
-
-		k_ptr->tried = FALSE;	/* Reset "tried" */
-		k_ptr->aware = FALSE;	/* Reset "aware" */
-	}
-
+	memset(p_ptr->object_awareness,0,z_info->k_max);
 
 	/* Reset the "monsters" */
 	for (i = 1; i < z_info->r_max; i++)

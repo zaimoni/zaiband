@@ -1243,16 +1243,13 @@ static bool item_tester_hook_armour(const object_type *o_ptr)
 
 static bool item_tester_unknown(const object_type *o_ptr)
 {
-	return !o_ptr->known();
+	return !p_ptr->known(*o_ptr);
 }
 
 
 static bool item_tester_unknown_star(const object_type *o_ptr)
 {
-	if (o_ptr->ident & IDENT_MENTAL)
-		return FALSE;
-	else
-		return TRUE;
+	return o_ptr->ident & IDENT_MENTAL;
 }
 
 

@@ -1519,14 +1519,8 @@ static errr rd_savefile_new_aux(void)
 	/* Read the object memory */
 	for (i = 0; i < tmp16u; i++)
 	{
-		byte tmp8u;
-
-		object_kind *k_ptr = &object_type::k_info[i];
-
 		rd_byte(&tmp8u);
-
-		k_ptr->aware = (tmp8u & 0x01) ? TRUE: FALSE;
-		k_ptr->tried = (tmp8u & 0x02) ? TRUE: FALSE;
+		p_ptr->object_awareness[i] = tmp8u & (PY_OBJECT_AWARE | PY_OBJECT_TRIED);
 	}
 	if (arg_fiddle) note("Loaded Object Memory");
 

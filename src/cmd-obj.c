@@ -321,7 +321,7 @@ static bool obj_can_zap(const object_type *o_ptr)
 /* Determine if an object is activatable */
 static bool obj_can_activate(const object_type *o_ptr)
 {
-	if (!o_ptr->known()) return FALSE;	/* Not known */
+	if (!p_ptr->known(*o_ptr)) return FALSE;	/* Not known */
 	if (o_ptr->timeout) return FALSE;	/* Check the recharge */
 	return obj_has_activation(o_ptr);
 }

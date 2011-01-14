@@ -2960,7 +2960,7 @@ static void do_cmd_knowledge_artifacts(void)
 				if (!o_ptr->is_artifact()) continue;
 
 				/* Ignore known items */
-				if (o_ptr->known()) continue;
+				if (p_ptr->known(*o_ptr)) continue;
 
 				/* Note the artifact */
 				okay[o_ptr->name1] = FALSE;
@@ -2980,7 +2980,7 @@ static void do_cmd_knowledge_artifacts(void)
 		if (!o_ptr->is_artifact()) continue;
 
 		/* Ignore known items */
-		if (o_ptr->known()) continue;
+		if (p_ptr->known(*o_ptr)) continue;
 
 		/* Note the artifact */
 		okay[o_ptr->name1] = FALSE;
@@ -3115,11 +3115,8 @@ static void do_cmd_knowledge_uniques(void)
 static void do_cmd_knowledge_objects(void)
 {
 	int k;
-
 	char o_name[80];
-
 	char file_name[1024];
-
 
 	/* Temporary file */
 	FILE* fff = my_fopen_temp(file_name, sizeof(file_name));
@@ -3136,16 +3133,15 @@ static void do_cmd_knowledge_objects(void)
 		if (k_ptr->flags[2] & (TR3_INSTA_ART)) continue;
 
 		/* List known flavored objects */
-		if (k_ptr->flavor && k_ptr->aware)
+		if (k_ptr->flavor && p_ptr->aware(k))
 		{
-			object_type object_type_body;
-			object_type *i_ptr = &object_type_body;	/* Get local object */
+			object_type i;
 
 			/* Create fake object */
-			object_prep(i_ptr, k);
+			object_prep(&i, k);
 
 			/* Describe the object */
-			object_desc_spoil(o_name, sizeof(o_name), i_ptr, FALSE, ODESC_BASE);
+			object_desc_spoil(o_name, sizeof(o_name), &i, FALSE, ODESC_BASE);
 
 			/* Print a message */
 			fprintf(fff, "     %s\n", o_name);

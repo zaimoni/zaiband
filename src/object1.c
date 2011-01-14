@@ -215,7 +215,7 @@ void flavor_init(void)
 		if (!k_ptr->_name) continue;
 
 		/* No flavor yields aware */
-		if (!k_ptr->flavor) k_ptr->aware = TRUE;
+		if (!k_ptr->flavor) p_ptr->be_aware(i);
 	}
 }
 
@@ -323,7 +323,7 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b* f)
 	if (mode != OBJECT_FLAGS_FULL)
 	{
 		C_WIPE(f,OBJECT_FLAG_STRICT_UB);	/* Clear */
-		if (!o_ptr->known()) return;		/* Must be identified */
+		if (!p_ptr->known(*o_ptr)) return;		/* Must be identified */
 	}
 
 	if (mode != OBJECT_FLAGS_RANDOM)
@@ -512,7 +512,7 @@ static bool obj_desc_show_armor(const object_type *o_ptr)
 static bool object_desc_append_name(const object_type *o_ptr)
 {
 	/* if unaware, never append the name of the object */
-	if (!o_ptr->aware() && !(o_ptr->ident & IDENT_STORE)) return FALSE;
+	if (!p_ptr->aware(*o_ptr) && !(o_ptr->ident & IDENT_STORE)) return FALSE;
 
 	/* Analyze the object */
 	switch (o_ptr->obj_id.tval)
@@ -702,8 +702,8 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 	const char* basenm = k_ptr->name();	/* Extract default "base" string */
 	const char* modstr = "";				/* Assume no "modifier" string */
 
-	bool aware = o_ptr->aware();	/* See if the object is "aware" */
-	bool known = o_ptr->known();	/* See if the object is "known" */
+	bool aware = p_ptr->aware(*o_ptr);	/* See if the object is "aware" */
+	bool known = p_ptr->known(*o_ptr);	/* See if the object is "known" */
 	bool flavor = k_ptr->flavor;	/* See if the object is "flavored" */
 
 	const char* s;
@@ -1480,7 +1480,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 	}
 
 	/* Use "tried" if the object has been tested unsuccessfully */
-	else if (!aware && o_ptr->tried())
+	else if (!aware && p_ptr->tried(*o_ptr))
 	{
 		v = "tried";
 	};

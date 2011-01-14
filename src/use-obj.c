@@ -2401,7 +2401,7 @@ static bool activate_object(object_type *o_ptr, int dir)
 static bool want_aim(object_type *o_ptr)
 {
 	if (o_ptr->obj_id.tval == TV_WAND) return TRUE;
-	if (o_ptr->obj_id.tval == TV_ROD && ((o_ptr->obj_id.sval >= SV_ROD_MIN_DIRECTION) || !o_ptr->aware())) return TRUE;
+	if (o_ptr->obj_id.tval == TV_ROD && ((o_ptr->obj_id.sval >= SV_ROD_MIN_DIRECTION) || !p_ptr->aware(*o_ptr))) return TRUE;
 	if (o_ptr->name1)
 	{
 		switch (object_type::a_info[o_ptr->name1].activation)
@@ -2580,9 +2580,9 @@ void do_cmd_use(object_type *o_ptr, int item, int snd, use_type _use)
 	 * aware and reward the player with some experience.  Otherwise, mark
 	 * it as "tried".
 	 */
-	if (ident && !o_ptr->aware())
+	if (ident && !p_ptr->aware(*o_ptr))
 	{
-		object_type::k_info[o_ptr->k_idx].aware = TRUE;
+		p_ptr->object_awareness[o_ptr->k_idx] |= PY_OBJECT_AWARE;
 		gain_exp((object_type::k_info[o_ptr->k_idx].level + (p_ptr->lev / 2)) / p_ptr->lev);
 //		p_ptr->notice |= PN_SQUELCH;
 	}
