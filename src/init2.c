@@ -1087,18 +1087,12 @@ static errr init_flavor_info(void)
 
 /*** Initialize others ***/
 
-#define STORE_CHOICES   32              /* Number of items to choose stock from */
-
-
 /*
  * Hack -- Objects sold in the stores -- by tval/sval pair.
  */
-static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
-{
-	{
-		/* General Store */
-
-		{ TV_FOOD, SV_FOOD_RATION },
+/* General Store */
+static const tvalsval store_table_0[]
+ = 	{	{ TV_FOOD, SV_FOOD_RATION },
 		{ TV_FOOD, SV_FOOD_RATION },
 		{ TV_FOOD, SV_FOOD_RATION },
 		{ TV_FOOD, SV_FOOD_RATION },
@@ -1133,12 +1127,11 @@ static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
 		{ TV_CLOAK, SV_CLOAK },
 		{ TV_CLOAK, SV_CLOAK },
 		{ TV_CLOAK, SV_CLOAK }
-	},
+	};
 
-	{
-		/* Armoury */
-
-		{ TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS },
+/* Armoury */
+static const tvalsval store_table_1[]
+ =  {	{ TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS },
 		{ TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS },
 		{ TV_BOOTS, SV_PAIR_OF_HARD_LEATHER_BOOTS },
 		{ TV_BOOTS, SV_PAIR_OF_HARD_LEATHER_BOOTS },
@@ -1173,12 +1166,11 @@ static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
 		{ TV_SHIELD, SV_SMALL_LEATHER_SHIELD },
 		{ TV_SHIELD, SV_LARGE_LEATHER_SHIELD },
 		{ TV_SHIELD, SV_SMALL_METAL_SHIELD }
-	},
+	};
 
-	{
-		/* Weaponsmith */
-
-		{ TV_SWORD, SV_DAGGER },
+/* Weaponsmith */
+static const tvalsval store_table_2[]
+ = {	{ TV_SWORD, SV_DAGGER },
 		{ TV_SWORD, SV_MAIN_GAUCHE },
 		{ TV_SWORD, SV_RAPIER },
 		{ TV_SWORD, SV_SMALL_SWORD },
@@ -1213,12 +1205,11 @@ static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
 		{ TV_ARROW, SV_AMMO_NORMAL },
 		{ TV_BOLT, SV_AMMO_NORMAL },
 		{ TV_BOLT, SV_AMMO_NORMAL },
-	},
+	};
 
-	{
-		/* Temple */
-
-		{ TV_HAFTED, SV_WHIP },
+/* Temple */
+static const tvalsval store_table_3[]
+ = {	{ TV_HAFTED, SV_WHIP },
 		{ TV_HAFTED, SV_QUARTERSTAFF },
 		{ TV_HAFTED, SV_MACE },
 		{ TV_HAFTED, SV_MACE },
@@ -1253,12 +1244,11 @@ static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
 		{ TV_PRAYER_BOOK, 2 },
 		{ TV_PRAYER_BOOK, 2 },
 		{ TV_PRAYER_BOOK, 3 }
-	},
+	};
 
-	{
-		/* Alchemy shop */
-
-		{ TV_SCROLL, SV_SCROLL_ENCHANT_WEAPON_TO_HIT },
+/* Alchemy shop */
+static const tvalsval store_table_4[]
+ = {	{ TV_SCROLL, SV_SCROLL_ENCHANT_WEAPON_TO_HIT },
 		{ TV_SCROLL, SV_SCROLL_ENCHANT_WEAPON_TO_DAM },
 		{ TV_SCROLL, SV_SCROLL_ENCHANT_ARMOR },
 		{ TV_SCROLL, SV_SCROLL_IDENTIFY },
@@ -1293,12 +1283,11 @@ static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
 		{ TV_POTION, SV_POTION_RES_DEX },
 		{ TV_POTION, SV_POTION_RES_CON },
 		{ TV_POTION, SV_POTION_RES_CHR }
-	},
+	}; 
 
-	{
-		/* Magic-User store */
-
-		{ TV_RING, SV_RING_SEARCHING },
+/* Magic-User store */
+static const tvalsval store_table_5[]
+ = {	{ TV_RING, SV_RING_SEARCHING },
 		{ TV_RING, SV_RING_FEATHER_FALL },
 		{ TV_RING, SV_RING_PROTECTION },
 		{ TV_AMULET, SV_AMULET_CHARISMA },
@@ -1333,9 +1322,26 @@ static const tvalsval store_table[MAX_STORES-2][STORE_CHOICES] =
 		{ TV_MAGIC_BOOK, 2 },
 		{ TV_MAGIC_BOOK, 2 },
 		{ TV_MAGIC_BOOK, 3 }
-	}
-};
+	};
 
+static size_t store_table_limits[]
+= {	N_ELEMENTS(store_table_0),
+	N_ELEMENTS(store_table_1),
+	N_ELEMENTS(store_table_2),
+	N_ELEMENTS(store_table_3),
+	N_ELEMENTS(store_table_4),
+	N_ELEMENTS(store_table_5)};
+
+static const tvalsval* const store_table[]
+= {	store_table_0,
+	store_table_1,
+	store_table_2,
+	store_table_3,
+	store_table_4,
+	store_table_5};
+
+ZAIBAND_STATIC_ASSERT(N_ELEMENTS(store_table)==N_ELEMENTS(store_table_limits));
+	
 /*
  * Initialize some other arrays
  */
@@ -1350,10 +1356,10 @@ static errr init_other(void)
 	macro_init();
 
 	/* Initialize the "quark" package */
-	(void)quarks_init();
+	quarks_init();
 
 	/* Initialize the "message" package */
-	(void)messages_init();
+	messages_init();
 
 	/*** Prepare grid arrays ***/
 
@@ -1384,7 +1390,7 @@ static errr init_other(void)
 	/*** Prepare "vinfo" array ***/
 
 	/* Used by "update_view()" */
-	(void)vinfo_init();
+	vinfo_init();
 
 
 	/*** Prepare entity arrays ***/
@@ -1427,7 +1433,7 @@ static errr init_other(void)
 	/* Fill in each store */
 	for (i = 0; i < MAX_STORES; i++)
 	{
-		int k;
+		size_t k;
 
 		/* Get the store */
 		store_type *st_ptr = &store[i];
@@ -1439,16 +1445,16 @@ static errr init_other(void)
 		C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
 
 		/* No table for the black market or home */
-		if ((i == STORE_B_MARKET) || (i == STORE_HOME)) continue;
+		if (N_ELEMENTS(store_table) <= i) continue;
 
 		/* Assume full table */
-		st_ptr->table_size = STORE_CHOICES;
+		st_ptr->table_size = store_table_limits[i];
 
 		/* Allocate the stock */
 		C_MAKE(st_ptr->table, st_ptr->table_size, s16b);
 
 		/* Scan the choices */
-		for (k = 0; k < STORE_CHOICES; k++)
+		for (k = 0; k < store_table_limits[i]; k++)
 		{
 			int k_idx = lookup_kind(store_table[i][k]);
 			assert(k_idx);
