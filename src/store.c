@@ -1914,7 +1914,7 @@ static bool display_entry(int item)
 		const byte backup_quantity = o_ptr->number;
 
 		/* Zaiband: Viewing an object in a store makes you aware of it */
-		object_aware(o_ptr);
+		p_ptr->be_aware(*o_ptr);
 
 		/* Must leave room for the "price" */
 		maxwid = 65;
@@ -2818,7 +2818,7 @@ static void store_sell(void)
 			o_ptr->pseudo = 0;
 
 			/* Identify original object */
-			object_aware(o_ptr);
+			p_ptr->be_aware(*o_ptr);
 			object_known(o_ptr);
 
 			/* Combine / Reorder the pack (later) */

@@ -184,7 +184,7 @@ static bool full_sense(object_type* o_ptr,int feel)
 	{	/* average is pretty much fully known anyway.  Give a free identify. */
 		identified_average = TRUE;
 
-		object_aware(o_ptr);
+		p_ptr->be_aware(*o_ptr);
 		object_known(o_ptr);
 	}
 	else

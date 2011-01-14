@@ -238,7 +238,7 @@ void identify_pack(void)
 		object_type* const o_ptr = &p_ptr->inventory[i];
 
 		/* Aware and Known */
-		object_aware(o_ptr);
+		p_ptr->be_aware(*o_ptr);
 		object_known(o_ptr);
 	}
 
@@ -1486,7 +1486,7 @@ bool ident_spell(void)
 	o_ptr = get_o_ptr_from_inventory_or_floor(item);
 
 	/* Identify it */
-	object_aware(o_ptr);
+	p_ptr->be_aware(*o_ptr);
 	object_known(o_ptr);
 
 	/* Recalculate bonuses */
@@ -1567,7 +1567,7 @@ bool identify_fully(void)
 	o_ptr = get_o_ptr_from_inventory_or_floor(item);
 
 	/* Identify it */
-	object_aware(o_ptr);
+	p_ptr->be_aware(*o_ptr);
 	object_known(o_ptr);
 
 	/* Mark the item as fully known */

@@ -1172,7 +1172,9 @@ public:
 	bool aware(s16b k_idx) const {assert(0<k_idx && z_info->k_max>k_idx); return object_awareness[k_idx] & PY_OBJECT_AWARE;};
 	bool tried(s16b k_idx) const {assert(0<k_idx && z_info->k_max>k_idx); return object_awareness[k_idx] & PY_OBJECT_TRIED;};
 
+	bool be_aware(const object_type& o) {assert(0<o.k_idx && z_info->k_max>o.k_idx); object_awareness[o.k_idx] |= PY_OBJECT_AWARE;};
 	bool be_aware(s16b k_idx) {assert(0<k_idx && z_info->k_max>k_idx); object_awareness[k_idx] |= PY_OBJECT_AWARE;};
+	bool have_tried(const object_type& o) const {assert(0<o.k_idx && z_info->k_max>o.k_idx); object_awareness[o.k_idx] |= PY_OBJECT_TRIED;};
 	
 /*
  * Determine if a given inventory item is "known"

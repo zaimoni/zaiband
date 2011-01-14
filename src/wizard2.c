@@ -1168,7 +1168,7 @@ static void do_cmd_wiz_learn(void)
 			object_prep(i_ptr, i);
 
 			/* Awareness */
-			object_aware(i_ptr);
+			p_ptr->be_aware(*i_ptr);
 		}
 	}
 }

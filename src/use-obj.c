@@ -2582,13 +2582,13 @@ void do_cmd_use(object_type *o_ptr, int item, int snd, use_type _use)
 	 */
 	if (ident && !p_ptr->aware(*o_ptr))
 	{
-		p_ptr->object_awareness[o_ptr->k_idx] |= PY_OBJECT_AWARE;
+		p_ptr->be_aware(*o_ptr);
 		gain_exp((object_type::k_info[o_ptr->k_idx].level + (p_ptr->lev / 2)) / p_ptr->lev);
 //		p_ptr->notice |= PN_SQUELCH;
 	}
 	else
 	{
-		object_tried(o_ptr);
+		p_ptr->have_tried(*o_ptr);
 	}
 
 	

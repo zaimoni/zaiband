@@ -551,7 +551,7 @@ static void player_outfit(void)
 			object_prep(i_ptr, k_idx);
 			i_ptr->number = (byte)rand_range(e_ptr->min, e_ptr->max);
 
-			object_aware(i_ptr);
+			p_ptr->be_aware(*i_ptr);
 			object_known(i_ptr);
 
 			/* Zaiband: swipe auto-equipping from Unangband etc. */
@@ -1704,7 +1704,7 @@ static void player_birth_done_hook(void)
 	/* Give the player some food */
 	object_prep(i_ptr, lookup_kind2(TV_FOOD, SV_FOOD_RATION));
 	i_ptr->number = (byte)rand_range(3, 7);
-	object_aware(i_ptr);
+	p_ptr->be_aware(*i_ptr);
 	object_known(i_ptr);
 	inven_carry(i_ptr);
 
@@ -1714,7 +1714,7 @@ static void player_birth_done_hook(void)
 	object_prep(i_ptr, lookup_kind2(TV_LITE, SV_LITE_TORCH));
 	i_ptr->number = (byte)rand_range(3, 7);
 	i_ptr->pval = (7*FUEL_TORCH) / 10;
-	object_aware(i_ptr);
+	p_ptr->be_aware(*i_ptr);
 	object_known(i_ptr);
 	inven_carry(i_ptr);
 
@@ -1724,7 +1724,7 @@ static void player_birth_done_hook(void)
 	if (!(p_ptr->inventory[INVEN_OUTER].k_idx))
 	{	/* Basic Cloak */
 		object_prep(p_ptr->inventory+INVEN_OUTER, lookup_kind2(TV_CLOAK, SV_CLOAK));
-		object_aware(p_ptr->inventory+INVEN_OUTER);
+		p_ptr->be_aware(p_ptr->inventory[INVEN_OUTER]);
 		object_known(p_ptr->inventory+INVEN_OUTER);
 	}
 
@@ -1732,35 +1732,35 @@ static void player_birth_done_hook(void)
 	if (!(p_ptr->inventory[INVEN_BODY].k_idx))
 	{	/* start with a robe */
 		object_prep(p_ptr->inventory+INVEN_BODY, lookup_kind2(TV_SOFT_ARMOR, SV_ROBE));
-		object_aware(p_ptr->inventory+INVEN_BODY);
+		p_ptr->be_aware(p_ptr->inventory[INVEN_BODY]);
 		object_known(p_ptr->inventory+INVEN_BODY);
 	}
 
 	if (!(p_ptr->inventory[INVEN_ARM].k_idx))
 	{	/* start with a shield */
 		object_prep(p_ptr->inventory+INVEN_ARM, lookup_kind2(TV_SHIELD, SV_SMALL_LEATHER_SHIELD));
-		object_aware(p_ptr->inventory+INVEN_ARM);
+		p_ptr->be_aware(p_ptr->inventory[INVEN_ARM]);
 		object_known(p_ptr->inventory+INVEN_ARM);
 	}
 
 	if (!(p_ptr->inventory[INVEN_HEAD].k_idx))
 	{	/* start with a helmet */
 		object_prep(p_ptr->inventory+INVEN_HEAD, lookup_kind2(TV_HELM, SV_HARD_LEATHER_CAP));
-		object_aware(p_ptr->inventory+INVEN_HEAD);
+		p_ptr->be_aware(p_ptr->inventory[INVEN_HEAD]);
 		object_known(p_ptr->inventory+INVEN_HEAD);
 	}
 
 	if (!(p_ptr->inventory[INVEN_HANDS].k_idx) && !(p_ptr->cp_ptr->flags & CF_CUMBER_GLOVE))
 	{	/* start with leather gloves */
 		object_prep(p_ptr->inventory+INVEN_HANDS, lookup_kind2(TV_GLOVES, SV_SET_OF_LEATHER_GLOVES));
-		object_aware(p_ptr->inventory+INVEN_HANDS);
+		p_ptr->be_aware(p_ptr->inventory[INVEN_HANDS]);
 		object_known(p_ptr->inventory+INVEN_HANDS);
 	}
 
 	if (!(p_ptr->inventory[INVEN_FEET].k_idx))
 	{
 		object_prep(p_ptr->inventory+INVEN_FEET, lookup_kind2(TV_BOOTS, SV_PAIR_OF_SOFT_LEATHER_BOOTS));
-		object_aware(p_ptr->inventory+INVEN_FEET);
+		p_ptr->be_aware(p_ptr->inventory[INVEN_FEET]);
 		object_known(p_ptr->inventory+INVEN_FEET);
 	}
 

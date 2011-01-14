@@ -2830,7 +2830,7 @@ static void death_knowledge(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Aware and Known */
-		object_aware(o_ptr);
+		p_ptr->be_aware(*o_ptr);
 		object_known(o_ptr);
 
 		/* Fully known */
@@ -2846,7 +2846,7 @@ static void death_knowledge(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Aware and Known */
-		object_aware(o_ptr);
+		p_ptr->be_aware(*o_ptr);
 		object_known(o_ptr);
 
 		/* Fully known */

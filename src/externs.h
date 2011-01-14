@@ -410,8 +410,6 @@ extern object_type* get_first_object(int y, int x);
 extern object_type* get_next_object(const object_type *o_ptr);
 extern s16b get_obj_num(int level);
 extern void object_known(object_type *o_ptr);
-extern void object_aware(object_type *o_ptr);
-extern void object_tried(object_type *o_ptr);
 extern bool is_blessed(const object_type *o_ptr);
 extern s32b object_value(const object_type *o_ptr);
 extern void distribute_charges(object_type *o_ptr, object_type *i_ptr, int amt);

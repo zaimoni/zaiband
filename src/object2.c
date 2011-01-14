@@ -734,30 +734,6 @@ void object_known(object_type *o_ptr)
 }
 
 
-
-
-
-/*
- * The player is now aware of the effects of the given object.
- */
-void object_aware(object_type *o_ptr)
-{
-	/* Fully aware of the effects */
-	p_ptr->object_awareness[o_ptr->k_idx] |= PY_OBJECT_AWARE;
-}
-
-
-
-/*
- * Something has been "sampled"
- */
-void object_tried(object_type *o_ptr)
-{
-	/* Mark it as tried (even if "aware") */
-	p_ptr->object_awareness[o_ptr->k_idx] |= PY_OBJECT_TRIED;
-}
-
-
 /*
  * Determine if a weapon is 'blessed'
  */
