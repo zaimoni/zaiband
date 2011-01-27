@@ -406,16 +406,13 @@ static void wr_extra(void)
 	int i;
 
 	wr_string(op_ptr->full_name);
-
 	wr_string(p_ptr->died_from);
-
 	wr_string(p_ptr->history);
 
 	/* Race/Class/Gender/Spells */
 	wr_byte(p_ptr->prace);
 	wr_byte(p_ptr->pclass);
 	wr_byte(p_ptr->psex);
-	wr_byte(0);	/* oops */
 
 	wr_byte(p_ptr->hitdie);
 	wr_byte(p_ptr->expfact);
@@ -451,12 +448,7 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->max_depth);
 
 	/* More info */
-	wr_s16b(0);	/* oops */
-	wr_s16b(0);	/* oops */
-	wr_s16b(0);	/* oops */
-	wr_s16b(0);	/* oops */
 	wr_s16b(p_ptr->sc);
-	wr_s16b(0);	/* oops */
 
 	wr_s16b(p_ptr->food);
 	wr_s16b(p_ptr->energy);
@@ -472,21 +464,11 @@ static void wr_extra(void)
 	for (i = 0; i < TMD_MAX; i++)
 		wr_s16b(p_ptr->timed[i]);
 
-	/* Future use */
-	for (i = 0; i < 10; i++) wr_u32b(0L);
-
-
 	/* Random artifact version */
 	wr_u32b(RANDART_VERSION);
 
 	/* Random artifact seed */
 	wr_u32b(seed_randart);
-
-
-	/* Ignore some flags */
-	wr_u32b(0L);	/* oops */
-	wr_u32b(0L);	/* oops */
-	wr_u32b(0L);	/* oops */
 
 
 	/* Write the "object seeds" */
@@ -513,6 +495,25 @@ static void wr_extra(void)
 	wr_s32b(turn);
 }
 
+/*
+ * Write some "extra" info
+ */
+static void wr_extra2(void)
+{
+	int i;
+
+	/* Dump the "player hp" entries */
+	wr_u16b(PY_MAX_LEVEL);
+	for (i = 0; i < PY_MAX_LEVEL; i++) wr_s16b(p_ptr->player_hp[i]);
+
+
+	/* Write spell data */
+	wr_u16b(PY_MAX_SPELLS);
+	for (i = 0; i < PY_MAX_SPELLS; i++) wr_byte(p_ptr->spell_flags[i]);
+
+	/* Dump the ordered spells */
+	for (i = 0; i < PY_MAX_SPELLS; i++) wr_byte(p_ptr->spell_order[i]);
+}
 
 /*
  * Dump the random artifacts
@@ -779,24 +780,7 @@ static bool wr_savefile_new(void)
 
 	/* Write the "extra" information */
 	wr_extra();
-
-
-	/* Dump the "player hp" entries */
-	wr_u16b(PY_MAX_LEVEL);
-	for (i = 0; i < PY_MAX_LEVEL; i++) wr_s16b(p_ptr->player_hp[i]);
-
-
-	/* Write spell data */
-	wr_u16b(PY_MAX_SPELLS);
-	for (i = 0; i < PY_MAX_SPELLS; i++) wr_byte(p_ptr->spell_flags[i]);
-
-	/* Dump the ordered spells */
-	for (i = 0; i < PY_MAX_SPELLS; i++) wr_byte(p_ptr->spell_order[i]);
-
-
-	/* Write randart information */
-	if (OPTION(adult_rand_artifacts)) wr_randarts();
-
+	wr_extra2();
 
 	/* Write the inventory.*/ 
 	for (i = 0; i < INVEN_TOTAL; i++)
@@ -810,6 +794,9 @@ static bool wr_savefile_new(void)
 
 	/* Add a sentinel */
 	wr_u16b(0xFFFF);
+	
+	/* Write randart information */
+	if (OPTION(adult_rand_artifacts)) wr_randarts();
 
 
 	/* Dump the stores */

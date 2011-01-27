@@ -766,13 +766,10 @@ static errr rd_extra(void)
 	int i;
 
 	byte tmp8u;
-	u16b tmp16u;
 	s16b tmp16s;
 
 	rd_string(op_ptr->full_name, sizeof(op_ptr->full_name));
-
 	rd_string(p_ptr->died_from, 80);
-
 	rd_string(p_ptr->history, 250);
 
 	/* Player race */
@@ -800,8 +797,6 @@ static errr rd_extra(void)
 	/* Player gender */
 	rd_byte(&tmp8u);
 	p_ptr->set_sex(tmp8u);
-
-	strip_bytes(1);
 
 	/* Special Race/Class info */
 	rd_byte(&p_ptr->hitdie);
@@ -851,9 +846,7 @@ static errr rd_extra(void)
 	if (p_ptr->max_depth < 0) p_ptr->max_depth = 1;
 
 	/* More info */
-	strip_bytes(8);
 	rd_s16b(&p_ptr->sc);
-	strip_bytes(2);
 
 	{
 		byte num;
@@ -886,18 +879,11 @@ static errr rd_extra(void)
 			}
 	}
 
-	/* Future use */
-	strip_bytes(40);
-
 	/* Read the randart version */
 	rd_u32b(&randart_version);
 
 	/* Read the randart seed */
 	rd_u32b(&seed_randart);
-
-	/* Skip the flags */
-	strip_bytes(12);
-
 
 	/* Hack -- the two "special seeds" */
 	rd_u32b(&seed_flavor);
@@ -924,6 +910,17 @@ static errr rd_extra(void)
 	/* Current turn */
 	rd_s32b(&turn);
 
+	return (0);
+}
+
+
+/*
+ * Read the "extra" information
+ */
+static errr rd_extra2(void)
+{
+	int i;
+	u16b tmp16u;
 
 	/* Read the player_hp array */
 	rd_u16b(&tmp16u);
@@ -936,10 +933,7 @@ static errr rd_extra(void)
 	}
 
 	/* Read the player_hp array */
-	for (i = 0; i < tmp16u; i++)
-	{
-		rd_s16b(&p_ptr->player_hp[i]);
-	}
+	for (i = 0; i < tmp16u; i++) rd_s16b(&p_ptr->player_hp[i]);
 
 	/* Read the player spells */
 	if (rd_player_spells()) return (-1);
@@ -1381,18 +1375,13 @@ static errr rd_dungeon(void)
 	/* Read the monsters */
 	for (i = 1; i < limit; i++)
 	{
-		monster_type monster_type_body;
-		monster_type *n_ptr = &monster_type_body;	/* Get local monster */
+		monster_type n;
 
-		/* Clear the monster */
-		WIPE(n_ptr);
-
-		/* Read the monster */
-		rd_monster(n_ptr);
-
+		WIPE(&n);	/* Clear the monster */
+		rd_monster(&n);	/* Read the monster */
 
 		/* Place monster in dungeon */
-		if (monster_place(n_ptr->loc, n_ptr) != i)
+		if (monster_place(n.loc, &n) != i)
 		{
 			note(format("Cannot place monster %d", i));
 			return (-1);
@@ -1571,22 +1560,21 @@ static errr rd_savefile_new_aux(void)
 
 	/* Read the extra stuff */
 	if (rd_extra()) return (-1);
+	if (rd_extra2()) return (-1);
 	if (arg_fiddle) note("Loaded extra information");
-
-
-	/* Read random artifacts */
-	if (OPTION(adult_rand_artifacts))
-	{
-		if (rd_randarts()) return (-1);
-		if (arg_fiddle) note("Loaded Random Artifacts");
-	}
-
 
 	/* Read the inventory */
 	if (rd_inventory())
 	{
 		note("Unable to read inventory");
 		return (-1);
+	}
+
+	/* Read random artifacts */
+	if (OPTION(adult_rand_artifacts))
+	{
+		if (rd_randarts()) return (-1);
+		if (arg_fiddle) note("Loaded Random Artifacts");
 	}
 
 

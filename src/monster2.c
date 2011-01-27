@@ -1279,16 +1279,9 @@ s16b player_place(int y, int x)
  */
 s16b monster_place(coord g, monster_type *n_ptr)
 {
-	s16b m_idx;
+	/* Get a new redcord, if safe */
+	s16b m_idx = (0 != cave_m_idx[g.y][g.x]) ? 0 : mon_pop();
 
-	/* Paranoia XXX XXX */
-	if (cave_m_idx[g.y][g.x] != 0) return (0);
-
-
-	/* Get a new record */
-	m_idx = mon_pop();
-
-	/* Oops */
 	if (m_idx)
 	{
 		monster_type* m_ptr = &mon_list[m_idx];			/* Get the new monster */
