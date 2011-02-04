@@ -5,8 +5,10 @@ META: edit format break
 
 [resync dirs: src, lib/edit]
 Changes Zaiband 3.0.10
+- Total loss of backward savefile compatiblity.
 - Know everything about monsters changed to Ironman (default-true) option from Cheat (default-false) option.
 - Scrolls display with their own flavors even when unidentified
+- autoscum option is gone.  We don't need the late game to be truly impossible.
 
 Changes Zaiband 3.0.9
 - The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:

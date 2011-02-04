@@ -3388,7 +3388,6 @@ void generate_cave(void)
 	/* Generate */
 	for (num = 0; TRUE; num++)
 	{
-		bool okay = TRUE;
 		const char* why = NULL;
 
 		/* Reset */
@@ -3477,60 +3476,19 @@ void generate_cave(void)
 
 
 		/* Prevent object over-flow */
-		if (o_max >= z_info->o_max)
-		{
-			/* Message */
-			why = "too many objects";
-
-			/* Message */
-			okay = FALSE;
-		}
+		if (o_max >= z_info->o_max) why = "too many objects";
 
 		/* Prevent monster over-flow */
-		if (mon_max >= z_info->m_max)
-		{
-			/* Message */
-			why = "too many monsters";
+		if (mon_max >= z_info->m_max) why = "too many monsters";
 
-			/* Message */
-			okay = FALSE;
-		}
-
-		/* Mega-Hack -- "auto-scum" */
-		if (OPTION(adult_auto_scum) && (num < 100))
-		{
-			/* Require "goodness" */
-			if ((feeling > 9) ||
-			    ((p_ptr->depth >= 5) && (feeling > 8)) ||
-			    ((p_ptr->depth >= 10) && (feeling > 7)) ||
-			    ((p_ptr->depth >= 20) && (feeling > 6)) ||
-			    ((p_ptr->depth >= 40) && (feeling > 5)))
-			{
-				/* Give message to cheaters */
-				if (OPTION(cheat_room) || OPTION(cheat_hear) ||
-				    OPTION(cheat_peek) || OPTION(cheat_xtra))
-				{
-					/* Message */
-					why = "boring level";
-				}
-
-				/* Try again */
-				okay = FALSE;
-			}
-		}
-
-		/* Accept */
-		if (okay) break;
-
+		/* If we have no excuse to reject the level, accept */
+		if (!why) break;
 
 		/* Message */
-		if (why) msg_format("Generation restarted (%s)", why);
+		msg_format("Generation restarted (%s)", why);
 
-		/* Wipe the objects */
-		wipe_o_list();
-
-		/* Wipe the monsters */
-		wipe_mon_list();
+		wipe_o_list();   /* Wipe the objects */
+		wipe_mon_list(); /* Wipe the monsters */
 	}
 
 

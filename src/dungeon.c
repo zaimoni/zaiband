@@ -741,10 +741,10 @@ static void play_ambient_sound(void)
  */
 static void process_world(void)
 {
+	static unsigned int closing_flag = 0;		/* Dungeon is closing */
+
 	int i;
-
 	int regen_amount;
-
 	object_type* o_ptr;
 
 	/* Every 10 game turns */
@@ -2438,7 +2438,6 @@ static void dungeon(void)
 
 	/* Reset shimmer flags */
 	shimmer_monsters = TRUE;
-	shimmer_objects = TRUE;
 
 	/* Reset repair flags */
 	repair_mflag_nice = TRUE;

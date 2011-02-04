@@ -54,8 +54,8 @@ bool character_dungeon;		/* The character has a dungeon */
 bool character_loaded;		/* The character was loaded from a savefile */
 bool character_saved;		/* The character was just saved to a savefile */
 
-s16b character_icky;		/* Depth of the game in special mode */
-s16b character_xtra;		/* Depth of the game in startup mode */
+s16b character_icky = 0;		/* Depth of the game in special mode */
+s16b character_xtra = 0;		/* Depth of the game in startup mode */
 
 u32b seed_randart;		/* Hack -- consistent random artifacts */
 
@@ -88,7 +88,6 @@ bool inkey_flag;		/* See the "inkey()" function */
 bool opening_chest = FALSE;		/* Hack -- prevent chest generation */
 
 bool shimmer_monsters;	/* Hack -- optimize multi-hued monsters */
-bool shimmer_objects;	/* Hack -- optimize multi-hued objects */
 
 bool repair_mflag_nice;	/* Hack -- repair monster flags (nice) */
 bool repair_mflag_show;	/* Hack -- repair monster flags (show) */
@@ -108,8 +107,6 @@ byte feeling;			/* Most recent feeling */
 s16b rating;			/* Level's current rating */
 
 bool good_item_flag;	/* True if "Artifact" on this level */
-
-bool closing_flag;		/* Dungeon is closing */
 
 
 /*
