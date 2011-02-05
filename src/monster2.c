@@ -1796,115 +1796,30 @@ static int summon_specific_type = 0;
  */
 static bool summon_specific_okay(int r_idx)
 {
-	monster_race *r_ptr = &monster_type::r_info[r_idx];
-
-	bool okay = FALSE;
-
-
 	/* Hack -- no specific type specified */
-	if (!summon_specific_type) return (TRUE);
+	if (!summon_specific_type) return true;
 
+	const monster_race * const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Check our requirements */
 	switch (summon_specific_type)
 	{
-		case SUMMON_ANIMAL:
-		{
-			okay = ((r_ptr->flags[2] & RF2_ANIMAL) &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_SPIDER:
-		{
-			okay = ((r_ptr->d._char == 'S') &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_HOUND:
-		{
-			okay = ((NULL!=strchr("CZ",r_ptr->d._char)) &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_HYDRA:
-		{
-			okay = ((r_ptr->d._char == 'M') &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_ANGEL:
-		{
-			okay = ((r_ptr->d._char == 'A') &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_DEMON:
-		{
-			okay = ((r_ptr->flags[2] & RF2_DEMON) &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_UNDEAD:
-		{
-			okay = ((r_ptr->flags[2] & RF2_UNDEAD) &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_DRAGON:
-		{
-			okay = ((r_ptr->flags[2] & RF2_DRAGON) &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_KIN:
-		{
-			okay = ((r_ptr->d._char == summon_kin_type) &&
-			        !(r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_HI_UNDEAD:
-		{
-			okay = (NULL!=strchr("LVW",r_ptr->d._char));
-			break;
-		}
-
-		case SUMMON_HI_DRAGON:
-		{
-			okay = (r_ptr->d._char == 'D');
-			break;
-		}
-
-		case SUMMON_HI_DEMON:
-		{
-			okay = (r_ptr->d._char == 'U');
-			break;
-		}
-
-		case SUMMON_WRAITH:
-		{
-			okay = ((r_ptr->d._char == 'W') &&
-			        (r_ptr->flags[0] & RF0_UNIQUE));
-			break;
-		}
-
-		case SUMMON_UNIQUE:
-		{
-			okay = (r_ptr->flags[0] & RF0_UNIQUE);
-			break;
-		}
+	default: return false; 
+	case SUMMON_ANIMAL: return (r_ptr->flags[2] & RF2_ANIMAL) && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_SPIDER: return (r_ptr->d._char == 'S') && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_HOUND: return strchr("CZ",r_ptr->d._char) && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_HYDRA: return (r_ptr->d._char == 'M') && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_ANGEL: return (r_ptr->d._char == 'A') && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_DEMON: return (r_ptr->flags[2] & RF2_DEMON) && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_UNDEAD: return (r_ptr->flags[2] & RF2_UNDEAD) && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_DRAGON: return (r_ptr->flags[2] & RF2_DRAGON) && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_KIN: return (r_ptr->d._char == summon_kin_type) && !(r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_HI_UNDEAD: return strchr("LVW",r_ptr->d._char);
+	case SUMMON_HI_DRAGON: return r_ptr->d._char == 'D';
+	case SUMMON_HI_DEMON: return r_ptr->d._char == 'U';
+	case SUMMON_WRAITH: return (r_ptr->d._char == 'W') && (r_ptr->flags[0] & RF0_UNIQUE);
+	case SUMMON_UNIQUE: return r_ptr->flags[0] & RF0_UNIQUE;
 	}
-
-	/* Result */
-	return (okay);
 }
 
 
@@ -2012,7 +1927,7 @@ bool multiply_monster(const m_idx_type m_idx)
 		scatter(g, m_ptr->loc, d, 0);
 
 		/* Require an "empty" floor grid */
-		if (cave_empty_bold(g.y, g.x)) break;
+		if (!cave_empty_bold(g.y, g.x)) continue;
 
 		/* Create a new monster (awake, no groups) */
 		return place_monster_aux(g, m_ptr->r_idx, FALSE, FALSE);

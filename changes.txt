@@ -11,6 +11,7 @@ Changes Zaiband 3.0.10
 - autoscum option is gone.  We don't need the late game to be truly impossible.
 - tiles are broken again (pretty sure objects won't work).  Leaving on for those energetic enough to debug them.
 - Temporary poison resistance fixed.
+- monster breeders fixed.
 
 Changes Zaiband 3.0.9
 - The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:
