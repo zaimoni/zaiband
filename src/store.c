@@ -15,6 +15,8 @@
 #include "tvalsval.h"
 #include "x-spell.h"
 
+#include "simple_lock.hpp"
+
 /*
  * Store constants.
  */
@@ -3280,7 +3282,8 @@ void do_cmd_store(void)
 
 
 	forget_view();		/* Forget the view */
-	character_icky++;	/* Hack -- Increase "icky" depth */
+	{	/* Hack -- Increase "icky" depth */
+	zaimoni::simple_lock<s16b> tmp(character_icky);	
 
 	p_ptr->command_arg = 0;	/* No command argument */
 	p_ptr->command_rep = 0;	/* No repeated command */
@@ -3403,7 +3406,7 @@ void do_cmd_store(void)
 	p_ptr->energy_use = 100; /* Take a turn */
 	p_ptr->command_new = 0; /* Hack -- Cancel automatic command */
 	message_flush(); /* Flush messages XXX XXX XXX */
-	character_icky--; /* Hack -- Decrease "icky" depth */
+	} /* Hack -- Decrease "icky" depth */
 	Term_clear(); /* Clear the screen */
 
 

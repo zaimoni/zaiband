@@ -31,6 +31,7 @@ $(addsuffix .o, attack cave, spells1): flow.h
 $(addsuffix .o, attack cave cmd1 cmd2 cmd4 generate melee2 monster2 spells2 use-obj xtra2 xtra3): keypad.h
 $(addsuffix .o, object2): POD.hpp
 $(addsuffix .o, flow): rational.hpp
+$(addsuffix .o, dungeon files store): simple_lock.hpp
 $(addsuffix .o, attack birth cave cmd3 cmd4 dungeon generate melee1 melee2 monster1 monster2 spells1 spells2 wizard1 xtra2): bitflag.h
 
 $(addsuffix .o, load spells2): ego.h

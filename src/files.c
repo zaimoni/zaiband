@@ -15,6 +15,8 @@
 #include "store.h"
 #include "tvalsval.h"
 
+#include "simple_lock.hpp"
+
 #define MAX_PANEL 12
 
 #if 0
@@ -3216,24 +3218,14 @@ static void close_game_aux(void)
  */
 void close_game(void)
 {
-	/* Handle stuff */
-	handle_stuff();
+	handle_stuff();  /* Handle stuff */
+	message_flush(); /* Flush the messages */
+	flush();         /* Flush the input */
+	signals_ignore_tstp(); /* No suspending now */
 
-	/* Flush the messages */
-	message_flush();
+	{ /* Hack -- Increase "icky" depth */
+	zaimoni::simple_lock<s16b> tmp(character_icky);
 
-	/* Flush the input */
-	flush();
-
-
-	/* No suspending now */
-	signals_ignore_tstp();
-
-
-	/* Hack -- Increase "icky" depth */
-	character_icky++;
-
-	
 	/* Open the high score file, for reading/writing */
 	open_scoretable(O_RDWR);
 
@@ -3266,10 +3258,7 @@ void close_game(void)
 
 	/* Shut the high score file */
 	close_scoretable();
-
-
-	/* Hack -- Decrease "icky" depth */
-	character_icky--;
+	} /* Hack -- Decrease "icky" depth */
 
 
 	/* Allow suspending now */

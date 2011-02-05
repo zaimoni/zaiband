@@ -16,6 +16,7 @@
 #include "raceflag.h"
 #include "store.h"
 #include "tvalsval.h"
+#include "simple_lock.hpp"
 
 /**
  * There is a 1/MAX_M_ALLOC_CHANCE chance per round of creating a new monster
@@ -2511,43 +2512,30 @@ static void dungeon(void)
 	message_flush();
 
 
-	/* Hack -- Increase "xtra" depth */
-	character_xtra++;
-
+	{	/* Increase "xtra" depth; decrease when out of scope */
+	zaimoni::simple_lock<s16b> tmp(character_xtra);
 
 	/* Clear */
 	Term_clear();
 
-
-	/* Update stuff */
-	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
-
-	/* Calculate torch radius */
-	p_ptr->update |= (PU_TORCH);
+	/* Update stuff, calculate torch radius */
+	p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS | PU_TORCH);
 
 	/* Update stuff */
 	update_stuff();
 
 
-	/* Fully update the visuals (and monster distances) */
-	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_DISTANCE);
-
-	/* Fully update the flow */
-	p_ptr->update |= (PU_FORGET_FLOW | PU_UPDATE_FLOW);
+	/* Fully update the visuals (and monster distances); fully update the flow */
+	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_DISTANCE | PU_FORGET_FLOW | PU_UPDATE_FLOW);
 
 	/* Redraw dungeon */
 	p_ptr->redraw |= (PR_BASIC | PR_EXTRA | PR_MAP | PR_INVEN | PR_EQUIP | PR_MONSTER | PR_MONLIST);
 
-	/* Update stuff */
-	update_stuff();
-
-	/* Redraw stuff */
-	redraw_stuff();
+	update_stuff(); /* Update stuff */
+	redraw_stuff(); /* Redraw stuff */
 
 	assert(p_ptr->inven_cnt_is_strict_UB_of_nonzero_k_idx() && "precondition");
-
-	/* Hack -- Decrease "xtra" depth */
-	character_xtra--;
+	}
 
 
 	/* Update stuff */
@@ -2743,61 +2731,38 @@ void play_game(bool new_game)
  	bool new_game = init_angband(); 
 #endif
 
-	/* Hack -- Increase "icky" depth */
-	character_icky++;
-
+	{	/* Hack -- Increase "icky" depth */
+	zaimoni::simple_lock<s16b> tmp(character_icky);
 
 	/* Verify main term */
-	if (!term_screen)
-	{
-		quit("main window does not exist");
-	}
+	if (!term_screen) quit("main window does not exist");
 
 	/* Make sure main term is active */
 	Term_activate(term_screen);
 
 	/* Verify minimum size */
-	if ((Term->hgt < 24) || (Term->wid < 80))
-	{
-		quit("main window is too small");
-	}
+	if ((Term->hgt < 24) || (Term->wid < 80)) quit("main window is too small");
 
-	/* Hack -- Turn off the cursor */
-	(void)Term_set_cursor(FALSE);
-
-	/* Set screen resize hook */
-	Term_set_resize_hook(do_cmd_redraw);
+	Term_set_cursor(FALSE); /* Hack -- Turn off the cursor */
+	Term_set_resize_hook(do_cmd_redraw); /* Set screen resize hook */
 
 	/* Attempt to load */
-	if (!load_player())
-	{
-		/* Oops */
-		quit("broken savefile");
-	}
+	if (!load_player()) quit("broken savefile");
 
 	/* Nothing loaded */
 	if (!character_loaded)
 	{
-		/* Make new player */
-		new_game = TRUE;
-
-		/* The dungeon is not ready */
-		character_dungeon = FALSE;
+		new_game = TRUE; /* Make new player */
+		character_dungeon = FALSE; /* The dungeon is not ready */
 	}
 
 	/* Hack -- Default base_name */
-	if (!op_ptr->base_name[0])
-	{
-		strcpy(op_ptr->base_name, "PLAYER");
-	}
+	if (!op_ptr->base_name[0]) strcpy(op_ptr->base_name, "PLAYER");
 
 	/* Init RNG */
 	if (Rand_quick)
 	{
-		u32b seed;
-
-		/* Basic seed */
-		seed = (time(NULL));
+		u32b seed = (time(NULL)); /* Basic seed */
 
 #ifdef SET_UID
 
@@ -2806,11 +2771,8 @@ void play_game(bool new_game)
 
 #endif
 
-		/* Use the complex RNG */
-		Rand_quick = FALSE;
-
-		/* Seed the "complex" RNG */
-		Rand_state_init(seed);
+		Rand_quick = FALSE; /* Use the complex RNG */
+		Rand_state_init(seed); /* Seed the "complex" RNG */
 	}
 
 	/* Roll new character */
@@ -2856,49 +2818,28 @@ void play_game(bool new_game)
 		process_player_name(TRUE);
 	}
 
-	/* Flash a message */
-	prt("Please wait...", 0, 0);
-
-	/* Flush the message */
-	Term_fresh();
-
+	prt("Please wait...", 0, 0); /* Flash a message */
+	Term_fresh();	/* Flush the message */
 
 	/* Hack -- Enter wizard mode */
 	if (arg_wizard && enter_wizard_mode()) p_ptr->wizard = TRUE;
 
-
-	/* Flavor the objects */
-	flavor_init();
-
-	/* Reset visuals */
-	reset_visuals(TRUE);
-
+	flavor_init(); /* Flavor the objects */
+	reset_visuals(TRUE); /* Reset visuals */
 
 	/* Window stuff */
 	p_ptr->redraw |= (PR_INVEN | PR_EQUIP | PR_MESSAGE | PR_MONSTER);
 
-	/* Redraw stuff */
-	redraw_stuff();
-
-
-	/* Process some user pref files */
-	process_some_user_pref_files();
-
-
-	/* React to changes */
-	Term_xtra(TERM_XTRA_REACT, 0);
-
+	redraw_stuff(); /* Redraw stuff */
+	process_some_user_pref_files(); /* Process some user pref files */
+	Term_xtra(TERM_XTRA_REACT, 0); /* React to changes */
 
 	/* Generate a dungeon level if needed */
 	if (!character_dungeon) generate_cave();
 
-
 	/* Character is now "complete" */
 	character_generated = TRUE;
-
-
-	/* Hack -- Decrease "icky" depth */
-	character_icky--;
+	}	/* Hack -- Decrease "icky" depth */
 
 
 	/* Start playing */
