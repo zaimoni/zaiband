@@ -79,6 +79,15 @@ static timed_effect effects[] =
 	{ "You feel resistant to poison!", "You feel less resistant to poison", PR_OPPOSE_ELEMENTS, 0, MSG_RES_POIS },
 };
 
+#if 0
+static timed_effect core_effects[] =
+{
+	{ "You are confused!", "You feel less confused now.", PR_CONFUSED, 0, MSG_CONFUSED },
+	{ "You are terrified!", "You feel bolder now.", PR_AFRAID, 0, MSG_AFRAID },
+	{ "", "", 0, 0, 0 },  /* TMD_STUN -- handled seperately */
+};
+#endif
+
 /*
  * Set a timed event (except timed resists, cutting and stunning).
  */
@@ -91,12 +100,12 @@ bool player_type::set_timed_clean(int idx, int v)
 	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
 
 	/* Hack -- call other functions */
-	if (idx == TMD_STUN) return set_stun(v,*p_ptr);
-	else if (idx == TMD_CUT) return set_cut(v,*p_ptr);
-	else if (idx == TMD_OPP_ACID) return set_oppose_acid(v,*p_ptr);
-	else if (idx == TMD_OPP_ELEC) return set_oppose_elec(v,*p_ptr);
-	else if (idx == TMD_OPP_FIRE) return set_oppose_fire(v,*p_ptr);
-	else if (idx == TMD_OPP_COLD) return set_oppose_cold(v,*p_ptr);
+	if (idx == TMD_STUN) return set_stun(v,*this);
+	else if (idx == TMD_CUT) return set_cut(v,*this);
+	else if (idx == TMD_OPP_ACID) return set_oppose_acid(v,*this);
+	else if (idx == TMD_OPP_ELEC) return set_oppose_elec(v,*this);
+	else if (idx == TMD_OPP_FIRE) return set_oppose_fire(v,*this);
+	else if (idx == TMD_OPP_COLD) return set_oppose_cold(v,*this);
 
 	/* Find the effect */
 	effect = &effects[idx];
@@ -104,7 +113,7 @@ bool player_type::set_timed_clean(int idx, int v)
 	/* Open */
 	if (v)
 	{
-		if (!p_ptr->timed[idx])
+		if (!timed[idx])
 		{
 			message(effect->msg, 0, effect->on_begin);
 			notice = TRUE;
@@ -114,7 +123,7 @@ bool player_type::set_timed_clean(int idx, int v)
 	/* Shut */
 	else
 	{
-		if (p_ptr->timed[idx])
+		if (timed[idx])
 		{
 			message(MSG_RECOVER, 0, effect->on_end);
 			notice = TRUE;
@@ -122,7 +131,7 @@ bool player_type::set_timed_clean(int idx, int v)
 	}
 
 	/* Use the value */
-	p_ptr->timed[idx] = v;
+	timed[idx] = v;
 
 	/* Nothing to notice */
 	if (!notice) return FALSE;
@@ -131,8 +140,8 @@ bool player_type::set_timed_clean(int idx, int v)
 	if (OPTION(disturb_state)) disturb(0, 0);
 
 	/* Update the visuals, as appropriate. */
-	p_ptr->update |= effect->flag_update;
-	p_ptr->redraw |= effect->flag_redraw;
+	update |= effect->flag_update;
+	redraw |= effect->flag_redraw;
 
 	/* Handle stuff */
 	handle_stuff();
@@ -148,23 +157,6 @@ bool player_type::dec_timed(int idx, int v)
 
 	return set_timed_clean(idx, timed[idx] - v);
 }
-
-#ifndef ZAIBAND_STATIC_ASSERT
-bool player_type::set_timed(int idx, int v)
-{
-	DEBUG_FAIL_OR_LEAVE((0 > idx) || (TMD_MAX<=idx),return FALSE);
-
-	return set_timed_clean(idx,v);
-}
-
-bool player_type::inc_timed(int idx, int v)
-{
-	/* Check we have a valid effect */
-	DEBUG_FAIL_OR_LEAVE((0 > idx) || (TMD_MAX<=idx),return FALSE);
-
-	return set_timed_clean(idx, v + timed[idx]);
-}
-#endif
 
 /* common aux function */
 static bool set_timed_condition_w_immunity(int v, s16b& stat,bool immune, int msg_on,const char* const cond_on,int msg_off, const char* const cond_off)

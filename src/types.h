@@ -1140,22 +1140,11 @@ private:
 	bool set_timed_clean(int idx, int v);
 public:
 	bool dec_timed(int idx, int v);
-#ifdef ZAIBAND_STATIC_ASSERT
 	/* compile-time checking */
-	template<timed_effects idx> bool set_timed(int v) {ZAIBAND_STATIC_ASSERT((0 <= idx) && (TMD_MAX>idx)); return set_timed_clean(idx,v);}
-	template<timed_effects idx> bool inc_timed(int v) {ZAIBAND_STATIC_ASSERT((0 <= idx) && (TMD_MAX>idx)); return set_timed_clean(idx,timed[idx]+v);}
-	template<timed_effects idx> bool dec_timed(int v) {ZAIBAND_STATIC_ASSERT((0 <= idx) && (TMD_MAX>idx)); return set_timed_clean(idx,timed[idx]-v);}
-	template<timed_effects idx> bool clear_timed(void) {ZAIBAND_STATIC_ASSERT((0 <= idx) && (TMD_MAX>idx)); return set_timed_clean(idx,0);}
-#else
-	bool set_timed(int idx, int v);
-	bool inc_timed(int idx, int v);
-	bool clear_timed(int idx) { return set_timed(idx, 0); }
-
-	template<timed_effects idx> bool set_timed(int v) {return set_timed(idx,v);}
-	template<timed_effects idx> bool inc_timed(int v) {return inc_timed(idx,timed[idx]+v);}
-	template<timed_effects idx> bool dec_timed(int v) {return dec_timed(idx,timed[idx]-v);}
-	template<timed_effects idx> bool clear_timed(void) {return set_timed(idx,0);}
-#endif
+	template<timed_effects idx> bool set_timed(int v) {return set_timed_clean(idx,v);}
+	template<timed_effects idx> bool inc_timed(int v) {return set_timed_clean(idx,timed[idx]+v);}
+	template<timed_effects idx> bool dec_timed(int v) {return set_timed_clean(idx,timed[idx]-v);}
+	template<timed_effects idx> bool clear_timed(void) {return set_timed_clean(idx,0);}
 
 	/* xtra3.c */
 	bool allow_moron() const;
