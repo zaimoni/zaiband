@@ -405,6 +405,8 @@ static void wr_extra(void)
 {
 	int i;
 
+	wr_agent(*p_ptr);
+
 	wr_string(op_ptr->full_name);
 	wr_string(p_ptr->died_from);
 	wr_string(p_ptr->history);
@@ -425,9 +427,6 @@ static void wr_extra(void)
 	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_max[i]);
 	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_cur[i]);
 
-	/* Ignore the transient stats */
-	for (i = 0; i < 12; ++i) wr_s16b(0);
-
 	wr_u32b(p_ptr->au);
 
 	wr_u32b(p_ptr->max_exp);
@@ -435,8 +434,6 @@ static void wr_extra(void)
 	wr_u16b(p_ptr->exp_frac);
 	wr_s16b(p_ptr->lev);
 
-	wr_s16b(p_ptr->mhp);
-	wr_s16b(p_ptr->chp);
 	wr_u16b(p_ptr->chp_frac);
 
 	wr_s16b(p_ptr->msp);
@@ -451,7 +448,6 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->sc);
 
 	wr_s16b(p_ptr->food);
-	wr_s16b(p_ptr->energy);
 	wr_s16b(p_ptr->word_recall);
 	wr_s16b(p_ptr->see_infra);
 	wr_byte(p_ptr->confusing);
@@ -581,7 +577,6 @@ static void wr_dungeon(void)
 
 	/* Dungeon specific info follows */
 	wr_u16b(p_ptr->depth);
-	wr(p_ptr->loc);
 	wr_u16b(DUNGEON_HGT);
 	wr_u16b(DUNGEON_WID);
 

@@ -764,10 +764,10 @@ static errr rd_player_spells(void)
 static errr rd_extra(void)
 {
 	int i;
-
 	byte tmp8u;
-	s16b tmp16s;
 
+	rd_agent(*p_ptr);
+	
 	rd_string(op_ptr->full_name, sizeof(op_ptr->full_name));
 	rd_string(p_ptr->died_from, 80);
 	rd_string(p_ptr->history, 250);
@@ -811,8 +811,6 @@ static errr rd_extra(void)
 	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_max[i]);
 	for (i = 0; i < A_MAX; i++) rd_s16b(&p_ptr->stat_cur[i]);
 
-	strip_bytes(24);	/* oops */
-
 	rd_s32b(&p_ptr->au);
 
 	rd_s32b(&p_ptr->max_exp);
@@ -828,8 +826,6 @@ static errr rd_extra(void)
 		return (-1);
 	}
 
-	rd_s16b(&p_ptr->mhp);
-	rd_s16b(&p_ptr->chp);
 	rd_u16b(&p_ptr->chp_frac);
 
 	rd_s16b(&p_ptr->msp);
@@ -853,8 +849,6 @@ static errr rd_extra(void)
 		int i;
 
 		rd_s16b(&p_ptr->food);
-		rd_s16b(&tmp16s);
-		p_ptr->energy = tmp16s;
 		rd_s16b(&p_ptr->word_recall);
 		rd_s16b(&p_ptr->see_infra);
 		rd_byte(&p_ptr->confusing);
@@ -1187,7 +1181,7 @@ static errr rd_dungeon(void)
 
 	s16b depth;
 	s16b ymax, xmax;
-	coord ploc;
+	coord ploc = p_ptr->loc;
 
 	byte count;
 	byte tmp8u;
@@ -1199,7 +1193,6 @@ static errr rd_dungeon(void)
 
 	/* Header info */
 	rd_s16b(&depth);
-	rd(ploc);
 	rd_s16b(&ymax);
 	rd_s16b(&xmax);
 
