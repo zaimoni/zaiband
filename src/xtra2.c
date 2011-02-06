@@ -21,6 +21,7 @@
 #include "raceflag.h"
 #include "tvalsval.h"
 
+#include "grammar.h"
 #include "keypad.h"
 
 /*
@@ -2107,7 +2108,7 @@ static int target_set_interactive_aux(coord g, int mode, const char* const info)
 			if (*s2 && (feat >= FEAT_DOOR_HEAD)) s2 = "in ";
 
 			/* Pick proper indefinite article */
-			s3 = (is_a_vowel(name[0])) ? "an " : "a ";
+			s3 = INDEFINITE_ARTICLE(name[0]);
 
 			/* Hack -- special introduction for store doors */
 			if ((feat >= FEAT_SHOP_HEAD) && (feat <= FEAT_SHOP_TAIL))

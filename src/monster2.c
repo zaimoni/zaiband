@@ -21,6 +21,7 @@
 #include "raceflag.h"
 #include "summon.h"
 
+#include "grammar.h"
 #include "keypad.h"
 
 /*
@@ -29,13 +30,6 @@
  * Lower values yield harder monsters more often.
  */
 #define NASTY_MON	50		/* 1/chance of inflated monster level */
-
-/*
- * Pronoun arrays, by gender
- */
-static const char* const wd_himself[3] =
-{ "itself", "himself", "herself" };
-
 
 /*
  * Delete a monster by index.
@@ -644,71 +638,35 @@ void display_monlist(void)
  */
 void monster_desc(char *desc, size_t max, const monster_type *m_ptr, int mode)
 {
-	const char* res;
-
+	assert(m_ptr);
+	
 	monster_race *r_ptr = m_ptr->race();
 	const char* name = r_ptr->name();
 
 	/* Can we "see" it (forced, or not hidden + visible) */
-	bool seen = ((mode & (0x80)) || (!(mode & (0x40)) && m_ptr->ml));
+	const bool seen = ((mode & 0x80) || (!(mode & 0x40) && m_ptr->ml));
 
 	/* Sexed Pronouns (seen and forced, or unseen and allowed) */
-	bool pron = ((seen && (mode & (0x20))) || (!seen && (mode & (0x10))));
+	const bool pron = ((seen && (mode & 0x20)) || (!seen && (mode & 0x10)));
 
 
 	/* First, try using pronouns, or describing hidden monsters */
 	if (!seen || pron)
 	{
-		/* an encoding of the monster "sex" */
-		int kind = 0x00;
+		/* an encoding of the monster "sex", if we need the pronoun anyway */
+		const int kind = pron ? race_gender_index(*r_ptr)<<4 : 0;
 
-		/* Extract the gender (if applicable) */
-		if (r_ptr->flags[0] & (RF0_FEMALE)) kind = 0x20;
-		else if (r_ptr->flags[0] & (RF0_MALE)) kind = 0x10;
-
-		/* Ignore the gender (if desired) */
-		if (!m_ptr || !pron) kind = 0x00;
-
-
-		/* Assume simple result */
-		res = "it";
-
-		/* Brute force: split on the possibilities */
-		switch (kind + (mode & 0x07))
+		switch(mode & 0x07)
 		{
-			/* Neuter, or unknown */
-			case 0x00: res = "it"; break;
-			case 0x01: res = "it"; break;
-			case 0x02: res = "its"; break;
-			case 0x03: res = "itself"; break;
-			case 0x04: res = "something"; break;
-			case 0x05: res = "something"; break;
-			case 0x06: res = "something's"; break;
-			case 0x07: res = "itself"; break;
-
-			/* Male (assume human if vague) */
-			case 0x10: res = "he"; break;
-			case 0x11: res = "him"; break;
-			case 0x12: res = "his"; break;
-			case 0x13: res = "himself"; break;
-			case 0x14: res = "someone"; break;
-			case 0x15: res = "someone"; break;
-			case 0x16: res = "someone's"; break;
-			case 0x17: res = "himself"; break;
-
-			/* Female (assume human if vague) */
-			case 0x20: res = "she"; break;
-			case 0x21: res = "her"; break;
-			case 0x22: res = "her"; break;
-			case 0x23: res = "herself"; break;
-			case 0x24: res = "someone"; break;
-			case 0x25: res = "someone"; break;
-			case 0x26: res = "someone's"; break;
-			case 0x27: res = "herself"; break;
+		case 0x00: my_strcpy(desc, pronoun_subject_third_singular[kind], max); break;
+		case 0x01: my_strcpy(desc, pronoun_object_third_singular[kind], max); break;
+		case 0x02: my_strcpy(desc, pronoun_possessive_third_singular[kind], max); break;
+		case 0x03: my_strcpy(desc, pronoun_reflexive_third_singular[kind], max); break;
+		case 0x04: // intentional fall-through
+		case 0x05: my_strcpy(desc, "someone", max); break;
+		case 0x06: my_strcpy(desc, "someone's", max); break;
+		case 0x07: my_strcpy(desc, pronoun_reflexive_third_singular[kind], max); break;
 		}
-
-		/* Copy the result */
-		my_strcpy(desc, res, max);
 	}
 
 
@@ -716,7 +674,7 @@ void monster_desc(char *desc, size_t max, const monster_type *m_ptr, int mode)
 	else if ((mode & 0x02) && (mode & 0x01))
 	{
 		/* The monster is visible, so use its gender */
-		my_strcpy(desc, wd_himself[race_gender_index(*r_ptr)], max);
+		my_strcpy(desc, pronoun_reflexive_third_singular[race_gender_index(*r_ptr)], max);
 	}
 
 
@@ -736,7 +694,7 @@ void monster_desc(char *desc, size_t max, const monster_type *m_ptr, int mode)
 			/* XXX Check plurality for "some" */
 
 			/* Indefinite monsters need an indefinite article */
-			my_strcpy(desc, is_a_vowel(name[0]) ? "an " : "a ", max);
+			my_strcpy(desc, INDEFINITE_ARTICLE(name[0]), max);
 			my_strcat(desc, name, max);
 		}
 

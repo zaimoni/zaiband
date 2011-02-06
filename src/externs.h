@@ -610,9 +610,6 @@ extern void build_gamma_table(int gamma);
 extern byte gamma_table[256];
 #endif /* SUPPORT_GAMMA */
 
-/* inline int maxroll(int num, int sides) {return num*sides;} */
-inline bool is_a_vowel(char ch) {return strchr("aeiouAEIOU",ch);}
-
 /* x-spell.c */
 extern int get_spell_index(const object_type *o_ptr, int index);
 extern const char* get_spell_name(int tval, int index);

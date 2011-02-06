@@ -22,16 +22,7 @@
 #include "melee.h"
 #include "option.h"
 #include "raceflag.h"
-
-
-/*
- * Pronoun arrays, by gender.
- */
-static const char* const wd_he[3] =
-{ "it", "he", "she" };
-static const char* const wd_his[3] =
-{ "its", "his", "her" };
-
+#include "grammar.h"
 
 /*
  * Pluralizer.  Args(count, singular, plural)
@@ -41,9 +32,9 @@ static const char* const wd_his[3] =
 int race_gender_index(const monster_race& r)
 {
 	/* Extract a gender (if applicable) */
-	if (r.flags[0] & RF0_FEMALE) return 2;
-	if (r.flags[0] & RF0_MALE) return 1;
-	return 0;
+	if (r.flags[0] & RF0_FEMALE) return GENDER_FEMALE;
+	if (r.flags[0] & RF0_MALE) return GENDER_MALE;
+	return GENDER_NEUTER;
 }
 
 static void output_list(const char* const list[], int num, byte attr)
@@ -80,7 +71,7 @@ static void output_desc_list(int msex, const char* const intro, const char* cons
 	if (n != 0)
 	{
 		/* Output intro */
-		text_out(format("%^s %s ", wd_he[msex], intro));
+		text_out(format("%^s %s ", pronoun_subject_third_singular[msex], intro));
 
 		/* Output list */
 		output_list(list, n, attr);
@@ -240,7 +231,7 @@ static void describe_monster_spells(const monster_race& r, const monster_lore& l
 		breath = TRUE;
 
 		/* Display */
-		text_out("%^s may ", wd_he[msex]);
+		text_out("%^s may ", pronoun_subject_third_singular[msex]);
 		text_out_c(TERM_L_RED, "breathe ");
 		output_list(vp, -vn, TERM_WHITE);
 	}
@@ -317,7 +308,7 @@ static void describe_monster_spells(const monster_race& r, const monster_lore& l
 		if (breath)
 			text_out(", and is also ");
 		else
-			text_out("%^s is ", wd_he[msex]);
+			text_out("%^s is ", pronoun_subject_third_singular[msex]);
 
 		/* Verb Phrase */
 		text_out_c(TERM_L_RED, "magical");
@@ -377,7 +368,7 @@ static void describe_monster_drop(const monster_race& r, const monster_lore& lor
 		bool sin = FALSE;
 
 		/* Intro */
-		text_out(format("%^s may carry", wd_he[msex]));
+		text_out(format("%^s may carry", pronoun_subject_third_singular[msex]));
 
 		/* One drop (may need an "n") */
 		if (n == 1)
@@ -551,7 +542,7 @@ static void describe_monster_attack(const monster_race& r, const monster_lore& l
 		/* Introduce the attack description */
 		if (!i)
 		{
-			text_out(format("%^s can ", wd_he[msex]));
+			text_out(format("%^s can ", pronoun_subject_third_singular[msex]));
 		}
 		else if (i < n-1)
 		{
@@ -598,13 +589,13 @@ static void describe_monster_attack(const monster_race& r, const monster_lore& l
 	/* Notice lack of attacks */
 	else if (lore.flags[0] & RF0_NEVER_BLOW)
 	{
-		text_out(format("%^s has no physical attacks.  ", wd_he[msex]));
+		text_out(format("%^s has no physical attacks.  ", pronoun_subject_third_singular[msex]));
 	}
 
 	/* Or describe the lack of knowledge */
 	else
 	{
-		text_out(format("Nothing is known about %s attack.  ", wd_his[msex]));
+		text_out(format("Nothing is known about %s attack.  ", pronoun_possessive_third_singular[msex]));
 	}
 }
 
@@ -645,9 +636,9 @@ static void describe_monster_abilities(const monster_race& r, const monster_lore
 
 	/* Describe special things */
 	if (lore.flags[1] & RF1_MULTIPLY)
-		text_out("%^s breeds explosively.  ", wd_he[msex]);
+		text_out("%^s breeds explosively.  ", pronoun_subject_third_singular[msex]);
 	if (lore.flags[1] & RF1_REGENERATE)
-		text_out("%^s regenerates quickly.  ", wd_he[msex]);
+		text_out("%^s regenerates quickly.  ", pronoun_subject_third_singular[msex]);
 
 
 	/* Collect susceptibilities */
@@ -660,7 +651,7 @@ static void describe_monster_abilities(const monster_race& r, const monster_lore
 	if (vn)
 	{
 		/* Output connecting text */
-		text_out("%^s is hurt by ", wd_he[msex]);
+		text_out("%^s is hurt by ", pronoun_subject_third_singular[msex]);
 		output_list(vp, vn, TERM_YELLOW);
 		prev = TRUE;
 	}
@@ -684,7 +675,7 @@ static void describe_monster_abilities(const monster_race& r, const monster_lore
 		if (prev)
 			text_out(", but resists ");
 		else
-			text_out("%^s resists ", wd_he[msex]);
+			text_out("%^s resists ", pronoun_subject_third_singular[msex]);
 
 		/* Write the text */
 		output_list(vp, vn, TERM_ORANGE);
@@ -704,7 +695,7 @@ static void describe_monster_abilities(const monster_race& r, const monster_lore
 		if (prev)
 			text_out(", and cannot be ");
 		else
-			text_out("%^s cannot be ", wd_he[msex]);
+			text_out("%^s cannot be ", pronoun_subject_third_singular[msex]);
 
 		output_list(vp, -vn, TERM_ORANGE);
 		prev = TRUE;
@@ -734,7 +725,7 @@ static void describe_monster_abilities(const monster_race& r, const monster_lore
 		else if (r.sleep > 0)  act = "is vigilant for";
 		else                        act = "is ever vigilant for";
 
-		text_out("%^s %s intruders, which %s may notice from ", wd_he[msex], act, wd_he[msex]);
+		text_out("%^s %s intruders, which %s may notice from ", pronoun_subject_third_singular[msex], act, pronoun_subject_third_singular[msex]);
 		text_out_c(TERM_L_GREEN, "%d", 10 * r.aaf);
 		text_out(" feet.  ");
 	}
@@ -742,13 +733,13 @@ static void describe_monster_abilities(const monster_race& r, const monster_lore
 	/* Describe escorts */
 	if ((lore.flags[0] & (RF0_ESCORT | RF0_ESCORTS)))
 	{
-		text_out(format("%^s usually appears with escorts.  ", wd_he[msex]));
+		text_out(format("%^s usually appears with escorts.  ", pronoun_subject_third_singular[msex]));
 	}
 
 	/* Describe friends */
 	else if ((lore.flags[0] & (RF0_FRIEND | RF0_FRIENDS)))
 	{
-		text_out(format("%^s usually appears in groups.  ", wd_he[msex]));
+		text_out(format("%^s usually appears in groups.  ", pronoun_subject_third_singular[msex]));
 	}
 }
 
@@ -770,7 +761,7 @@ static void describe_monster_kills(const monster_race& r, const monster_lore& lo
 		{
 			/* Killed ancestors */
 			text_out(format("%^s has slain %d of your ancestors",
-			            wd_he[msex], lore.deaths));
+			            pronoun_subject_third_singular[msex], lore.deaths));
 
 			/* But we've also killed it */
 			if (dead)
@@ -823,7 +814,7 @@ static void describe_monster_kills(const monster_race& r, const monster_lore& lo
 		else
 		{
 			text_out_c(TERM_RED, format("and %s is not ever known to have been defeated.  ",
-			            wd_he[msex]));
+			            pronoun_subject_third_singular[msex]));
 		}
 	}
 
@@ -864,7 +855,7 @@ static void describe_monster_toughness(const monster_race& r, const monster_lore
 		int msex = race_gender_index(r);
 
 		/* Armor */
-		text_out(format("%^s has an armor rating of %d", wd_he[msex], r.ac));
+		text_out(format("%^s has an armor rating of %d", pronoun_subject_third_singular[msex], r.ac));
 
 		/* Maximized hitpoints */
 		if (lore.flags[0] & RF0_FORCE_MAXHP)

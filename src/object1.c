@@ -22,6 +22,8 @@
 #include "tvalsval.h"
 #include "wind_flg.h"
 
+#include "grammar.h"
+
 /*
  * Max sizes of the following arrays.
  */
@@ -542,9 +544,9 @@ static bool object_desc_append_name(const object_type *o_ptr)
  */
 #define object_desc_chr_macro(C) do { \
  \
-	assert((sizeof(tmp_buf) > t - b + 1U) && "already overflowed");	\
+	assert((sizeof(tmp_buf)-1U > t - b + 0U) && "already overflowed");	\
 	*t++ = (C);	/* Copy the char */ \
-	if (sizeof(tmp_buf) <= t - b + 1U) goto object_desc_done;	\
+	if (sizeof(tmp_buf)-1U <= t - b + 0U) goto object_desc_done;	\
  \
 } while (0)
 
@@ -554,15 +556,9 @@ static bool object_desc_append_name(const object_type *o_ptr)
  */
 #define object_desc_str_macro(S) do { \
  \
-	const char* s = (S); \
-	assert((sizeof(tmp_buf) > t - b + 1U) && "already overflowed");	\
- \
-	/* Copy the string */ \
-	while (*s)	\
-	{	\
-		*t++ = *s++; \
-		if (sizeof(tmp_buf) <= t - b + 1U) goto object_desc_done;	\
-	}	\
+	assert((sizeof(tmp_buf)-1U > t - b + 0U) && "already overflowed");	\
+	t += snprintf(t,sizeof(tmp_buf)-(t-b),"%s",(S)); \
+	if (sizeof(tmp_buf)-1U <= t - b + 0U) goto object_desc_done;	\
  \
 } while (0)
 
@@ -571,20 +567,9 @@ static bool object_desc_append_name(const object_type *o_ptr)
  */
 #define object_desc_num_macro(N) do { \
  \
-	int n = (N); \
-	int p = 1;	\
-	assert((sizeof(tmp_buf) > t - b + 1U) && "already overflowed");	\
- \
-	while(10 <= n / p) p *= 10;	\
- \
-	do	{	\
-		/* Dump the digit */ \
-		*t++ = I2D(n / p); \
-		if (sizeof(tmp_buf) <= t - b + 1U) goto object_desc_done;	\
-		n %= p;	/* Remove the digit */	\
-	    p /= 10;	/* Process next digit */ \
-		}	\
-	while(0 < p);	\
+	assert((sizeof(tmp_buf)-1U > t - b + 0U) && "already overflowed");	\
+	t += snprintf(t,sizeof(tmp_buf)-(t-b),"%u",(N)); \
+	if (sizeof(tmp_buf)-1U <= t - b + 0U) goto object_desc_done;	\
  \
 } while (0)
 
@@ -596,7 +581,7 @@ static bool object_desc_append_name(const object_type *o_ptr)
 #define object_desc_int_macro(I) do { \
  \
 	int i = (I); \
-	assert((sizeof(tmp_buf) > t - b + 1U) && "already overflowed");	\
+	assert((sizeof(tmp_buf)-1U > t - b + 0U) && "already overflowed");	\
  \
 	/* Negative */ \
 	if (0 > i) \
@@ -606,7 +591,7 @@ static bool object_desc_append_name(const object_type *o_ptr)
  \
 		/* Use a "minus" sign */ \
 		*t++ = '-'; \
-		if (sizeof(tmp_buf) <= t - b + 1U) goto object_desc_done;	\
+		if (sizeof(tmp_buf)-1U <= t - b + 0U) goto object_desc_done;	\
 	} \
  \
 	/* Positive (or zero) */ \
@@ -614,7 +599,7 @@ static bool object_desc_append_name(const object_type *o_ptr)
 	{ \
 		/* Use a "plus" sign */ \
 		*t++ = '+'; \
-		if (sizeof(tmp_buf) <= t - b + 1U) goto object_desc_done;	\
+		if (sizeof(tmp_buf)-1U <= t - b + 0U) goto object_desc_done;	\
 	} \
  \
 	/* Dump the number itself */ \
@@ -990,8 +975,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 		/* Hack -- None left */
 		else if (o_ptr->number <= 0)
 		{
-			strcpy(t, "no more ");
-			t += sizeof("no more ") - 1;
+			t += my_strcpy(t, "no more ", sizeof(tmp_buf)-(t-b));
 		}
 
 		/* Extract the number */
@@ -1004,22 +988,13 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 		/* Hack -- The only one of its kind */
 		else if (known && o_ptr->is_artifact())
 		{
-			strcpy(t, "The ");
-			t += sizeof("The ") - 1;
+			t += my_strcpy(t, "The ", sizeof(tmp_buf)-(t-b));
 		}
 
-		/* Hack -- A single one, and next character will be a vowel */
-		else if (is_a_vowel((*s == '#') ? modstr[0] : *s))
-		{
-			strcpy(t, "an ");
-			t += sizeof("an ") - 1;
-		}
-
-		/* A single one, and next character will be a non-vowel */
+		/* Indefinite, single */
 		else
 		{
-			strcpy(t, "a ");
-			t += sizeof("a ") - 1;
+			t += my_strcpy(t, INDEFINITE_ARTICLE((*s == '#') ? modstr[0] : *s), sizeof(tmp_buf)-(t-b));
 		}
 		/* 0 <= t - b <= 8 */
 	}
@@ -1031,8 +1006,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 		/* Hack -- all gone */
 		if (0 >= o_ptr->number)
 		{
-			strcpy(t, "no more ");
-			t += sizeof("no more ") - 1;
+			t += my_strcpy(t, "no more ", sizeof(tmp_buf)-(t-b));
 		}
 
 		/* Prefix a number if required */
@@ -1045,8 +1019,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 		/* The only one of its kind */
 		else if (known && o_ptr->is_artifact())
 		{
-			strcpy(t, "The ");
-			t += sizeof("The ") - 1;
+			t += my_strcpy(t, "The ", sizeof(tmp_buf)-(t-b));
 		};
 
 		/* A single item, so no prefix needed */

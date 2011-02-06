@@ -10,6 +10,8 @@
 #include "angband.h"
 #include "randname.h"
 
+#include "grammar.h"
+
 /* 
  * Arrays of purely alphabetical, lower-case strings to teach 
  * the name generator with. 

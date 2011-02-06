@@ -32,6 +32,7 @@ ANGFILES = \
 	files.o \
 	game-cmd.o \
 	generate.o \
+	grammar.o \
 	init1.o \
 	init2.o \
 	load.o \

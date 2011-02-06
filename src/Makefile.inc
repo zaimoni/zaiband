@@ -28,6 +28,7 @@ z-file.o: z-file.h
 
 # Various files depend on various headers
 $(addsuffix .o, attack cave, spells1): flow.h
+$(addsuffix .o, grammar monster1 monster2 object1 randname xtra2): grammar.h
 $(addsuffix .o, attack cave cmd1 cmd2 cmd4 generate melee2 monster2 spells2 use-obj xtra2 xtra3): keypad.h
 $(addsuffix .o, object2): POD.hpp
 $(addsuffix .o, flow): rational.hpp
