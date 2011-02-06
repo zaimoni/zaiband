@@ -227,9 +227,6 @@ static void chest_death(coord t, object_type& o)
 	/* Opening a chest */
 	opening_chest = TRUE;
 
-	/* Determine the "value" of the items */
-	object_level = ABS(o.pval) + 10;
-
 	/* Drop some objects (non-chests) */
 	for (; number > 0; --number)
 	{
@@ -240,21 +237,20 @@ static void chest_death(coord t, object_type& o)
 		if (tiny && !one_in_(4))
 		{
 			/* Make some gold */
-			make_gold(i_ptr, SV_CASH);
+			make_gold(i_ptr, SV_CASH, ABS(o.pval) + 10);
 		}
 
 		/* Otherwise drop an item */
 		else
 		{
 			/* Make an object */
-			if (!make_object(i_ptr, FALSE, FALSE)) continue;
+			if (!make_object(i_ptr, FALSE, FALSE, ABS(o.pval) + 10)) continue;
 		}
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, t);
 	}
 
-	object_level = p_ptr->depth; /* Reset the object level */
 	opening_chest = FALSE; /* No longer opening a chest */
 	o.pval = 0; /* Empty */
 	object_known(&o); /* Known */
@@ -1097,7 +1093,7 @@ static bool do_cmd_tunnel_aux(coord g)
 			if (gold)
 			{
 				/* Place some gold */
-				place_gold(g.y, g.x);
+				place_gold(g.y, g.x, p_ptr->depth);
 
 				/* Message */
 				msg_print("You have found something!");
@@ -1141,7 +1137,7 @@ static bool do_cmd_tunnel_aux(coord g)
 			if (one_in_(10))
 			{
 				/* Create a simple object */
-				place_object(g.y, g.x, FALSE, FALSE);
+				place_object(g.y, g.x, FALSE, FALSE, p_ptr->depth);
 
 				/* Observe new object */
 				if (player_can_see_bold(g.y, g.x))

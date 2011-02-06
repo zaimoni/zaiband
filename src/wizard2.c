@@ -765,7 +765,7 @@ static void wiz_statistics(object_type *o_ptr)
 			WIPE(i_ptr);
 
 			/* Create an object */
-			make_object(i_ptr, good, great);
+			make_object(i_ptr, good, great, p_ptr->depth);
 
 
 			/* Mega-Hack -- allow multiple artifacts XXX XXX XXX */
@@ -1483,7 +1483,7 @@ void do_cmd_debug(void)
 		case 'g':
 		{
 			if (p_ptr->command_arg <= 0) p_ptr->command_arg = 1;
-			acquirement(p_ptr->loc, p_ptr->command_arg, FALSE);
+			acquirement(p_ptr->loc, p_ptr->command_arg, FALSE, p_ptr->depth);
 			break;
 		}
 
@@ -1584,7 +1584,7 @@ void do_cmd_debug(void)
 		case 'v':
 		{
 			if (p_ptr->command_arg <= 0) p_ptr->command_arg = 1;
-			acquirement(p_ptr->loc, p_ptr->command_arg, TRUE);
+			acquirement(p_ptr->loc, p_ptr->command_arg, TRUE, p_ptr->depth);
 			break;
 		}
 

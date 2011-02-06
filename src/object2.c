@@ -1530,14 +1530,13 @@ static void object_mention(const object_type *o_ptr)
  * If no legal ego item is found, this routine returns 0, resulting in
  * an unenchanted item.
  */
-static int make_ego_item(object_type *o_ptr, bool force_uncursed)
+static int make_ego_item(object_type *o_ptr, bool force_uncursed, int level)
 {
 	ego_item_type *e_ptr;
 	alloc_entry *table = alloc_ego_table;
 	long value;
 	long total = 0L;		/* Reset total */
 	int i, j;
-	int level = object_level;
 	int e_idx;
 
 	/* Fail if object already is ego or artifact */
@@ -1657,7 +1656,7 @@ static void copy_artifact_data(object_type& o, artifact_type& a)
  * only major effect of this logic is that the Phial (with rarity one)
  * is always the first special artifact created.
  */
-static bool make_artifact_special(object_type *o_ptr)
+static bool make_artifact_special(object_type *o_ptr, s16b o_level)
 {
 	int i;
 	int k_idx;
@@ -1689,10 +1688,10 @@ static bool make_artifact_special(object_type *o_ptr)
 		k_idx = lookup_kind(a_ptr->obj_id);
 
 		/* Enforce minimum "object" level (loosely) */
-		if (object_type::k_info[k_idx].level > object_level)
+		if (object_type::k_info[k_idx].level > o_level)
 		{
 			/* Get the "out-of-depth factor" */
-			int d = (object_type::k_info[k_idx].level - object_level) * 5;
+			int d = (object_type::k_info[k_idx].level - o_level) * 5;
 
 			if (!one_in_(d)) continue;	/* Roll for out-of-depth creation */
 		}
@@ -2538,7 +2537,7 @@ void apply_magic(object_type *o_ptr, int lev, bool allow_artifacts, bool good, b
 		{
 			if ((power > 1) || (power < -1))
 			{
-				int ego_power = make_ego_item(o_ptr, (good || great));
+				int ego_power = make_ego_item(o_ptr, (good || great), lev);
 				if (ego_power) power = ego_power;
 			}
 
@@ -2558,7 +2557,7 @@ void apply_magic(object_type *o_ptr, int lev, bool allow_artifacts, bool good, b
 		{
 			if ((power > 1) || (power < -1))
 			{
-				int ego_power = make_ego_item(o_ptr, (good || great));
+				int ego_power = make_ego_item(o_ptr, (good || great), lev);
 				if (ego_power) power = ego_power;
 			}
 
@@ -2578,7 +2577,7 @@ void apply_magic(object_type *o_ptr, int lev, bool allow_artifacts, bool good, b
 		{
 			if ((power > 1) || (power < -1))
 			{
-				make_ego_item(o_ptr, (good || great));
+				make_ego_item(o_ptr, (good || great), lev);
 			}
 
 			/* Fuel it */
@@ -2756,17 +2755,17 @@ static bool kind_is_good(int k_idx)
  *
  * We assume that the given object has been "wiped".
  */
-bool make_object(object_type *j_ptr, bool good, bool great)
+bool make_object(object_type *j_ptr, bool good, bool great, s16b o_level)
 {
 	/* Chance of "special object" */
 	int prob = (good ? 10 : 1000);
 
 	/* Base level for the object */
-	int base = (good ? (object_level + 10) : object_level);
+	int base = (good ? (o_level + 10) : o_level);
 
 
 	/* Generate a special artifact, or a normal object */
-	if (!one_in_(prob) || !make_artifact_special(j_ptr))
+	if (!one_in_(prob) || !make_artifact_special(j_ptr, o_level))
 	{
 		int k_idx;
 
@@ -2787,7 +2786,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	}
 
 	/* Apply magic (allow artifacts) */
-	apply_magic(j_ptr, object_level, TRUE, good, great);
+	apply_magic(j_ptr, o_level, TRUE, good, great);
 
 	/* Hack -- generate multiple spikes/missiles */
 	switch (j_ptr->obj_id.tval)
@@ -2820,11 +2819,9 @@ bool make_object(object_type *j_ptr, bool good, bool great)
  *
  * The location must be a legal, clean, floor grid.
  */
-void make_gold(object_type *j_ptr, SV_cash coin_type)
+void make_gold(object_type *j_ptr, SV_cash coin_type, s16b o_level)
 {
 	int sval;
-	int k_idx;
-	s32b base;
 
 	if (coin_type)
 	{	/* Creeping Coins only generate "themselves" */
@@ -2833,22 +2830,22 @@ void make_gold(object_type *j_ptr, SV_cash coin_type)
 
 	else
 	{	/* Pick a Treasure variety */
-		sval = 1 + (randint(object_level + 2) / 2);
+		sval = 1 + (randint(o_level + 2) / 2);
 
 		/* Apply "extra" magic */
-		if (one_in_(GREAT_OBJ)) sval += randint(object_level + 1);
+		if (one_in_(GREAT_OBJ)) sval += randint(o_level + 1);
 	}
 
 	/* Do not create "illegal" Treasure Types */
 	if (sval > MAX_GOLD) sval = MAX_GOLD;
 
-	k_idx = lookup_kind2(TV_GOLD, sval);
+	int k_idx = lookup_kind2(TV_GOLD, sval);
 	
 	/* Prepare a gold object */
 	object_prep(j_ptr, k_idx);
 
 	/* Base coin cost */
-	base = object_type::k_info[k_idx].cost;
+	s32b base = object_type::k_info[k_idx].cost;
 
 	/* Determine how much the treasure is "worth" */
 	j_ptr->pval = (base + (8L * randint(base)) + randint(8));
@@ -3143,22 +3140,21 @@ void drop_near(object_type *j_ptr, int chance, coord t)
 /*
  * Scatter some "great" objects near the player
  */
-void acquirement(coord t, int num, bool great)
+void acquirement(coord t, int num, bool great, s16b o_level)
 {
-	object_type object_type_body;
-	object_type *i_ptr = &object_type_body;	/* Get local object */
+	object_type i;	/* Get local object */
 
 	/* Acquirement */
 	while (num--)
 	{
 		/* Wipe the object */
-		WIPE(i_ptr);
+		WIPE(&i);
 
 		/* Make a good (or great) object (if possible) */
-		if (!make_object(i_ptr, TRUE, great)) continue;
+		if (!make_object(&i, TRUE, great, o_level)) continue;
 
 		/* Drop the object */
-		drop_near(i_ptr, -1, t);
+		drop_near(&i, -1, t);
 	}
 }
 
@@ -3166,10 +3162,9 @@ void acquirement(coord t, int num, bool great)
 /*
  * Attempt to place an object (normal or good/great) at the given location.
  */
-void place_object(int y, int x, bool good, bool great)
+void place_object(int y, int x, bool good, bool great, s16b o_level)
 {
-	object_type object_type_body;
-	object_type *i_ptr = &object_type_body;	/* Get local object */
+	object_type i;
 
 	/* Paranoia */
 	if (!in_bounds(y, x)) return;
@@ -3178,16 +3173,16 @@ void place_object(int y, int x, bool good, bool great)
 	if (!cave_clean_bold(y, x)) return;
 
 	/* Wipe the object */
-	WIPE(i_ptr);
+	WIPE(&i);
 
 	/* Make an object (if possible) */
-	if (make_object(i_ptr, good, great))
+	if (make_object(&i, good, great, o_level))
 	{
 		/* Give it to the floor */
-		if (!floor_carry(y, x, i_ptr))
+		if (!floor_carry(y, x, &i))
 		{
 			/* Hack -- Preserve artifacts */
-			object_type::a_info[i_ptr->name1].cur_num = 0;
+			object_type::a_info[i.name1].cur_num = 0;
 		}
 	}
 }
@@ -3196,7 +3191,7 @@ void place_object(int y, int x, bool good, bool great)
 /*
  * Places a treasure (Gold or Gems) at given location
  */
-void place_gold(int y, int x)
+void place_gold(int y, int x, s16b o_level)
 {
 	object_type object_type_body;
 	object_type *i_ptr = &object_type_body;	/* Get local object */
@@ -3211,7 +3206,7 @@ void place_gold(int y, int x)
 	WIPE(i_ptr);
 
 	/* Make some gold */
-	make_gold(i_ptr, SV_CASH);
+	make_gold(i_ptr, SV_CASH, o_level);
 
 	/* Give it to the floor */
 	floor_carry(y, x, i_ptr);

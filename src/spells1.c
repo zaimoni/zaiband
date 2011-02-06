@@ -1418,7 +1418,7 @@ static bool project_f(int who, int r, coord g, int dam, int typ)
 				cave_set_feat(g.y, g.x, FEAT_FLOOR);
 
 				/* Place some gold */
-				place_gold(g.y, g.x);
+				place_gold(g.y, g.x, p_ptr->depth);
 			}
 
 			/* Quartz / Magma */
@@ -1465,7 +1465,7 @@ static bool project_f(int who, int r, coord g, int dam, int typ)
 					}
 
 					/* Place gold */
-					place_object(g.y, g.x, FALSE, FALSE);
+					place_object(g.y, g.x, FALSE, FALSE, p_ptr->depth);
 				}
 			}
 

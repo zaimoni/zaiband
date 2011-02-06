@@ -833,9 +833,6 @@ void monster_death(const m_idx_type m_idx)
 	if (r_ptr->flags[0] & RF0_DROP_3D2) number += NdS(3, 2);
 	if (r_ptr->flags[0] & RF0_DROP_4D2) number += NdS(4, 2);
 
-	/* Average dungeon and monster levels */
-	object_level = (p_ptr->depth + r_ptr->level) / 2;
-
 	/* Drop some objects */
 	for (j = 0; j < number; j++)
 	{
@@ -845,7 +842,7 @@ void monster_death(const m_idx_type m_idx)
 		/* Make Gold */
 		if (do_gold && (!do_item || one_in_(2)))
 		{
-			make_gold(i_ptr, force_coin);	/* Make some gold */
+			make_gold(i_ptr, force_coin, (p_ptr->depth + r_ptr->level) / 2);	/* Make some gold */
 			dump_gold++;					/* Assume seen XXX XXX XXX */
 		}
 
@@ -853,7 +850,7 @@ void monster_death(const m_idx_type m_idx)
 		else
 		{
 			/* Make an object */
-			if (!make_object(i_ptr, good, great)) continue;
+			if (!make_object(i_ptr, good, great, (p_ptr->depth + r_ptr->level) / 2)) continue;
 
 			/* Assume seen XXX XXX XXX */
 			dump_item++;
@@ -862,8 +859,6 @@ void monster_death(const m_idx_type m_idx)
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, g);
 	}
-
-	object_level = p_ptr->depth;	/* Reset the object level */
 
 	/* Take note of any dropped treasure */
 	if (visible && (dump_item || dump_gold))

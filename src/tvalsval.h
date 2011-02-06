@@ -596,5 +596,5 @@ enum SV_cash 	{	SV_CASH = 0,
 /*
  * object2.c 
  */
-extern void make_gold(object_type *j_ptr, SV_cash coin_type);
+extern void make_gold(object_type *j_ptr, SV_cash coin_type, s16b o_level);
 
