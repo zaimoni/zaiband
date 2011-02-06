@@ -123,19 +123,10 @@ void *mem_realloc(void *p, size_t len)
  */
 char *string_make(const char *str)
 {
-	char *res;
-	size_t siz;
-
 	/* Error-checking */
 	if (!str) return NULL;
 
-	/* Allocate space for the string (including terminator) */
-	siz = strlen(str) + 1;
-	res = (char*)mem_alloc(siz);
-
-	/* Copy the string (with terminator) */
-	my_strcpy(res, str, siz);
-
-	return res;
+	/* Copy the string (with terminator) into a large enough buffer */
+	return strcpy((char*)mem_alloc(strlen(str) + 1),str);
 }
 
