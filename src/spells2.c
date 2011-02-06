@@ -150,21 +150,21 @@ bool do_dec_stat(stat_index stat)
 		           desc_stat_neg[stat]);
 
 		/* Notice effect */
-		return (TRUE);
+		return true;
 	}
 
 	/* Attempt to reduce the stat */
 	if (dec_stat(stat, 10, FALSE))
 	{
 		/* Message */
-		message_format(MSG_DRAIN_STAT, stat, "You feel very %s.", desc_stat_neg[stat]);
+		message_format(MSG_DRAIN_STAT, "You feel very %s.", desc_stat_neg[stat]);
 
 		/* Notice effect */
-		return (TRUE);
+		return true;
 	}
 
 	/* Nothing obvious */
-	return (FALSE);
+	return false;
 }
 
 

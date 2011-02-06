@@ -2506,7 +2506,7 @@ void do_cmd_use(object_type *o_ptr, int item, int snd, use_type _use)
 	/* Special message for artifacts */
 	if (o_ptr->is_artifact())
 	{
-		message(snd, 0, "You activate it.");
+		message(snd, "You activate it.");
 	}
 	else
 	{

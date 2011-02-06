@@ -413,7 +413,7 @@ void move_player(int dir, int jumping)
 			/* Rubble */
 			if (cave_feat[dest_g.y][dest_g.x] == FEAT_RUBBLE)
 			{
-				message(MSG_HITWALL, 0, "You feel a pile of rubble blocking your way.");
+				message(MSG_HITWALL, "You feel a pile of rubble blocking your way.");
 				cave_info[dest_g.y][dest_g.x] |= (CAVE_MARK);
 				lite_spot(dest_g);
 			}
@@ -421,7 +421,7 @@ void move_player(int dir, int jumping)
 			/* Closed door */
 			else if (cave_feat[dest_g.y][dest_g.x] < FEAT_SECRET)
 			{
-				message(MSG_HITWALL, 0, "You feel a door blocking your way.");
+				message(MSG_HITWALL, "You feel a door blocking your way.");
 				cave_info[dest_g.y][dest_g.x] |= (CAVE_MARK);
 				lite_spot(dest_g);
 			}
@@ -429,7 +429,7 @@ void move_player(int dir, int jumping)
 			/* Wall (or secret door) */
 			else
 			{
-				message(MSG_HITWALL, 0, "You feel a wall blocking your way.");
+				message(MSG_HITWALL, "You feel a wall blocking your way.");
 				cave_info[dest_g.y][dest_g.x] |= (CAVE_MARK);
 				lite_spot(dest_g);
 			}
@@ -441,19 +441,19 @@ void move_player(int dir, int jumping)
 			/* Rubble */
 			if (cave_feat[dest_g.y][dest_g.x] == FEAT_RUBBLE)
 			{
-				message(MSG_HITWALL, 0, "There is a pile of rubble blocking your way.");
+				message(MSG_HITWALL, "There is a pile of rubble blocking your way.");
 			}
 
 			/* Closed door */
 			else if (cave_feat[dest_g.y][dest_g.x] < FEAT_SECRET)
 			{
-				message(MSG_HITWALL, 0, "There is a door blocking your way.");
+				message(MSG_HITWALL, "There is a door blocking your way.");
 			}
 
 			/* Wall (or secret door) */
 			else
 			{
-				message(MSG_HITWALL, 0, "There is a wall blocking your way.");
+				message(MSG_HITWALL, "There is a wall blocking your way.");
 			}
 		}
 	}

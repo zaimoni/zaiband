@@ -66,7 +66,7 @@ static const char* const comment_nonsense[] =
  */
 static void say_comment_accept(void)
 {
-	message(MSG_STORE5, 0, comment_accept[rand_int(N_ELEMENTS(comment_accept))]);
+	message(MSG_STORE5, comment_accept[rand_int(N_ELEMENTS(comment_accept))]);
 }
 
 
@@ -271,28 +271,28 @@ static void purchase_analyze(s32b price, s32b value, s32b guess)
 	if ((value <= 0) && (price > value))
 	{
 		/* Comment */
-		message(MSG_STORE1, 0, comment_worthless[rand_int(N_ELEMENTS(comment_worthless))]);
+		message(MSG_STORE1, comment_worthless[rand_int(N_ELEMENTS(comment_worthless))]);
 	}
 
 	/* Item was cheaper than we thought, and we paid more than necessary */
 	else if ((value < guess) && (price > value))
 	{
 		/* Comment */
-		message(MSG_STORE2, 0, comment_bad[rand_int(N_ELEMENTS(comment_bad))]);
+		message(MSG_STORE2, comment_bad[rand_int(N_ELEMENTS(comment_bad))]);
 	}
 
 	/* Item was a good bargain, and we got away with it */
 	else if ((value > guess) && (value < (4 * guess)) && (price < value))
 	{
 		/* Comment */
-		message(MSG_STORE3, 0, comment_good[rand_int(N_ELEMENTS(comment_good))]);
+		message(MSG_STORE3, comment_good[rand_int(N_ELEMENTS(comment_good))]);
 	}
 
 	/* Item was a great bargain, and we got away with it */
 	else if ((value > guess) && (price < value))
 	{
 		/* Comment */
-		message(MSG_STORE4, 0, comment_great[rand_int(N_ELEMENTS(comment_great))]);
+		message(MSG_STORE4, comment_great[rand_int(N_ELEMENTS(comment_great))]);
 	}
 }
 

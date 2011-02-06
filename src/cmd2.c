@@ -72,7 +72,7 @@ void do_cmd_go_up(void)
 	p_ptr->energy_use = 100;
 
 	/* Success */
-	message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
+	message(MSG_STAIRS_UP, "You enter a maze of up staircases.");
 
 	/* Create a way back */
 	p_ptr->create_down_stair = TRUE;
@@ -101,7 +101,7 @@ void do_cmd_go_down(void)
 	p_ptr->energy_use = 100;
 
 	/* Success */
-	message(MSG_STAIRS_DOWN, 0, "You enter a maze of down staircases.");
+	message(MSG_STAIRS_DOWN, "You enter a maze of down staircases.");
 
 	/* Create a way back */
 	p_ptr->create_up_stair = TRUE;
@@ -344,30 +344,30 @@ static void chest_trap(coord g, object_type& o)
  */
 static bool do_cmd_open_chest(coord g, object_type& o)
 {
-	bool flag = TRUE;
-	bool more = FALSE;
+	bool flag = true;
+	bool more = false;
 
 	/* Attempt to unlock it */
 	if (o.pval > 0)
 	{
 		/* Assume locked, and thus not open */
-		flag = FALSE;
+		flag = false;
 
 		/* Success -- May still have traps */
 		if (p_ptr->disarm_trap(o.pval))
 		{
-			message(MSG_LOCKPICK, 0, "You have picked the lock.");
+			message(MSG_LOCKPICK, "You have picked the lock.");
 			gain_exp(1);
-			flag = TRUE;
+			flag = true;
 		}
 
 		/* Failure -- Keep trying */
 		else
 		{
 			/* We may continue repeating */
-			more = TRUE;
+			more = true;
 			if (OPTION(flush_failure)) flush();
-			message(MSG_LOCKPICK_FAIL, 0, "You failed to pick the lock.");
+			message(MSG_LOCKPICK_FAIL, "You failed to pick the lock.");
 		}
 	}
 
@@ -382,7 +382,7 @@ static bool do_cmd_open_chest(coord g, object_type& o)
 	}
 
 	/* Result */
-	return (more);
+	return more;
 }
 
 
@@ -395,7 +395,7 @@ static bool do_cmd_open_chest(coord g, object_type& o)
  */
 static bool do_cmd_disarm_chest(coord g, object_type& o)
 {
-	bool more = FALSE;
+	bool more = false;
 	int i = p_ptr->disarm_skill(); /* Get the "disarm" factor */
 
 	/* Must find the trap first. */
@@ -419,7 +419,7 @@ static bool do_cmd_disarm_chest(coord g, object_type& o)
 	/* Success (get a lot of experience) */
 	else if (p_ptr->disarm_trap(o.pval))
 	{
-		message(MSG_DISARM, 0, "You have disarmed the chest.");
+		message(MSG_DISARM, "You have disarmed the chest.");
 		gain_exp(o.pval);
 		o.pval = (0 - o.pval);
 	}
@@ -428,7 +428,7 @@ static bool do_cmd_disarm_chest(coord g, object_type& o)
 	else if ((i > 5) && (randint(i) > 5))
 	{
 		/* We may keep trying */
-		more = TRUE;
+		more = true;
 		if (OPTION(flush_failure)) flush();
 		msg_print("You failed to disarm the chest.");
 	}
@@ -441,7 +441,7 @@ static bool do_cmd_disarm_chest(coord g, object_type& o)
 	}
 
 	/* Result */
-	return (more);
+	return more;
 }
 
 
@@ -591,21 +591,21 @@ static bool do_cmd_open_test(coord g)
 		msg_print("You see nothing there.");
 
 		/* Nope */
-		return (FALSE);
+		return false;
 	}
 
 	/* Must be a closed door */
 	if (!cave_feat_in_range(g.y,g.x,FEAT_DOOR_HEAD,FEAT_DOOR_TAIL))
 	{
 		/* Message */
-		message(MSG_NOTHING_TO_OPEN, 0, "You see nothing there to open.");
+		message(MSG_NOTHING_TO_OPEN, "You see nothing there to open.");
 
 		/* Nope */
-		return (FALSE);
+		return false;
 	}
 
 	/* Okay */
-	return (TRUE);
+	return true;
 }
 
 
@@ -614,11 +614,11 @@ static bool do_cmd_open_test(coord g)
  *
  * \pre There is no monster blocking the destination
  *
- * \return TRUE if repeated commands may continue
+ * \return true if repeated commands may continue
  */
 static bool do_cmd_open_aux(coord g)
 {
-	bool more = FALSE;
+	bool more = false;
 
 
 	/* Verify legality */
@@ -639,7 +639,7 @@ static bool do_cmd_open_aux(coord g)
 		if (p_ptr->disarm_trap(4*(cave_feat[g.y][g.x] - FEAT_DOOR_HEAD)))
 		{
 			/* Message */
-			message(MSG_LOCKPICK, 0, "You have picked the lock.");
+			message(MSG_LOCKPICK, "You have picked the lock.");
 
 			/* Open the door */
 			cave_set_feat(g.y, g.x, FEAT_OPEN);
@@ -658,10 +658,10 @@ static bool do_cmd_open_aux(coord g)
 			if (OPTION(flush_failure)) flush();
 
 			/* Message */
-			message(MSG_LOCKPICK_FAIL, 0, "You failed to pick the lock.");
+			message(MSG_LOCKPICK_FAIL, "You failed to pick the lock.");
 
 			/* We may keep trying */
-			more = TRUE;
+			more = true;
 		}
 	}
 
@@ -679,7 +679,7 @@ static bool do_cmd_open_aux(coord g)
 	}
 
 	/* Result */
-	return (more);
+	return more;
 }
 
 
@@ -1512,11 +1512,11 @@ static bool do_cmd_bash_aux(coord g)
 {
 	int bash, temp;
 
-	bool more = FALSE;
+	bool more = false;
 
 
 	/* Verify legality */
-	if (!do_cmd_bash_test(g)) return (FALSE);
+	if (!do_cmd_bash_test(g)) return false;
 
 
 	/* Message */
@@ -1542,7 +1542,7 @@ static bool do_cmd_bash_aux(coord g)
 											: FEAT_OPEN));	/* Open the door */
 		
 		/* Message */
-		message(MSG_OPENDOOR, 0, "The door crashes open!");
+		message(MSG_OPENDOOR, "The door crashes open!");
 
 		apply_noise(g, 10);		/* Bashing open doors is noisy */
 
@@ -1560,7 +1560,7 @@ static bool do_cmd_bash_aux(coord g)
 		apply_noise(g, 2);		/* Failing to bash open doors is noisy */
 
 		/* Allow repeated bashing */
-		more = TRUE;
+		more = true;
 	}
 
 	/* High dexterity yields coolness */
@@ -1576,7 +1576,7 @@ static bool do_cmd_bash_aux(coord g)
 	}
 
 	/* Result */
-	return (more);
+	return more;
 }
 
 
@@ -1931,12 +1931,12 @@ void do_cmd_spike(void)
 static bool do_cmd_walk_test(int y, int x)
 {
 	/* Hack -- walking obtains knowledge XXX XXX */
-	if (!(cave_info[y][x] & (CAVE_MARK))) return (TRUE);
+	if (!(cave_info[y][x] & (CAVE_MARK))) return true;
 
 	/* Allow attack on visible monsters */
 	if ((cave_m_idx[y][x] > 0) && (mon_list[cave_m_idx[y][x]].ml))
 	{
-		return TRUE;
+		return true;
 	}
 
 	/* Require open space */
@@ -1946,7 +1946,7 @@ static bool do_cmd_walk_test(int y, int x)
 		if (cave_feat[y][x] == FEAT_RUBBLE)
 		{
 			/* Message */
-			message(MSG_HITWALL, 0, "There is a pile of rubble in the way!");
+			message(MSG_HITWALL, "There is a pile of rubble in the way!");
 		}
 
 		/* Door */
@@ -1956,22 +1956,22 @@ static bool do_cmd_walk_test(int y, int x)
 			if (OPTION(easy_alter)) return (TRUE);
 
 			/* Message */
-			message(MSG_HITWALL, 0, "There is a door in the way!");
+			message(MSG_HITWALL, "There is a door in the way!");
 		}
 
 		/* Wall */
 		else
 		{
 			/* Message */
-			message(MSG_HITWALL, 0, "There is a wall in the way!");
+			message(MSG_HITWALL, "There is a wall in the way!");
 		}
 
 		/* Nope */
-		return (FALSE);
+		return false;
 	}
 
 	/* Okay */
-	return (TRUE);
+	return true;
 }
 
 

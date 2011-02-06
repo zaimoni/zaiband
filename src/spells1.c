@@ -226,47 +226,39 @@ void teleport_player_level(void)
 
 	if (!p_ptr->depth)
 	{
-		message(MSG_TPLEVEL, 0, "You sink through the floor.");
+		message(MSG_TPLEVEL, "You sink through the floor.");
 
 		/* New depth */
 		p_ptr->depth++;
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
 	}
 
 	else if (is_quest(p_ptr->depth) || (p_ptr->depth >= MAX_DEPTH-1))
 	{
-		message(MSG_TPLEVEL, 0, "You rise up through the ceiling.");
+		message(MSG_TPLEVEL, "You rise up through the ceiling.");
 
 		/* New depth */
 		p_ptr->depth--;
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
 	}
 
 	else if (one_in_(2))
 	{
-		message(MSG_TPLEVEL, 0, "You rise up through the ceiling.");
+		message(MSG_TPLEVEL, "You rise up through the ceiling.");
 
 		/* New depth */
 		p_ptr->depth--;
-
-		/* Leaving */
-		p_ptr->leaving = TRUE;
 	}
 
 	else
 	{
-		message(MSG_TPLEVEL, 0, "You sink through the floor.");
+		message(MSG_TPLEVEL, "You sink through the floor.");
 
 		/* New depth */
 		p_ptr->depth++;
 
-		/* Leaving */
-		p_ptr->leaving = TRUE;
 	}
+
+	/* Leaving */
+	p_ptr->leaving = true;
 }
 
 
@@ -409,7 +401,6 @@ static attr_char bolt_pict(int y, int x, int ny, int nx, int typ)
 void take_hit(int dam, const char* kb_str)
 {
 	int old_chp = p_ptr->chp;
-
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
 
 
@@ -433,7 +424,7 @@ void take_hit(int dam, const char* kb_str)
 	if (p_ptr->chp < 0)
 	{
 		/* Hack -- Note death */
-		message(MSG_DEATH, 0, "You die.");
+		message(MSG_DEATH, "You die.");
 		message_flush();
 
 		/* Note cause of death */
@@ -456,13 +447,10 @@ void take_hit(int dam, const char* kb_str)
 	if (p_ptr->chp < warning)
 	{
 		/* Hack -- bell on first notice */
-		if (old_chp > warning)
-		{
-			bell("Low hitpoint warning!");
-		}
+		if (old_chp > warning) bell("Low hitpoint warning!");
 
 		/* Message */
-		message(MSG_HITPOINT_WARN, 0, "*** LOW HITPOINT WARNING! ***");
+		message(MSG_HITPOINT_WARN, "*** LOW HITPOINT WARNING! ***");
 		message_flush();
 	}
 }
@@ -2740,8 +2728,7 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 			if ((fear || do_fear) && (m_ptr->ml))
 			{
 				/* Message */
-				message_format(MSG_FLEE, m_ptr->r_idx,
-				               "%^s flees in terror!", m_name);
+				message_format(MSG_FLEE, "%^s flees in terror!", m_name);
 			}
 
 			/* Hack -- handle sleep */

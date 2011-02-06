@@ -1361,16 +1361,10 @@ void msg_format(const char* fmt, ...)
 
 /*
  * Display a message and play the associated sound.
- *
- * The "extra" parameter is currently unused.
  */
-void message(u16b message_type, s16b extra, const char* message)
+void message(u16b message_type, const char* message)
 {
-	/* Unused parameter */
-	(void)extra;
-
 	sound(message_type);
-
 	msg_print_aux(message_type, message);
 }
 
@@ -1378,26 +1372,23 @@ void message(u16b message_type, s16b extra, const char* message)
 
 /*
  * Display a formatted message and play the associated sound.
- *
- * The "extra" parameter is currently unused.
  */
-void message_format(u16b message_type, s16b extra, const char* fmt, ...)
+void message_format(u16b message_type, const char* fmt, ...)
 {
 	va_list vp;
-
 	char buf[1024];
 
 	/* Begin the Varargs Stuff */
 	va_start(vp, fmt);
 
 	/* Format the args, save the length */
-	(void)vstrnfmt(buf, sizeof(buf), fmt, vp);
+	vstrnfmt(buf, sizeof(buf), fmt, vp);
 
 	/* End the Varargs Stuff */
 	va_end(vp);
 
 	/* Display */
-	message(message_type, extra, buf);
+	message(message_type, buf);
 }
 
 

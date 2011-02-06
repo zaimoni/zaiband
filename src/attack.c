@@ -499,7 +499,7 @@ void py_attack(coord g)
 		if (test_hit(chance, r_ptr->ac, m_ptr->ml))
 		{
 			/* Message */
-			message_format(MSG_GENERIC, m_ptr->r_idx, "You hit %s.", m_name);
+			message_format(MSG_GENERIC, "You hit %s.", m_name);
 
 			/* Hack -- bare hands do one damage */
 			k = 1;
@@ -561,7 +561,7 @@ void py_attack(coord g)
 		else
 		{
 			/* Message */
-			message_format(MSG_MISS, m_ptr->r_idx, "You miss %s.", m_name);
+			message_format(MSG_MISS, "You miss %s.", m_name);
 		}
 	}
 
@@ -570,7 +570,7 @@ void py_attack(coord g)
 	if (fear && m_ptr->ml)
 	{
 		/* Message */
-		message_format(MSG_FLEE, m_ptr->r_idx, "%^s flees in terror!", m_name);
+		message_format(MSG_FLEE, "%^s flees in terror!", m_name);
 	}
 
 
@@ -960,8 +960,7 @@ void do_cmd_fire(void)
 						monster_desc(m_name, sizeof(m_name), m_ptr, 0);
 
 						/* Message */
-						message_format(MSG_FLEE, m_ptr->r_idx,
-						               "%^s flees in terror!", m_name);
+						message_format(MSG_FLEE, "%^s flees in terror!", m_name);
 					}
 				}
 			}
@@ -1280,8 +1279,7 @@ void do_cmd_throw(void)
 						monster_desc(m_name, sizeof(m_name), m_ptr, 0);
 
 						/* Message */
-						message_format(MSG_FLEE, m_ptr->r_idx,
-						               "%^s flees in terror!", m_name);
+						message_format(MSG_FLEE, "%^s flees in terror!", m_name);
 					}
 				}
 			}

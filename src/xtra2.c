@@ -79,15 +79,6 @@ static timed_effect effects[] =
 	{ "You feel resistant to poison!", "You feel less resistant to poison", PR_OPPOSE_ELEMENTS, 0, MSG_RES_POIS },
 };
 
-#if 0
-static timed_effect core_effects[] =
-{
-	{ "You are confused!", "You feel less confused now.", PR_CONFUSED, 0, MSG_CONFUSED },
-	{ "You are terrified!", "You feel bolder now.", PR_AFRAID, 0, MSG_AFRAID },
-	{ "", "", 0, 0, 0 },  /* TMD_STUN -- handled seperately */
-};
-#endif
-
 /*
  * Set a timed event (except timed resists, cutting and stunning).
  */
@@ -115,7 +106,7 @@ bool player_type::set_timed_clean(int idx, int v)
 	{
 		if (!timed[idx])
 		{
-			message(effect->msg, 0, effect->on_begin);
+			message(effect->msg, effect->on_begin);
 			notice = TRUE;
 		}
 	}
@@ -125,7 +116,7 @@ bool player_type::set_timed_clean(int idx, int v)
 	{
 		if (timed[idx])
 		{
-			message(MSG_RECOVER, 0, effect->on_end);
+			message(MSG_RECOVER, effect->on_end);
 			notice = TRUE;
 		}
 	}
@@ -170,7 +161,7 @@ static bool set_timed_condition_w_immunity(int v, s16b& stat,bool immune, int ms
 		{
 			if (!stat)
 			{
-				message(msg_on, 0, cond_on);
+				message(msg_on, cond_on);
 				notice = true;
 			}
 		}
@@ -180,7 +171,7 @@ static bool set_timed_condition_w_immunity(int v, s16b& stat,bool immune, int ms
 		{
 			if (stat)
 			{
-				message(msg_off, 0, cond_off);
+				message(msg_off, cond_off);
 				notice = true;
 			}
 		}
@@ -325,7 +316,7 @@ bool set_stun(int v,player_type& p)
 	if (new_aux > old_aux)
 	{
 		/* range 0..3 for both, so new_aux must be 1..3 */
-		message(MSG_STUN, 0, new_stun_level[new_aux-1]);
+		message(MSG_STUN, new_stun_level[new_aux-1]);
 
 		/* Notice */
 		notice = TRUE;
@@ -337,7 +328,7 @@ bool set_stun(int v,player_type& p)
 		/* Describe the state */
 		if (0==new_aux)
 		{
-			message(MSG_RECOVER, 0, "You are no longer stunned.");
+			message(MSG_RECOVER, "You are no longer stunned.");
 		}
 
 		/* Notice */
@@ -396,7 +387,7 @@ bool set_cut(int v,player_type& p)
 	if (new_aux > old_aux)
 	{
 		/* range 0..7 for both, so new_aux must be 1..7 */
-		message(MSG_CUT, 0, new_cut_level[new_aux-1]);
+		message(MSG_CUT, new_cut_level[new_aux-1]);
 
 		/* Notice */
 		notice = TRUE;
@@ -408,7 +399,7 @@ bool set_cut(int v,player_type& p)
 		/* Describe the state */
 		if (0==new_aux)
 		{
-			message(MSG_RECOVER, 0, "You are no longer bleeding.");
+			message(MSG_RECOVER, "You are no longer bleeding.");
 		};
 
 		/* Notice */
@@ -607,7 +598,7 @@ void check_experience(void)
 		if (p_ptr->lev > p_ptr->max_lev) p_ptr->max_lev = p_ptr->lev;
 
 		/* Message */
-		message_format(MSG_LEVEL, p_ptr->lev, "Welcome to level %d.", p_ptr->lev);
+		message_format(MSG_LEVEL, "Welcome to level %d.", p_ptr->lev);
 
 		/* Update some stuff */
 		p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
@@ -991,25 +982,25 @@ bool mon_take_hit(const m_idx_type m_idx, int dam, bool *fear, const char* note)
 		/* Death by Missile/Spell attack */
 		if (note)
 		{
-			message_format(soundfx, m_ptr->r_idx, "%^s%s", m_name, note);
+			message_format(soundfx, "%^s%s", m_name, note);
 		}
 
 		/* Death by physical attack -- invisible monster */
 		else if (!m_ptr->ml)
 		{
-			message_format(soundfx, m_ptr->r_idx, "You have killed %s.", m_name);
+			message_format(soundfx, "You have killed %s.", m_name);
 		}
 
 		/* Death by Physical attack -- non-living monster */
 		else if (r_ptr->is_nonliving())
 		{
-			message_format(soundfx, m_ptr->r_idx, "You have destroyed %s.", m_name);
+			message_format(soundfx, "You have destroyed %s.", m_name);
 		}
 
 		/* Death by Physical attack -- living monster */
 		else
 		{
-			message_format(soundfx, m_ptr->r_idx, "You have slain %s.", m_name);
+			message_format(soundfx, "You have slain %s.", m_name);
 		}
 
 		/* Player level */
