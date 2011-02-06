@@ -2566,9 +2566,6 @@ static void dungeon(void)
 
 	/*** Process this dungeon level ***/
 
-	/* Reset the monster generation level */
-	monster_level = p_ptr->depth;
-
 	/* Main loop */
 	while (TRUE)
 	{

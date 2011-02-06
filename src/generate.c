@@ -801,10 +801,6 @@ static void vault_monsters(coord g, int num)
 {
 	coord t;
 	int k, i;
-	int mon_level_old = monster_level;
-
-	/* Temporary increase monster level */
-	monster_level += 2;
 
 	/* Try to summon "num" monsters "near" the given location */
 	for (k = 0; k < num; k++)
@@ -821,14 +817,11 @@ static void vault_monsters(coord g, int num)
 			if (!cave_empty_bold(t.y, t.x)) continue;
 
 			/* Place the monster (allow groups) */
-			(void)place_monster(t, TRUE, TRUE);
+			place_monster(t, TRUE, TRUE, 2*p_ptr->depth);
 
 			break;
 		}
 	}
-
-	/* Restore monster level */
-	monster_level = mon_level_old;
 }
 
 
@@ -2266,27 +2259,21 @@ static void build_vault(int y0, int x0, int ymax, int xmax, const char* const da
 				/* Monster */
 				case '&':
 				{
-					monster_level = p_ptr->depth + 5;
-					place_monster(tt, TRUE, TRUE);
-					monster_level = p_ptr->depth;
+					place_monster(tt, TRUE, TRUE, p_ptr->depth + 5);
 					break;
 				}
 
 				/* Meaner monster */
 				case '@':
 				{
-					monster_level = p_ptr->depth + 11;
-					place_monster(tt, TRUE, TRUE);
-					monster_level = p_ptr->depth;
+					place_monster(tt, TRUE, TRUE, p_ptr->depth + 11);
 					break;
 				}
 
 				/* Meaner monster, plus treasure */
 				case '9':
 				{
-					monster_level = p_ptr->depth + 9;
-					place_monster(tt, TRUE, TRUE);
-					monster_level = p_ptr->depth;
+					place_monster(tt, TRUE, TRUE, p_ptr->depth + 9);
 					place_object(tt.y, tt.x, TRUE, FALSE, p_ptr->depth + 7);
 					break;
 				}
@@ -2294,9 +2281,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, const char* const da
 				/* Nasty monster and treasure */
 				case '8':
 				{
-					monster_level = p_ptr->depth + 40;
-					place_monster(tt, TRUE, TRUE);
-					monster_level = p_ptr->depth;
+					place_monster(tt, TRUE, TRUE, p_ptr->depth + 40);
 					place_object(tt.y, tt.x, TRUE, TRUE, p_ptr->depth + 20);
 					break;
 				}
@@ -2306,9 +2291,7 @@ static void build_vault(int y0, int x0, int ymax, int xmax, const char* const da
 				{
 					if (rand_int(100) < 50)
 					{
-						monster_level = p_ptr->depth + 3;
-						place_monster(tt, TRUE, TRUE);
-						monster_level = p_ptr->depth;
+						place_monster(tt, TRUE, TRUE, p_ptr->depth + 3);
 					}
 					if (rand_int(100) < 50)
 					{
@@ -3420,9 +3403,6 @@ void generate_cave(void)
 		Term->offset_y = DUNGEON_HGT;
 		Term->offset_x = DUNGEON_WID;
 
-
-		/* Reset the monster generation level */
-		monster_level = p_ptr->depth;
 
 		/* Nothing special here yet */
 		good_item_flag = FALSE;

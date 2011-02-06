@@ -1664,12 +1664,12 @@ bool place_monster_aux(coord g, int r_idx, bool slp, bool grp)
  *
  * Attempt to find a monster appropriate to the "monster_level"
  */
-bool place_monster(coord g, bool slp, bool grp)
+bool place_monster(coord g, bool slp, bool grp, s16b m_level)
 {
-	int r_idx = get_mon_num(monster_level);	/* Pick a monster */
+	int r_idx = get_mon_num(m_level);	/* Pick a monster */
 
 	/* Handle failure */
-	if (!r_idx) return (FALSE);
+	if (!r_idx) return false;
 
 	/* Attempt to place the monster */
 	return place_monster_aux(g, r_idx, slp, grp);
@@ -1762,24 +1762,19 @@ bool alloc_monster(int dis, bool slp)
 		if (!cave_naked_bold(g.y, g.x)) continue;
 
 		/* Accept far away grids */
-		if (distance(g.y, g.x, py, px) > dis) break;
-	}
-
-	if (!attempts_left)
-	{
-		if (OPTION(cheat_xtra) || OPTION(cheat_hear))
-		{
-			msg_print("Warning! Could not allocate a new monster.");
+		if (distance(g.y, g.x, py, px) > dis)
+		{	/* Attempt to place the monster, allow groups */
+			return place_monster(g, slp, TRUE, p_ptr->depth);
 		}
+	};
 
-		return FALSE;
+	/* 0==attempts_left */
+	if (OPTION(cheat_xtra) || OPTION(cheat_hear))
+	{
+		msg_print("Warning! Could not allocate a new monster.");
 	}
 
-	/* Attempt to place the monster, allow groups */
-	return place_monster(g, slp, TRUE);
-
-	/* Nope */
-	return (FALSE);
+	return false;
 }
 
 
