@@ -522,7 +522,7 @@ static bool monster_condition_timeout(monster_type& m)
 
 				/* Get the monster name/poss */
 				monster_desc(m_name, sizeof(m_name), &m, 0);
-				monster_desc(m_poss, sizeof(m_poss), &m, 0x22);
+				monster_desc(m_poss, sizeof(m_poss), &m, MDESC_PRO2 | MDESC_POSS);
 
 				/* Dump a message */
 				msg_format("%^s recovers %s courage.", m_name, m_poss);
