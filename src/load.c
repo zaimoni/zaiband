@@ -455,7 +455,18 @@ static errr rd_item(object_type *o_ptr)
 	return (0);
 }
 
+static void wrap_mon_desc(char *desc, size_t max, const agent_type& agent, int mode)
+{
+	monster_desc(desc,max,&static_cast<const monster_type&>(agent),mode);
+}
 
+static agent_type::lang_aux monster_lang =
+{
+	"is",
+	3,
+	wrap_mon_desc,
+	NULL	// as monster is not a viewpoint no self-desc
+};
 
 
 /*!
@@ -468,6 +479,7 @@ static void rd_monster(monster_type *m_ptr)
 
 	/* Read the other information */
 	rd_agent(*m_ptr);
+	m_ptr->lang = &monster_lang;
 	rd_s16b(&m_ptr->csleep);
 	rd_byte(&m_ptr->stunned);
 	rd_byte(&m_ptr->confused);
@@ -481,7 +493,6 @@ static void rd_monster(monster_type *m_ptr)
 static void rd_lore(int r_idx)
 {
 	int i;
-	byte tmp8u;
 	
 	monster_race *r_ptr = &monster_type::r_info[r_idx];
 	monster_lore *l_ptr = &monster_type::l_list[r_idx];
@@ -523,11 +534,6 @@ static void rd_lore(int r_idx)
 	/* Read the "Racial" monster limit per level */
 	rd_byte(&r_ptr->max_num);
 
-	/* Later (?) */
-	rd_byte(&tmp8u);
-	rd_byte(&tmp8u);
-	rd_byte(&tmp8u);
-
 	/* Repair the lore flags */
 	for (i = 0; i < RACE_FLAG_STRICT_UB; i++)
 		l_ptr->flags[i] &= r_ptr->flags[i];
@@ -547,18 +553,11 @@ static errr rd_store(int n)
 	store_type *st_ptr = &store[n];
 
 	int j;
-
 	byte own, num;
-
-	/* XXX Old values */
-	strip_bytes(6);
 
 	/* Read the basic info */
 	rd_byte(&own);
 	rd_byte(&num);
-
-	/* XXX Old values */
-	strip_bytes(4);
 
 	/* Paranoia */
 	if (own >= z_info->b_max)
@@ -572,21 +571,20 @@ static errr rd_store(int n)
 	/* Read the items */
 	for (j = 0; j < num; j++)
 	{
-		object_type object_type_body;
-		object_type *i_ptr = &object_type_body;	/* Get local object */
+		object_type i;	/* Get local object */
 
 		/* Wipe the object */
-		WIPE(i_ptr);
+		WIPE(&i);
 
 		/* Read the item */
-		if (rd_item(i_ptr))
+		if (rd_item(&i))
 		{
 			note("Error reading item");
 			return (-1);
 		}
 
 		/* Accept any valid items */
-		if (st_ptr->stock_num < STORE_INVEN_MAX) st_ptr->stock[st_ptr->stock_num++] = *i_ptr;
+		if (st_ptr->stock_num < STORE_INVEN_MAX) st_ptr->stock[st_ptr->stock_num++] = i;
 	}
 
 	/* Success */
@@ -602,20 +600,11 @@ static void rd_randomizer(void)
 {
 	int i;
 
-	u16b tmp16u;
-
-
-	/* Tmp */
-	rd_u16b(&tmp16u);
-
 	/* Place */
 	rd_u16b(&Rand_place);
 
 	/* State */
-	for (i = 0; i < RAND_DEG; i++)
-	{
-		rd_u32b(&Rand_state[i]);
-	}
+	for (i = 0; i < RAND_DEG; i++) rd_u32b(&Rand_state[i]);
 
 	/* Accept */
 	Rand_quick = FALSE;
@@ -757,6 +746,13 @@ static errr rd_player_spells(void)
 	return (0);
 }
 
+static agent_type::lang_aux player_lang =
+{
+	"are",
+	2,
+	NULL,	// don't have to think about third-person desc until multiplayer
+	NULL
+};
 
 /*
  * Read the "extra" information
@@ -767,6 +763,7 @@ static errr rd_extra(void)
 	byte tmp8u;
 
 	rd_agent(*p_ptr);
+	p_ptr->lang = &player_lang;
 	
 	rd_string(op_ptr->full_name, sizeof(op_ptr->full_name));
 	rd_string(p_ptr->died_from, 80);

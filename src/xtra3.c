@@ -700,7 +700,7 @@ NoTarget:
 			attr = TERM_L_UMBER;
 		};
 
-		sprintf(buf, "%2d", (int)(extract_energy[i]));
+		sprintf(buf, "%2d", (int)(agent_type::extract_energy[i]));
 
 		/* Display the speed */
 		c_put_str(attr, buf, row, col+7);
@@ -728,7 +728,7 @@ NoTarget:
 			attr = TERM_L_UMBER;
 		};
 
-		sprintf(buf, "%d/%d", (int)(extract_energy[i]), (int)(extract_energy[m_ptr->speed]));
+		sprintf(buf, "%d/%d", (int)(agent_type::extract_energy[i]), (int)(agent_type::extract_energy[m_ptr->speed]));
 
 		/* Display the energy ratio */
 		c_put_str(attr, buf, row, col+7);

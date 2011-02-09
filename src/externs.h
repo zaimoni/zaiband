@@ -43,7 +43,6 @@ extern const byte adj_dex_safe[];
 extern const byte adj_con_fix[];
 extern const int adj_con_mhp[];
 extern const byte blows_table[12][12];
-extern const byte extract_energy[200];
 extern const s32b player_exp[PY_MAX_LEVEL];
 extern const byte chest_traps[64];
 extern const char* const stat_names[A_MAX];

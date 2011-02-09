@@ -32,23 +32,31 @@
 #include "angband.h"
 #include "option.h"
 
-int
-agent_type::ticks_to_move(int move, int diag) const
+int agent_type::ticks_to_move(int move, int diag) const
 {
 	return (50*(diag + 1) + 100*move - (int)energy)/(int)(extract_energy[speed]);
 }
 
-int
-agent_type::moves_in_ticks(int ticks, int diag) const
+int agent_type::moves_in_ticks(int ticks, int diag) const
 {
 	return ((int)energy + ticks*(int)(extract_energy[speed]) - 50*(diag + 1))/100;
 }
 
-int
-agent_type::energy_in_ticks(int ticks) const
+int agent_type::energy_in_ticks(int ticks) const
 {
 	return (int)energy + ticks*(int)(extract_energy[speed]);
 }
+
+int agent_type::min_ticks_in_energy(int _energy) const
+{
+	return _energy/(int)(extract_energy[speed]);
+}
+
+int agent_type::max_ticks_in_energy(int _energy) const
+{
+	return _energy/(int)(extract_energy[speed])+(0!=_energy%(int)(extract_energy[speed]));
+}
+
 
 void
 agent_type::move_ratio(int& threat_moves, int& my_moves, const agent_type& threat, int threat_diag, int my_diag) const
@@ -82,8 +90,7 @@ agent_type::move_ratio(int& threat_moves, int& my_moves, const agent_type& threa
 /**
  * \return nonstrict upper bound on health that player could calculate from monster health bar.
  */
-int
-agent_type::apparent_health() const
+int agent_type::apparent_health() const
 {
 	if (chp>=mhp || OPTION(adult_smart_cheat)) return chp;
 

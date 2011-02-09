@@ -4802,7 +4802,7 @@ NOTE: Vulnerable items must be moved away in initial generation.
 			do_turn = TRUE;	/* Take a turn */
 
 			/* Zaiband: if a diagonal move, use 150 energy rather than 100 energy */
-			if (0!=dd_coord[d].x && 0!=dd_coord[d].y) m_ptr->energy -= 50;
+			if (0!=dd_coord[d].x && 0!=dd_coord[d].y) m_ptr->energy -= (ENERGY_MOVE_DIAGONAL-ENERGY_MOVE_AXIS);
 
 			monster_swap(o, n);	/* Move the monster */
 
@@ -4819,7 +4819,7 @@ NOTE: Vulnerable items must be moved away in initial generation.
 			/* this condition must reflect the attack type's existence */
 			if (monster_has_attack(r_ptr,RBE_EAT_FOOD))
 				{	/* Scan all objects in the grid */
-				(void)destroy_items_selectively(cave_o_idx[n.y][n.x], m_ptr,
+				destroy_items_selectively(cave_o_idx[n.y][n.x], m_ptr,
 										player_has_los_bold(n.y, n.x),
 										"%^s tries to eat %s, but fails.",
 										"%^s eats %s.",

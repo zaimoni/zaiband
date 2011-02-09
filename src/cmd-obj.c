@@ -242,7 +242,7 @@ static void obj_study(object_type *o_ptr, int)
 
 	/* Learn the spell */
 	spell_learn(spell);
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 }
 
 /* Cast a spell from a book */
@@ -265,8 +265,7 @@ static void obj_cast(object_type *o_ptr, int)
 	}
 
 	/* Cast a spell */
-	if (spell_cast(spell))
-	    p_ptr->energy_use = 100;
+	if (spell_cast(spell)) p_ptr->energy_use = ENERGY_MOVE_AXIS;
 }
 
 

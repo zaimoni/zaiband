@@ -214,6 +214,14 @@ enum player_gender	{
 #define MAX_RANGE	18	/* Maximum range (spells, etc) */
 
 
+/*
+ * movement costs
+ * move along axis is also "reference attack duration"
+ */
+#define ENERGY_MOVE_DIAGONAL 150
+#define ENERGY_MOVE_AXIS 100
+
+ZAIBAND_STATIC_ASSERT(ENERGY_MOVE_DIAGONAL>=ENERGY_MOVE_AXIS);
 
 /*
  * Player constants

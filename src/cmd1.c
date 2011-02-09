@@ -471,7 +471,9 @@ void move_player(int dir, int jumping)
 		dest_g = p_ptr->loc;
 
 		/* Zaiband: if a diagonal move, use 150 energy rather than 100 energy */
-		if (0!=dd_coord[dir].x && 0!=dd_coord[dir].y) p_ptr->energy_use += 50;
+#if ENERGY_MOVE_DIAGONAL>ENERGY_MOVE_AXIS
+		if (0!=dd_coord[dir].x && 0!=dd_coord[dir].y) p_ptr->energy_use += (ENERGY_MOVE_DIAGONAL-ENERGY_MOVE_AXIS);
+#endif		
 
 		/* Spontaneous Searching */
 		if ((p_ptr->skills[SKILL_SEARCH_FREQUENCY]) ||
@@ -481,10 +483,7 @@ void move_player(int dir, int jumping)
 		}
 
 		/* Continuous Searching */
-		if (p_ptr->searching)
-		{
-			search();
-		}
+		if (p_ptr->searching) search();
 
 		/* Handle "objects" */
 		py_pickup(jumping != OPTION(always_pickup));
@@ -1203,7 +1202,7 @@ void run_step(int dir)
 	p_ptr->running--;
 
 	/* Take time */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Move the player */
 	move_player(p_ptr->run_cur_dir, FALSE);

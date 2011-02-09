@@ -122,23 +122,19 @@ void do_cmd_equip(void)
  */
 void wield_item(object_type *o_ptr, int item)
 {
-	object_type object_type_body;
-	object_type *i_ptr = &object_type_body;
-
-	const char* act;
+	object_type i;
 	char o_name[80];
-
 	int slot = wield_slot(o_ptr);
 	assert((INVEN_EQUIP_ORIGIN <= slot) && (slot < INVEN_EQUIP_STRICT_UB) && "retval precondition");
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Obtain local object */
-	*i_ptr = *o_ptr;
+	i = *o_ptr;
 
 	/* Modify quantity */
-	i_ptr->number = 1;
+	i.number = 1;
 
 	/* Decrease the item (from the pack) */
 	if (item >= 0)
@@ -161,27 +157,23 @@ void wield_item(object_type *o_ptr, int item)
 	if (o_ptr->k_idx)
 	{
 		/* Take off existing item */
-		(void)inven_takeoff(slot, 255);
+		inven_takeoff(slot, 255);
 	}
 
 	/* Wear the new stuff */
-	*o_ptr = *i_ptr;
+	*o_ptr = i;
 
 	/* Increase the weight */
-	p_ptr->total_weight += i_ptr->weight;
+	p_ptr->total_weight += i.weight;
 
 	/* Increment the equip counter by hand */
 	p_ptr->equip_cnt++;
 
 	/* Where is the item now */
-	if (slot == INVEN_WIELD)
-		act = "You are wielding";
-	else if (slot == INVEN_BOW)
-		act = "You are shooting with";
-	else if (slot == INVEN_LITE)
-		act = "Your light source is";
-	else
-		act = "You are wearing";
+	const char* const act = (INVEN_WIELD == slot) ? "You are wielding"
+	    : (INVEN_BOW == slot) ? "You are shooting with"
+	    : (INVEN_LITE == slot) ? "Your light source is"
+	    : "You are wearing";
 
 	/* Describe the result */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, ODESC_FULL);
@@ -268,7 +260,7 @@ void do_cmd_destroy(void)
 	}
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Artifacts cannot be destroyed */
 	if (o_ptr->is_artifact())
@@ -283,10 +275,7 @@ void do_cmd_destroy(void)
 		if (o_ptr->ident & (IDENT_SENSE))
 		{
 			/* Already sensed objects always get improved feelings */
-			if (o_ptr->is_broken_or_cursed())
-				o_ptr->pseudo = INSCRIP_TERRIBLE;
-			else
-				o_ptr->pseudo = INSCRIP_SPECIAL;
+			o_ptr->pseudo = (o_ptr->is_broken_or_cursed()) ? INSCRIP_TERRIBLE : INSCRIP_SPECIAL;
 		}
 		else
 		{

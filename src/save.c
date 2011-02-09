@@ -228,11 +228,6 @@ static void wr_lore(int r_idx)
 
 	/* Monster limit per level */
 	wr_byte(r_ptr->max_num);
-
-	/* Later (?) */
-	wr_byte(0);
-	wr_byte(0);
-	wr_byte(0);
 }
 
 
@@ -252,21 +247,11 @@ static void wr_store(const store_type *st_ptr)
 {
 	int j;
 
-	/* XXX Old value (<= Angband 3.0.3) */
-	wr_u32b(0L);
-
-	/* XXX Old value (<= Angband 3.0.3) */
-	wr_s16b(0);
-
 	/* Save the current owner */
 	wr_byte(st_ptr->owner);
 
 	/* Save the stock size */
 	wr_byte(st_ptr->stock_num);
-
-	/* XXX Old values (<= Angband 3.0.3) */
-	wr_s16b(0);
-	wr_s16b(0);
 
 	/* Save the stock */
 	for (j = 0; j < st_ptr->stock_num; j++)
@@ -280,24 +265,15 @@ static void wr_store(const store_type *st_ptr)
 /*
  * Write RNG state
  */
-static errr wr_randomizer(void)
+static void wr_randomizer(void)
 {
 	int i;
-
-	/* Zero */
-	wr_u16b(0);
 
 	/* Place */
 	wr_u16b(Rand_place);
 
 	/* State */
-	for (i = 0; i < RAND_DEG; i++)
-	{
-		wr_u32b(Rand_state[i]);
-	}
-
-	/* Success */
-	return (0);
+	for (i = 0; i < RAND_DEG; i++) wr_u32b(Rand_state[i]);
 }
 
 

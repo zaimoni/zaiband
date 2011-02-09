@@ -1765,7 +1765,7 @@ static void player_birth_done_hook(void)
 	}
 
 	/* Give the player a full energy count */
-	p_ptr->energy = 150;
+	p_ptr->energy = ENERGY_MOVE_DIAGONAL;
 }
 
 

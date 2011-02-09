@@ -69,7 +69,7 @@ void do_cmd_go_up(void)
 	}
 
 	/* Hack -- take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Success */
 	message(MSG_STAIRS_UP, "You enter a maze of up staircases.");
@@ -98,19 +98,14 @@ void do_cmd_go_down(void)
 	}
 
 	/* Hack -- take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Success */
 	message(MSG_STAIRS_DOWN, "You enter a maze of down staircases.");
 
-	/* Create a way back */
-	p_ptr->create_up_stair = TRUE;
-
-	/* New level */
-	p_ptr->depth++;
-
-	/* Leaving */
-	p_ptr->leaving = TRUE;
+	p_ptr->create_up_stair = TRUE; /* Create a way back */
+	p_ptr->depth++; /* New level */
+	p_ptr->leaving = TRUE; /* Leaving */
 }
 
 
@@ -133,11 +128,8 @@ void do_cmd_search(void)
 		p_ptr->command_arg = 0;
 	}
 
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
-	/* Search */
-	search();
+	p_ptr->energy_use = ENERGY_MOVE_AXIS; /* Take a turn */
+	search(); /* Search */
 }
 
 
@@ -735,7 +727,7 @@ void do_cmd_open(void)
 		}
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Apply confusion */
 	if (confuse_dir(&dir))
@@ -894,7 +886,7 @@ void do_cmd_close(void)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Apply confusion */
 	if (confuse_dir(&dir))
@@ -1219,7 +1211,6 @@ void do_cmd_tunnel(void)
 {
 	int dir;
 	coord t;
-
 	bool more = FALSE;
 
 
@@ -1234,7 +1225,7 @@ void do_cmd_tunnel(void)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Apply confusion */
 	if (confuse_dir(&dir))
@@ -1412,7 +1403,7 @@ void do_cmd_disarm(void)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Apply confusion */
 	if (confuse_dir(&dir))
@@ -1608,7 +1599,7 @@ void do_cmd_bash(void)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Apply confusion */
 	if (confuse_dir(&dir))
@@ -1692,7 +1683,7 @@ void do_cmd_alter(void)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Apply confusion */
 	if (confuse_dir(&dir))
@@ -1871,7 +1862,7 @@ void do_cmd_spike(void)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Confuse direction */
 	if (confuse_dir(&dir))
@@ -1992,7 +1983,7 @@ static void do_cmd_walk_or_jump(int jumping)
 
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Confuse direction */
 	if (confuse_dir(&dir))
@@ -2101,7 +2092,7 @@ static void do_cmd_hold_or_stay(int pickup)
 	}
 
 	/* Take a turn */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Spontaneous Searching */
 	if (	(p_ptr->skills[SKILL_SEARCH_FREQUENCY] >= 50)
@@ -2111,10 +2102,7 @@ static void do_cmd_hold_or_stay(int pickup)
 	}
 
 	/* Continuous Searching */
-	if (p_ptr->searching)
-	{
-		search();
-	}
+	if (p_ptr->searching) search();
 
 	/* Handle "objects" */
 	py_pickup(pickup);
@@ -2198,27 +2186,16 @@ void do_cmd_rest(void)
 
 
 	/* Take a turn XXX XXX XXX (?) */
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Save the rest code */
 	p_ptr->resting = p_ptr->command_arg;
 
-	/* Cancel the arg */
-	p_ptr->command_arg = 0;
-
-	/* Cancel searching */
-	p_ptr->searching = FALSE;
-
-	/* Recalculate bonuses */
-	p_ptr->update |= (PU_BONUS);
-
-	/* Redraw the state */
-	p_ptr->redraw |= (PR_STATE);
-
-	/* Handle stuff */
-	handle_stuff();
-
-	/* Refresh XXX XXX XXX */
-	Term_fresh();
+	p_ptr->command_arg = 0; /* Cancel the arg */
+	p_ptr->searching = FALSE; /* Cancel searching */
+	p_ptr->update |= (PU_BONUS); /* Recalculate bonuses */
+	p_ptr->redraw |= (PR_STATE); /* Redraw the state */
+	handle_stuff(); /* Handle stuff */
+	Term_fresh(); /* Refresh XXX XXX XXX */
 }
 

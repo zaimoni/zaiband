@@ -1181,8 +1181,8 @@ static bool player_bow_boring(const object_type* o_ptr, const u32b* f_ref, s32b 
 
 	/* consider basic attack power */
 	if (has_flags) return FALSE;					/* had something the other item didn't */
-	if (   base_dam_rate2*extract_energy[speed1]<base_dam_rate1*extract_energy[speed2]
-		&& ideal_dam_rate2*extract_energy[speed1]<ideal_dam_rate1*extract_energy[speed2]) return TRUE;	/* dominated : no flags, worse base and ideal damage */
+	if (   base_dam_rate2*agent_type::extract_energy[speed1]<base_dam_rate1*agent_type::extract_energy[speed2]
+		&& ideal_dam_rate2*agent_type::extract_energy[speed1]<ideal_dam_rate1*agent_type::extract_energy[speed2]) return TRUE;	/* dominated : no flags, worse base and ideal damage */
 	return FALSE;
 }
 
@@ -1253,8 +1253,8 @@ static bool player_weapon_boring(const object_type* o_ptr, const u32b* f_ref, s3
 
 	/* consider basic attack power */
 	if (has_flags) { return FALSE; } /* had something the other item didn't */
-	if (   base_dam_rate2*extract_energy[speed1]<base_dam_rate1*extract_energy[speed2]
-		&& ideal_dam_rate2*extract_energy[speed1]<ideal_dam_rate1*extract_energy[speed2]) return TRUE;	/* dominated : no flags, worse base and ideal damage */
+	if (   base_dam_rate2*agent_type::extract_energy[speed1]<base_dam_rate1*agent_type::extract_energy[speed2]
+		&& ideal_dam_rate2*agent_type::extract_energy[speed1]<ideal_dam_rate1*agent_type::extract_energy[speed2]) return TRUE;	/* dominated : no flags, worse base and ideal damage */
 	return FALSE;
 }
 
@@ -3403,7 +3403,7 @@ void do_cmd_store(void)
 	}
 
 	sound(MSG_STORE_LEAVE); /* Leave the store sound */
-	p_ptr->energy_use = 100; /* Take a turn */
+	p_ptr->energy_use = ENERGY_MOVE_AXIS; /* Take a turn */
 	p_ptr->command_new = 0; /* Hack -- Cancel automatic command */
 	message_flush(); /* Flush messages XXX XXX XXX */
 	} /* Hack -- Decrease "icky" depth */

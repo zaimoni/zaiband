@@ -874,23 +874,16 @@ static void process_world(void)
 	/*** Damage over Time ***/
 
 	/* Take damage from poison */
-	if (p_ptr->timed[TMD_POISONED])
-	{
-		/* Take damage */
-		take_hit(1, "poison");
-	}
+	if (p_ptr->timed[TMD_POISONED]) take_hit(1, "poison");
 
 	/* Take damage from cuts */
 	if (p_ptr->timed[TMD_CUT])
 	{
-		unsigned int bleeding = cut_level(p_ptr->timed[TMD_CUT]);
+		const unsigned int bleeding = cut_level(p_ptr->timed[TMD_CUT]);
 		
-		if (6 <= bleeding)
-			i = 3;	/* Mortal wound or Deep Gash */
-		else if (5 == bleeding)
-			i = 2;	/* Severe cut */
-		else
-			i = 1;	/* Other cuts */
+		i = (6 <= bleeding) ? 3 /* Mortal wound or Deep Gash */
+		  : (5 == bleeding) ? 2 /* Severe cut */
+		  : 1; /* Other cuts */
 
 		/* Take damage */
 		take_hit(i, "a fatal wound");
@@ -906,7 +899,7 @@ static void process_world(void)
 		if (!(turn % 100))
 		{
 			/* Basic digestion rate based on speed */
-			i = extract_energy[p_ptr->speed] * 2;
+			i = agent_type::extract_energy[p_ptr->speed] * 2;
 
 			/* Regeneration takes more food */
 			if (p_ptr->regenerate) i += 30;
@@ -918,7 +911,7 @@ static void process_world(void)
 			if (i < 1) i = 1;
 
 			/* Digest some food */
-			(void)set_food(p_ptr->food - i);
+			set_food(p_ptr->food - i);
 		}
 	}
 
@@ -926,7 +919,7 @@ static void process_world(void)
 	else
 	{
 		/* Digest a lot of food */
-		(void)set_food(p_ptr->food - 100);
+		set_food(p_ptr->food - 100);
 	}
 
 	/* Starve to death (slowly) */
@@ -2238,7 +2231,7 @@ static void process_player(void)
 			}
 
 			/* Take a turn */
-			p_ptr->energy_use = 100;
+			p_ptr->energy_use = ENERGY_MOVE_AXIS;
 		}
 
 		/* Running */
@@ -2585,17 +2578,13 @@ static void dungeon(void)
 
 		/* Can the player move? */
 		/* Zaiband: origin adjusted to 150 to handle monster energy being a byte, and diagonal move cost 150 */
-		while ((p_ptr->energy >= 150) && !p_ptr->leaving)
+		while ((p_ptr->energy >= ENERGY_MOVE_DIAGONAL) && !p_ptr->leaving)
 		{
 			/* process monster with even more energy first */
 			process_monsters((byte)(p_ptr->energy + 1));
 
-			/* if still alive */
-			if (!p_ptr->leaving)
-			{
-				/* Process the player */
-				process_player();
-			}
+			/* if player still alive, process */
+			if (!p_ptr->leaving) process_player();
 		}
 
 		/* Notice stuff */
@@ -2612,7 +2601,7 @@ static void dungeon(void)
 
 
 		/* Process all of the monsters */
-		process_monsters(150);
+		process_monsters(ENERGY_MOVE_DIAGONAL);
 
 		/* Notice stuff */
 		if (p_ptr->notice) notice_stuff();
@@ -2646,19 +2635,19 @@ static void dungeon(void)
 		/*** Apply energy ***/
 
 		/* Give the player some energy */
-		p_ptr->energy += extract_energy[p_ptr->speed];
+		p_ptr->energy += agent_type::extract_energy[p_ptr->speed];
 
 		/* Give energy to all monsters */
 		for (i = mon_max - 1; i >= 1; i--)
 		{
 			/* Access the monster */
-			monster_type* const m_ptr = &mon_list[i];
+			monster_type& m = mon_list[i];
 
 			/* Ignore "dead" monsters */
-			if (!m_ptr->r_idx) continue;
+			if (!m.r_idx) continue;
 
 			/* Give this monster some energy */
-			m_ptr->energy += extract_energy[m_ptr->speed];
+			m.energy += agent_type::extract_energy[m.speed];
 		}
 
 		/* Count game turns */

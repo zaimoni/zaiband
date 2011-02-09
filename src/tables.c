@@ -1088,7 +1088,7 @@ const byte blows_table[12][12] =
  * the (compiled out) small random energy boost code.  It may
  * also tend to cause more "clumping" at high speeds.
  */
-const byte extract_energy[200] =
+const byte agent_type::extract_energy[200] =
 {
 	/* Slow */     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
 	/* Slow */     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,

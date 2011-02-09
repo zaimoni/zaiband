@@ -836,7 +836,7 @@ void do_cmd_fire(void)
 
 
 	/* Take a (partial) turn */
-	p_ptr->energy_use = (100 / thits);
+	p_ptr->energy_use = (ENERGY_MOVE_AXIS / thits);
 
 	extrapolate_target(tt,dir);
 
@@ -1151,13 +1151,8 @@ void do_cmd_throw(void)
 	/* Chance of hitting */
 	chance = (p_ptr->skills[SKILL_TO_HIT_THROW] + (p_ptr->to_h * BTH_PLUS_ADJ));
 
-
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
-
-	/* Start at the player */
-	t = p_ptr->loc;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS; /* Take a turn */
+	t = p_ptr->loc; /* Start at the player */
 
 	extrapolate_target(tt,dir);
 

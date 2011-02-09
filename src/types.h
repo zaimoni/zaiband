@@ -570,12 +570,19 @@ template<byte TVal> inline bool o_ptr_is(const object_type* o) {return TVal==o->
 
 struct agent_type
 {
+	typedef char* text_fragment(agent_type&);
+	typedef void desc_aux(char *desc, size_t max, const agent_type& agent, int mode);
+	typedef struct {const char* const verb_is; const char linguistic_person; desc_aux* desc; desc_aux* self_desc;} lang_aux;
+
+	static const byte extract_energy[200];
+	
+	lang_aux* lang;  /**< output helpers; do not directly save to file */ 
 	coord loc;			/**< location on map */
 	s16b chp;			/**< Current Hit points */
 	s16b mhp;			/**< Max Hit points */
 	byte speed;			/**< "speed" */
 	byte energy;		/**< "energy" */
-
+	
 	/* xtra3.c */
 	void stars_color(int& stars, byte& attr) const;
 
@@ -583,6 +590,8 @@ struct agent_type
 	int ticks_to_move(int move, int diag) const;
 	int moves_in_ticks(int ticks, int diag) const;
 	int energy_in_ticks(int ticks) const;
+	int min_ticks_in_energy(int _energy) const;
+	int max_ticks_in_energy(int _energy) const;
 	void move_ratio(int& threat_moves, int& my_moves, const agent_type& threat, int threat_diag, int my_diag) const;
 	int apparent_health() const;
 };

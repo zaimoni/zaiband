@@ -2467,7 +2467,7 @@ void do_cmd_use(object_type *o_ptr, int item, int snd, use_type _use)
 	}
 
 	/* Use energy regardless of failure */	
-	p_ptr->energy_use = 100;
+	p_ptr->energy_use = ENERGY_MOVE_AXIS;
 
 	/* Check for use */
 	if (_use == USE_CHARGE || _use == USE_TIMEOUT)

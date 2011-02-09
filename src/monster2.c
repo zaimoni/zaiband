@@ -724,9 +724,6 @@ void monster_desc(char *desc, size_t max, const monster_type *m_ptr, int mode)
 	}
 }
 
-
-
-
 /*
  * Learn about a monster (by "probing" it)
  */
@@ -1290,48 +1287,42 @@ static bool place_monster_one(coord g, int r_idx, bool slp)
 	assert(0 < r_idx && r_idx < z_info->r_max);
 	int i;
 
-	monster_race *r_ptr;
-
-	monster_type monster_type_body;
-	monster_type *n_ptr = &monster_type_body;	/* Get local monster */
-
-	const char* name;
+	monster_type n;	/* Get local monster */
 
 
 	/* Paranoia */
-	if (!in_bounds(g.y, g.x)) return (FALSE);
+	if (!in_bounds(g.y, g.x)) return false;
 
 	/* Require empty space */
-	if (!cave_empty_bold(g.y, g.x)) return (FALSE);
+	if (!cave_empty_bold(g.y, g.x)) return false;
 
 	/* Hack -- no creation on glyph of warding */
-	if (cave_feat[g.y][g.x] == FEAT_GLYPH) return (FALSE);
-
+	if (cave_feat[g.y][g.x] == FEAT_GLYPH) return false;
 
 	/* Paranoia */
-	if (!r_idx) return (FALSE);
+	if (!r_idx) return false;
 
 	/* Race */
-	r_ptr = &monster_type::r_info[r_idx];
+	monster_race* const r_ptr = &monster_type::r_info[r_idx];
 
 	/* Paranoia */
-	if (!r_ptr->_name) return (FALSE);
+	if (!r_ptr->_name) return false;
 
 	/* Name */
-	name = r_ptr->name();
+	const char* const name = r_ptr->name();
 
 
 	/* Hack -- "unique" monsters must be "unique" */
 	if ((r_ptr->flags[0] & RF0_UNIQUE) && (r_ptr->cur_num >= r_ptr->max_num))
 	{
-		return FALSE;	/* Cannot create */
+		return false;	/* Cannot create */
 	}
 
 
 	/* Depth monsters may NOT be created out of depth */
 	if ((r_ptr->flags[0] & RF0_FORCE_DEPTH) && (p_ptr->depth < r_ptr->level))
 	{
-		return FALSE;	/* Cannot create */
+		return false;	/* Cannot create */
 	}
 
 
@@ -1367,56 +1358,52 @@ static bool place_monster_one(coord g, int r_idx, bool slp)
 	}
 
 
-	/* Clean out the monster */
-	WIPE(n_ptr);
-
-
-	/* Save the race */
-	n_ptr->r_idx = r_idx;
+	WIPE(&n); /* Clean out the monster */
+	n.r_idx = r_idx; /* Save the race */
 
 
 	/* Enforce sleeping if needed */
 	if (slp && r_ptr->sleep)
 	{
-		int val = r_ptr->sleep;
-		n_ptr->csleep = ((val * 2) + randint(val * 10));
+		const int val = r_ptr->sleep;
+		n.csleep = ((val * 2) + randint(val * 10));
 	}
 
 
 	/* Assign maximal hitpoints if forced */
-	n_ptr->mhp = (r_ptr->flags[0] & RF0_FORCE_MAXHP) ? r_ptr->h.maxroll()
+	n.mhp = (r_ptr->flags[0] & RF0_FORCE_MAXHP) ? r_ptr->h.maxroll()
 													 : r_ptr->h.damroll();
 
-	n_ptr->chp = n_ptr->mhp;		/* And start out fully healthy */
-	n_ptr->speed = r_ptr->speed;	/* Extract the monster base speed */
+	n.chp = n.mhp;		/* And start out fully healthy */
+	n.speed = r_ptr->speed;	/* Extract the monster base speed */
 
 	/* Hack -- small racial variety */
 	if (!(r_ptr->flags[0] & RF0_UNIQUE))
 	{
 		/* Allow some small variation per monster */
-		i = extract_energy[r_ptr->speed] / 10;
-		if (i) n_ptr->speed += rand_spread(0, i);
+		i = agent_type::extract_energy[r_ptr->speed] / 10;
+		if (i) n.speed += rand_spread(0, i);
 	}
 
 
 	/* Give a random starting energy */
-	n_ptr->energy = (byte)rand_int(100);
+	n.energy = rand_int(ENERGY_MOVE_DIAGONAL);
 
 	/* Force monster to wait for player */
 	if (r_ptr->flags[0] & RF0_FORCE_SLEEP)
 	{
 		/* Monster is still being nice */
-		n_ptr->mflag |= (MFLAG_NICE);
+		n.mflag |= (MFLAG_NICE);
 
 		/* Optimize -- Repair flags */
-		repair_mflag_nice = TRUE;
+		repair_mflag_nice = true;
 	}
 
 	/* Place the monster in the dungeon */
-	if (!monster_place(g, n_ptr)) return (FALSE);
+	if (!monster_place(g, &n)) return false;
 
 	/* Success */
-	return (TRUE);
+	return true;
 }
 
 
