@@ -517,6 +517,8 @@ inline bool is_trap(byte x) {	return IS_TRAP(x);	}
 #define MDESC_HIDE		0x40	/* Assume the monster is hidden */
 #define MDESC_SHOW		0x80	/* Assume the monster is visible */
 
+#define MDESC_SUBJ		0x00	/* subject */
+#define MDESC_REFL		0x03	/* reflexive */
 
 /*
  * Bit flags for the "get_item" function

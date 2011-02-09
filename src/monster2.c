@@ -658,14 +658,14 @@ void monster_desc(char *desc, size_t max, const monster_type *m_ptr, int mode)
 
 		switch(mode & 0x07)
 		{
-		case 0x00: my_strcpy(desc, pronoun_subject_third_singular[kind], max); break;
-		case 0x01: my_strcpy(desc, pronoun_object_third_singular[kind], max); break;
-		case 0x02: my_strcpy(desc, pronoun_possessive_third_singular[kind], max); break;
-		case 0x03: my_strcpy(desc, pronoun_reflexive_third_singular[kind], max); break;
-		case 0x04: // intentional fall-through
-		case 0x05: my_strcpy(desc, "someone", max); break;
-		case 0x06: my_strcpy(desc, "someone's", max); break;
-		case 0x07: my_strcpy(desc, pronoun_reflexive_third_singular[kind], max); break;
+		case MDESC_SUBJ: my_strcpy(desc, pronoun_subject_third_singular[kind], max); break;
+		case MDESC_OBJE: my_strcpy(desc, pronoun_object_third_singular[kind], max); break;
+		case MDESC_POSS: my_strcpy(desc, pronoun_possessive_third_singular[kind], max); break;
+		case MDESC_REFL: my_strcpy(desc, pronoun_reflexive_third_singular[kind], max); break;
+		case MDESC_IND1 | MDESC_SUBJ: // intentional fall-through
+		case MDESC_IND1 | MDESC_OBJE: my_strcpy(desc, "someone", max); break;
+		case MDESC_IND1 | MDESC_POSS: my_strcpy(desc, "someone's", max); break;
+		case MDESC_IND1 | MDESC_REFL: my_strcpy(desc, pronoun_reflexive_third_singular[kind], max); break;
 		}
 	}
 

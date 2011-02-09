@@ -746,12 +746,28 @@ static errr rd_player_spells(void)
 	return (0);
 }
 
+#define MDESC_OBJE		0x01	/* Objective (or Reflexive) */
+#define MDESC_POSS		0x02	/* Possessive (or Reflexive) */
+#define MDESC_IND1		0x04	/* Indefinites for hidden monsters */
+
+static void player_desc(char *desc, size_t max, const agent_type& agent, int mode)
+{	// second-person pronoun, always visible
+	// ignore the indefinite request
+	switch(mode & 0x03)
+	{
+	case MDESC_SUBJ: // intentional fall-through
+	case MDESC_OBJE: my_strcpy(desc, "you", max); break;
+	case MDESC_POSS: my_strcpy(desc, "your", max); break;
+	case MDESC_REFL: my_strcpy(desc, "yourself", max); break;
+	}
+}
+
 static agent_type::lang_aux player_lang =
 {
 	"are",
 	2,
 	NULL,	// don't have to think about third-person desc until multiplayer
-	NULL
+	player_desc
 };
 
 /*
