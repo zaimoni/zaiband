@@ -741,12 +741,9 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 			take_hit(damage, ddesc);
 
 			/* Increase "confused" */
-			if (!p_ptr->resist_confu)
+			if (p_ptr->take_confusion(3 + randint(rlev)))
 			{
-				if (p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(3 + randint(rlev)))
-				{
-					obvious = TRUE;
-				}
+				obvious = TRUE;
 			}
 
 			/* Learn about the player */

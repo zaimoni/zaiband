@@ -1853,6 +1853,14 @@ bool monster_type::take_confusion(int do_conf)
 	return inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
 }
 
+bool player_type::take_confusion(int do_conf)
+{
+	if (0>=do_conf) return false;
+	if (p_ptr->resist_confu) return false; 
+	return inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
+	/* XXX should update non-cheat learning for all monsters that can see the player XXX */
+}
+
 
 /*
  * Helper function for "project()" below.
@@ -2934,10 +2942,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				p_ptr->inc_timed<TMD_STUN>(randint(40));
 			}
-			if (!p_ptr->resist_confu)
-			{
-				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(randint(5) + 5);
-			}
+			p_ptr->take_confusion(randint(5) + 5);
 			take_hit(dam, killer);
 			break;
 		}
@@ -2950,12 +2955,9 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				dam *= 6; dam /= (randint(6) + 6);
 			}
-			if (!p_ptr->resist_confu && !p_ptr->resist_chaos)
-			{
-				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(20) + 10);
-			}
 			if (!p_ptr->resist_chaos)
 			{
+				p_ptr->take_confusion(rand_int(20) + 10);
 				p_ptr->inc_timed<TMD_IMAGE>(randint(10));
 			}
 			if (!p_ptr->resist_nethr && !p_ptr->resist_chaos)
@@ -3027,10 +3029,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				dam *= 5; dam /= (randint(6) + 6);
 			}
-			if (!p_ptr->resist_confu)
-			{
-				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(randint(20) + 10);
-			}
+			p_ptr->take_confusion(randint(20) + 10);
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_CONFU);
 			break;

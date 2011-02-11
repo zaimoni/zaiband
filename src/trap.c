@@ -386,10 +386,7 @@ void hit_trap(coord g)
 		case GAS_CONFUSE:
 		{
 			msg_print("You are surrounded by a gas of scintillating colors!");
-			if (!p_ptr->resist_confu)
-			{
-				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(20) + 10);
-			}
+			p_ptr->take_confusion(rand_int(20) + 10);
 			break;
 		}
 

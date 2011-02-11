@@ -1121,6 +1121,9 @@ struct player_type : public agent_type
 	bool inven_cnt_is_strict_UB_of_nonzero_k_idx() const;
 #endif
 
+	/* spells1.c */
+	bool take_confusion(int do_conf);
+
 	/* xtra2.c */
 private:
 	bool set_timed_clean(int idx, int v);
