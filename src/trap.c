@@ -348,7 +348,7 @@ void hit_trap(coord g)
 				msg_print("A small dart hits you!");
 				dam = NdS(1, 4);
 				take_hit(dam, name);
-				(void)do_dec_stat(A_DEX);
+				do_dec_stat(A_DEX);
 			}
 			else
 			{
@@ -364,7 +364,7 @@ void hit_trap(coord g)
 				msg_print("A small dart hits you!");
 				dam = NdS(1, 4);
 				take_hit(dam, name);
-				(void)do_dec_stat(A_CON);
+				do_dec_stat(A_CON);
 			}
 			else
 			{
@@ -378,7 +378,7 @@ void hit_trap(coord g)
 			msg_print("You are surrounded by a black gas!");
 			if (!p_ptr->resist_blind)
 			{
-				(void)p_ptr->inc_timed<TMD_BLIND>(rand_int(50) + 25);
+				p_ptr->inc_timed<TMD_BLIND>(rand_int(50) + 25);
 			}
 			break;
 		}
@@ -388,7 +388,7 @@ void hit_trap(coord g)
 			msg_print("You are surrounded by a gas of scintillating colors!");
 			if (!p_ptr->resist_confu)
 			{
-				(void)p_ptr->inc_timed<TMD_CONFUSED>(rand_int(20) + 10);
+				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(20) + 10);
 			}
 			break;
 		}
@@ -398,7 +398,7 @@ void hit_trap(coord g)
 			msg_print("You are surrounded by a pungent green gas!");
 			if (!p_ptr->resist_pois && !p_ptr->timed[TMD_OPP_POIS])
 			{
-				(void)p_ptr->inc_timed<TMD_POISONED>(rand_int(20) + 10);
+				p_ptr->inc_timed<TMD_POISONED>(rand_int(20) + 10);
 			}
 			break;
 		}
@@ -408,7 +408,7 @@ void hit_trap(coord g)
 			msg_print("You are surrounded by a strange white mist!");
 			if (!p_ptr->free_act)
 			{
-				(void)p_ptr->inc_timed<TMD_PARALYZED>(rand_int(10) + 5);
+				p_ptr->inc_timed<TMD_PARALYZED>(rand_int(10) + 5);
 			}
 			break;
 		}

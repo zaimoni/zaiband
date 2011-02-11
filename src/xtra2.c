@@ -32,6 +32,139 @@ static const char* const wd_He_is[3] =
 
 
 /*** Timed effects ***/
+/* second set of handlers for core timed effects */
+/*
+ * first conversion target: confusion
+ * need to handler following
+ ** You are confused.
+ ** You are no longer confused.
+ ** It is confused.
+ ** It is no longer confused.
+
+ * when we go multiplayer, this is going to need some adjustment for player message queues.
+ */
+static void SubjectLinkVerbPhrase(const agent_type& subject, const char* const phrase, u16b message_type)
+{
+	assert(subject.lang);
+	char subject_name[80];
+	if (subject.lang->self_desc)
+	{	/* player character; hard-code second person singular */
+		subject.lang->self_desc(subject_name, sizeof(subject_name), subject, 0);
+		message_format(message_type,"%^s are %s", subject_name, phrase);
+	}
+
+	/* monster; hard-code third person singular */	
+	else
+	{
+		subject.lang->desc(subject_name, sizeof(subject_name), subject, 0);
+		message_format(message_type,"%^s is %s", subject_name, phrase);
+	}
+		
+}
+
+typedef struct
+{
+  const char *on_begin_phrase, *on_end_phrase;
+  u32b flag_redraw, flag_update;
+  int msg;
+} core_timed_effect;
+
+static core_timed_effect effects2[] =
+{
+	{"confused.", "no longer confused.", PR_CONFUSED, 0, MSG_CONFUSED}
+};
+
+bool agent_type::set_core_timed_clean(int idx, int v)
+{
+	/* Find the effect */
+	const core_timed_effect& effect = effects2[idx];
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+	
+	/* Open */
+	if (v)
+	{
+		if (!core_timed[idx])
+		{
+			SubjectLinkVerbPhrase(*this, effect.on_begin_phrase, effect.msg);
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (core_timed[idx])
+		{
+			SubjectLinkVerbPhrase(*this, effect.on_end_phrase, MSG_RECOVER);
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	core_timed[idx] = v;
+
+	/* Is there anything to notice? */
+	return notice;
+}
+
+bool player_type::set_core_timed_clean(int idx, int v)
+{
+	if (agent_type::set_core_timed_clean(idx,v))
+	{
+		const core_timed_effect& effect = effects2[idx];
+
+		/* Disturb */
+		if (OPTION(disturb_state)) disturb(0, 0);
+
+		/* Update the visuals, as appropriate. */
+		update |= effect.flag_update;
+		redraw |= effect.flag_redraw;
+
+		/* Handle stuff */
+		handle_stuff();
+
+		/* Result */
+		return true;
+	}
+	
+	/* Result */
+	return false;
+}
+
+bool monster_type::set_core_timed_clean(int idx, int v)
+{
+	if (agent_type::set_core_timed_clean(idx,v))
+	{
+		/* Hack -- Update the health bar */
+		if (p_ptr->health_who == this-mon_list) p_ptr->redraw |= (PR_HEALTH);
+
+		/* Result */
+		return true;
+	}
+	
+	/* Result */
+	return false;
+}
+
+bool player_type::dec_core_timed(int idx, int v)
+{
+	/* Check we have a valid effect */
+	DEBUG_FAIL_OR_LEAVE((0 > idx) || (CORE_TMD_MAX<=idx),return false);
+
+	return set_core_timed_clean(idx, core_timed[idx] - v);
+}
+
+bool monster_type::dec_core_timed(int idx, int v)
+{
+	/* Check we have a valid effect */
+	DEBUG_FAIL_OR_LEAVE((0 > idx) || (CORE_TMD_MAX<=idx),return false);
+
+	return set_core_timed_clean(idx, core_timed[idx] - v);
+}
+
 
 /*
  * This code replace a lot of virtually identical functions and (ostensibly)
@@ -1136,11 +1269,11 @@ bool modify_panel(term *t, int wy, int wx)
 		p_ptr->redraw |= (PR_MAP);
 
 		/* Changed */
-		return (TRUE);
+		return true;
 	}
 
 	/* No change */
-	return (FALSE);
+	return false;
 }
 
 
@@ -1176,7 +1309,7 @@ static void look_mon_desc(char *buf, size_t max, const m_idx_type m_idx)
 	}
 
 	if (m_ptr->csleep) my_strcat(buf, ", asleep", max);
-	if (m_ptr->confused) my_strcat(buf, ", confused", max);
+	if (m_ptr->core_timed[CORE_TMD_CONFUSED]) my_strcat(buf, ", confused", max);
 	if (m_ptr->monfear) my_strcat(buf, ", afraid", max);
 	if (m_ptr->stunned) my_strcat(buf, ", stunned", max);
 }
@@ -2613,13 +2746,13 @@ bool get_aim_dir(int *dp)
 	}
 
 	/* No direction */
-	if (!dir) return (FALSE);
+	if (!dir) return false;
 
 	/* Save the direction */
 	p_ptr->command_dir = dir;
 
 	/* Check for confusion */
-	if (p_ptr->timed[TMD_CONFUSED])
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED])
 	{
 		/* Random direction */
 		dir = ddd[rand_int(KEYPAD_DIR_MAX)];
@@ -2638,7 +2771,7 @@ bool get_aim_dir(int *dp)
 	repeat_push(dir);
 
 	/* A "valid" direction was entered */
-	return (TRUE);
+	return true;
 }
 
 
@@ -2662,9 +2795,8 @@ bool get_rep_dir(int *dp)
 {
 	int dir;
 	char ch;
-	const char* p;
 
-	if (repeat_pull(dp)) return TRUE;
+	if (repeat_pull(dp)) return true;
 
 	/* Initialize */
 	(*dp) = 0;
@@ -2675,11 +2807,8 @@ bool get_rep_dir(int *dp)
 	/* Get a direction */
 	while (!dir)
 	{
-		/* Choose a prompt */
-		p = "Direction (Escape to cancel)? ";
-
 		/* Get a command (or Cancel) */
-		if (!get_com(p, &ch)) break;
+		if (!get_com("Direction (Escape to cancel)? ", &ch)) break;
 
 		/* Convert keypress into a direction */
 		dir = target_dir(ch);
@@ -2689,18 +2818,15 @@ bool get_rep_dir(int *dp)
 	}
 
 	/* Aborted */
-	if (!dir) return (FALSE);
+	if (!dir) return false;
 
-	/* Save desired direction */
-	p_ptr->command_dir = dir;
-
-	/* Save direction */
-	(*dp) = dir;
+	p_ptr->command_dir = dir; /* Save desired direction */
+	(*dp) = dir; /* Save direction */
 
 	repeat_push(dir);
 
 	/* Success */
-	return (TRUE);
+	return true;
 }
 
 
@@ -2711,13 +2837,10 @@ bool get_rep_dir(int *dp)
  */
 bool confuse_dir(int *dp)
 {
-	int dir;
-
-	/* Default */
-	dir = (*dp);
+	int dir = (*dp); /* Default */
 
 	/* Apply "confusion" */
-	if (p_ptr->timed[TMD_CONFUSED])
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED])
 	{
 		/* Apply confusion XXX XXX XXX */
 		if ((dir == 5) || !one_in_(4))
@@ -2730,17 +2853,13 @@ bool confuse_dir(int *dp)
 	/* Notice confusion */
 	if ((*dp) != dir)
 	{
-		/* Warn the user */
-		msg_print("You are confused.");
-
 		/* Save direction */
 		(*dp) = dir;
 
-		/* Confused */
-		return (TRUE);
+		/* Warn the user that he's confused */
+		return msg_print("You are confused."),true;
 	}
 
-	/* Not confused */
-	return (FALSE);
+	return false; /* Not confused */
 }
 

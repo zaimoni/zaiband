@@ -37,44 +37,6 @@ typedef byte byte_wid[DUNGEON_WID];
 typedef s16b s16b_wid[DUNGEON_WID];
 
 
-
-/**** Available Structs ****/
-
-/* these typedefs are unnecessary in C++ */
-#ifndef __cplusplus
-typedef struct _grid _grid;
-typedef struct dice_sides dice_sides;
-typedef struct range_spec range_spec;
-
-typedef struct tvalsval tvalsval;
-typedef struct maxima maxima;
-typedef struct feature_type feature_type;
-typedef struct object_kind object_kind;
-typedef struct artifact_type artifact_type;
-typedef struct ego_item_type ego_item_type;
-typedef struct monster_blow monster_blow;
-typedef struct monster_race monster_race;
-typedef struct monster_lore monster_lore;
-typedef struct vault_type vault_type;
-typedef struct object_type object_type;
-typedef struct monster_type monster_type;
-typedef struct alloc_entry alloc_entry;
-typedef struct quest quest;
-typedef struct owner_type owner_type;
-typedef struct store_type store_type;
-typedef struct magic_type magic_type;
-typedef struct player_magic player_magic;
-typedef struct player_sex player_sex;
-typedef struct player_race player_race;
-typedef struct player_class player_class;
-typedef struct hist_type hist_type;
-typedef struct player_other player_other;
-typedef struct player_type player_type;
-typedef struct start_item start_item;
-typedef struct flavor_type flavor_type;
-#endif
-
-
 /**** Available structs ****/
 
 /* Get the Boost-licensed types */
@@ -582,6 +544,10 @@ struct agent_type
 	s16b mhp;			/**< Max Hit points */
 	byte speed;			/**< "speed" */
 	byte energy;		/**< "energy" */
+	s16b core_timed[CORE_TMD_MAX];	/**< Timed effects */
+
+	/* xtra2.c */
+	bool set_core_timed_clean(int idx, int v);
 	
 	/* xtra3.c */
 	void stars_color(int& stars, byte& attr) const;
@@ -611,7 +577,7 @@ struct monster_type : public agent_type
 	s16b r_idx;			/**< Monster race index */
 	s16b csleep;		/**< Inactive counter */
 	byte stunned;		/**< Monster is stunned */
-	byte confused;		/**< Monster is confused */
+	/* byte confused; */		/**< Monster is confused */
 	byte monfear;		/**< Monster is afraid */
 
 	/* following are not saved */
@@ -631,6 +597,14 @@ struct monster_type : public agent_type
 	/* melee2.c */
 	void wake_up();
 	void disturb(int d);
+
+	/* xtra2.c */
+private:
+	bool set_core_timed_clean(int idx, int v);
+public:
+	bool dec_core_timed(int idx, int v);
+	template<core_timed_effects idx> bool inc_core_timed(int v) {return set_core_timed_clean(idx,core_timed[idx]+v);}
+	template<core_timed_effects idx> bool clear_core_timed() {return set_core_timed_clean(idx,0);}
 };
 
 typedef bool monster_action(monster_type& m);
@@ -1147,13 +1121,17 @@ struct player_type : public agent_type
 	/* xtra2.c */
 private:
 	bool set_timed_clean(int idx, int v);
+	bool set_core_timed_clean(int idx, int v);
 public:
 	bool dec_timed(int idx, int v);
+	bool dec_core_timed(int idx, int v);
 	/* compile-time checking */
 	template<timed_effects idx> bool set_timed(int v) {return set_timed_clean(idx,v);}
 	template<timed_effects idx> bool inc_timed(int v) {return set_timed_clean(idx,timed[idx]+v);}
 	template<timed_effects idx> bool dec_timed(int v) {return set_timed_clean(idx,timed[idx]-v);}
-	template<timed_effects idx> bool clear_timed(void) {return set_timed_clean(idx,0);}
+	template<timed_effects idx> bool clear_timed() {return set_timed_clean(idx,0);}
+	template<core_timed_effects idx> bool inc_core_timed(int v) {return set_core_timed_clean(idx,timed[idx]+v);}
+	template<core_timed_effects idx> bool clear_core_timed() {return set_core_timed_clean(idx,0);}
 
 	/* xtra3.c */
 	bool allow_moron() const;

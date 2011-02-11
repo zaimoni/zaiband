@@ -4074,7 +4074,7 @@ static bool is_moronic_to_eat(const object_type& o)
 	case SV_FOOD_RESTORE_CON: return (PY_FOOD_WEAK<=p_ptr->food && p_ptr->stat_cur[A_CON]==p_ptr->stat_max[A_CON] && !p_ptr->sustain[A_CON]);
 	case SV_FOOD_RESTORE_STR: return (PY_FOOD_WEAK<=p_ptr->food && p_ptr->stat_cur[A_STR]==p_ptr->stat_max[A_STR] && !p_ptr->sustain[A_STR]);
 	case SV_FOOD_CURE_SERIOUS: return (PY_FOOD_WEAK<=p_ptr->food && p_ptr->chp==p_ptr->mhp);
-	case SV_FOOD_CURE_CONFUSION: return (PY_FOOD_WEAK<=p_ptr->food && 0==p_ptr->timed[TMD_CONFUSED] && !p_ptr->resist_confu);
+	case SV_FOOD_CURE_CONFUSION: return (PY_FOOD_WEAK<=p_ptr->food && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && !p_ptr->resist_confu);
 	case SV_FOOD_PARALYSIS: return !p_ptr->free_act;
 	case SV_FOOD_HALLUCINATION: return !p_ptr->resist_chaos;
 	case SV_FOOD_CONFUSION: return !p_ptr->resist_confu;
@@ -4119,10 +4119,10 @@ static bool is_moronic_to_quaff(const object_type& o)
 	case SV_POTION_DEC_CHR: return !p_ptr->sustain[A_CHR];
 	case SV_POTION_BOLDNESS: return 0==p_ptr->timed[TMD_AFRAID];
 	case SV_POTION_CURE_LIGHT: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->timed[TMD_CUT]);
-	case SV_POTION_CURE_SERIOUS: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->timed[TMD_CONFUSED] && 0==p_ptr->timed[TMD_CUT]);
+	case SV_POTION_CURE_SERIOUS: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && 0==p_ptr->timed[TMD_CUT]);
 	case SV_POTION_CURE_CRITICAL:	/* fallthrough intentional */
 	case SV_POTION_HEALING:
-	case SV_POTION_STAR_HEALING: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->timed[TMD_CONFUSED] && 0==p_ptr->timed[TMD_POISONED] && 0==p_ptr->timed[TMD_STUN] && 0==p_ptr->timed[TMD_CUT]);
+	case SV_POTION_STAR_HEALING: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && 0==p_ptr->timed[TMD_POISONED] && 0==p_ptr->timed[TMD_STUN] && 0==p_ptr->timed[TMD_CUT]);
 	case SV_POTION_RESTORE_MANA: return (p_ptr->csp>=p_ptr->msp);
 	case SV_POTION_RESTORE_EXP: return (p_ptr->exp>=p_ptr->max_exp);
 	case SV_POTION_RES_STR: return (p_ptr->stat_cur[A_STR]==p_ptr->stat_max[A_STR]);

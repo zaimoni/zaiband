@@ -110,11 +110,20 @@ static void wr(const tvalsval& id)
  */
 static void wr_agent(const agent_type& src)
 {
+	int i;
+
 	wr(src.loc);
 	wr_s16b(src.chp);
 	wr_s16b(src.mhp);
 	wr_byte(src.speed);
 	wr_byte(src.energy);	
+
+	/* Find the number of core timed effects */
+	wr_byte(CORE_TMD_MAX);
+
+	/* Read all the effects, in a loop */
+	for (i = 0; i < CORE_TMD_MAX; i++)
+		wr_s16b(src.core_timed[i]);
 } 
 
 /*
@@ -122,8 +131,6 @@ static void wr_agent(const agent_type& src)
  */
 static void wr_item(const object_type *o_ptr)
 {
-	wr_s16b(0);	/* old k_idx */
-
 	/* Location */
 	wr(o_ptr->loc);
 
@@ -177,7 +184,6 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_agent(*m_ptr);
 	wr_s16b(m_ptr->csleep);
 	wr_byte(m_ptr->stunned);
-	wr_byte(m_ptr->confused);
 	wr_byte(m_ptr->monfear);
 }
 

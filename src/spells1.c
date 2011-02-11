@@ -2648,21 +2648,7 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 		/* Obvious (irrational caution) */
 		if (seen) obvious = TRUE;
 
-		/* Already partially confused */
-		if (m_ptr->confused)
-		{
-			note = " looks more confused.";
-			tmp = m_ptr->confused + (do_conf / 2);
-		}
-
-		/* Was not confused */
-		else
-		{
-			note = " looks confused.";
-			tmp = do_conf;
-		}
-
-		m_ptr->confused = MIN(tmp, 200);	/* Apply confusion */
+		m_ptr->inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
 	}
 
 
@@ -2935,11 +2921,11 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (blind) msg_print("You are hit by something!");
 			if (!p_ptr->resist_sound)
 			{
-				(void)p_ptr->inc_timed<TMD_STUN>(randint(40));
+				p_ptr->inc_timed<TMD_STUN>(randint(40));
 			}
 			if (!p_ptr->resist_confu)
 			{
-				(void)p_ptr->inc_timed<TMD_CONFUSED>(randint(5) + 5);
+				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(randint(5) + 5);
 			}
 			take_hit(dam, killer);
 			break;
@@ -2955,11 +2941,11 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			if (!p_ptr->resist_confu && !p_ptr->resist_chaos)
 			{
-				(void)p_ptr->inc_timed<TMD_CONFUSED>(rand_int(20) + 10);
+				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(20) + 10);
 			}
 			if (!p_ptr->resist_chaos)
 			{
-				(void)p_ptr->inc_timed<TMD_IMAGE>(randint(10));
+				p_ptr->inc_timed<TMD_IMAGE>(randint(10));
 			}
 			if (!p_ptr->resist_nethr && !p_ptr->resist_chaos)
 			{
@@ -2998,7 +2984,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				(void)p_ptr->inc_timed<TMD_CUT>(dam);
+				p_ptr->inc_timed<TMD_CUT>(dam);
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_SHARD);
@@ -3015,8 +3001,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				int k = (randint((dam > 90) ? 35 : (dam / 3 + 5)));
-				(void)p_ptr->inc_timed<TMD_STUN>(k);
+				p_ptr->inc_timed<TMD_STUN>(randint((dam > 90) ? 35 : (dam / 3 + 5)));
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_SOUND);
@@ -3033,7 +3018,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			if (!p_ptr->resist_confu)
 			{
-				(void)p_ptr->inc_timed<TMD_CONFUSED>(randint(20) + 10);
+				p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(randint(20) + 10);
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_CONFU);
@@ -3050,7 +3035,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				(void)apply_disenchant(0);
+				apply_disenchant(0);
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_DISEN);

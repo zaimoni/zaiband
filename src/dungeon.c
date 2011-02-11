@@ -210,7 +210,7 @@ static void sense_inventory(void)
 	/*** Check for "sensing" ***/
 
 	/* No sensing when confused */
-	if (p_ptr->timed[TMD_CONFUSED]) return;
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED]) return;
 
 	if (p_ptr->cp_ptr->flags & CF_PSEUDO_ID_IMPROV)
 	{
@@ -459,42 +459,6 @@ static bool monster_condition_timeout(monster_type& m)
 	}
 
 
-	/* Handle confusion */
-	if (m.confused)
-	{
-		int d = randint(m.race()->level / 10 + 1);
-
-		/* Still confused */
-		if (m.confused > d)
-		{
-			/* Reduce the confusion */
-			m.confused -= d;
-		}
-
-		/* Recovered */
-		else
-		{
-			/* No longer confused */
-			m.confused = 0;
-
-			/* Message if visible */
-			if (m.ml)
-			{
-				char m_name[80];
-
-				/* Get the monster name */
-				monster_desc(m_name, sizeof(m_name), &m, 0);
-
-				/* Dump a message */
-				msg_format("%^s is no longer confused.", m_name);
-
-				/* Hack -- Update the health bar */
-				if (p_ptr->health_who == &m-mon_list) p_ptr->redraw |= (PR_HEALTH);
-			}
-		}
-	}
-
-
 	/* Handle "fear" */
 	if (m.monfear)
 	{
@@ -532,6 +496,12 @@ static bool monster_condition_timeout(monster_type& m)
 			}
 		}
 	}
+
+	{
+	int i;
+	for(i=0; i<CORE_TMD_MAX; ++i) m.dec_core_timed(i,1);		
+	}
+
 	return false;
 }
 
@@ -1019,6 +989,8 @@ static void process_world(void)
 							};
 		default :	(void)p_ptr->dec_timed(i, 1);
 		};
+
+	for(i=0; i<CORE_TMD_MAX; ++i) p_ptr->dec_core_timed(i,1);
 	}
 
 	/* Paralyzed or Knocked Out: reset energy to 0 */
@@ -2122,7 +2094,7 @@ static void process_player(void)
 			/* Stop resting */
 			if ((p_ptr->chp == p_ptr->mhp) &&
 			    (p_ptr->csp == p_ptr->msp) &&
-			    !p_ptr->timed[TMD_BLIND]  && !p_ptr->timed[TMD_CONFUSED] &&
+			    !p_ptr->timed[TMD_BLIND]  && !p_ptr->core_timed[CORE_TMD_CONFUSED] &&
 			    !p_ptr->timed[TMD_POISONED] && !p_ptr->timed[TMD_AFRAID] &&
 			    !p_ptr->timed[TMD_STUN] && !p_ptr->timed[TMD_CUT] &&
 			    !p_ptr->timed[TMD_SLOW] && !p_ptr->timed[TMD_PARALYZED] &&
@@ -2900,17 +2872,17 @@ void play_game(bool new_game)
 				p_ptr->csp_frac = 0;
 
 				/* Hack -- Healing */
-				(void)p_ptr->clear_timed<TMD_BLIND>(); 
-				(void)p_ptr->clear_timed<TMD_CONFUSED>(); 
-				(void)p_ptr->clear_timed<TMD_POISONED>(); 
-				(void)p_ptr->clear_timed<TMD_AFRAID>(); 
-				(void)p_ptr->clear_timed<TMD_PARALYZED>(); 
-				(void)p_ptr->clear_timed<TMD_IMAGE>(); 
-				(void)p_ptr->clear_timed<TMD_STUN>(); 
-				(void)p_ptr->clear_timed<TMD_CUT>(); 
+				p_ptr->clear_timed<TMD_BLIND>(); 
+				p_ptr->clear_core_timed<CORE_TMD_CONFUSED>(); 
+				p_ptr->clear_timed<TMD_POISONED>(); 
+				p_ptr->clear_timed<TMD_AFRAID>(); 
+				p_ptr->clear_timed<TMD_PARALYZED>(); 
+				p_ptr->clear_timed<TMD_IMAGE>(); 
+				p_ptr->clear_timed<TMD_STUN>(); 
+				p_ptr->clear_timed<TMD_CUT>(); 
 
 				/* Hack -- Prevent starvation */
-				(void)set_food(PY_FOOD_MAX - 1);
+				set_food(PY_FOOD_MAX - 1);
 
 				/* Hack -- cancel recall */
 				if (p_ptr->word_recall)

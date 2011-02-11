@@ -32,7 +32,7 @@ int player_type::disarm_skill() const
 
 	/* Penalize some conditions */
 	if (p_ptr->timed[TMD_BLIND]  || no_lite()) i /= 10;
-	if (p_ptr->timed[TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) i /= 10;
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) i /= 10;
 
 	return i;
 }
@@ -2047,12 +2047,11 @@ void do_cmd_run(void)
 
 
 	/* Hack XXX XXX XXX */
-	if (p_ptr->timed[TMD_CONFUSED])
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED])
 	{
 		msg_print("You are too confused!");
 		return;
 	}
-
 
 	/* Get a direction (or abort) */
 	if (!get_rep_dir(&dir)) return;
@@ -2061,13 +2060,8 @@ void do_cmd_run(void)
 	y = p_ptr->loc.y + ddy[dir];
 	x = p_ptr->loc.x + ddx[dir];
 
-
-	/* Verify legality */
-	if (!do_cmd_walk_test(y, x)) return;
-
-
-	/* Start run */
-	run_step(dir);
+	if (!do_cmd_walk_test(y, x)) return; /* Verify legality */
+	run_step(dir); /* Start run */
 }
 
 

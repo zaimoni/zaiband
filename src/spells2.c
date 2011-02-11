@@ -405,7 +405,7 @@ void self_knowledge(void)
 
 
 	if (p_ptr->timed[TMD_BLIND]) info[i++] = "You cannot see.";
-	if (p_ptr->timed[TMD_CONFUSED]) info[i++] = "You are confused.";
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED]) info[i++] = "You are confused.";
 	if (p_ptr->timed[TMD_AFRAID]) info[i++] = "You are terrified.";
 	if (p_ptr->timed[TMD_CUT]) info[i++] = "You are bleeding.";
 	if (p_ptr->timed[TMD_STUN]) info[i++] = "You are stunned.";

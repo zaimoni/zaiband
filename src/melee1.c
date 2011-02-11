@@ -743,7 +743,7 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 			/* Increase "confused" */
 			if (!p_ptr->resist_confu)
 			{
-				if (p_ptr->inc_timed<TMD_CONFUSED>(3 + randint(rlev)))
+				if (p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(3 + randint(rlev)))
 				{
 					obvious = TRUE;
 				}

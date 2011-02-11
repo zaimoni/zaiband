@@ -240,11 +240,33 @@ static void strip_bytes(int n)
  */
 static void rd_agent(agent_type& src)
 {
+	int i;
+	byte num;
+
 	rd(src.loc);
 	rd_s16b(&src.chp);
 	rd_s16b(&src.mhp);
 	rd_byte(&src.speed);
 	rd_byte(&src.energy);	
+
+	/* Find the number of timed effects */
+	rd_byte(&num);
+
+	if (num<=CORE_TMD_MAX)
+		{	/* Read all the effects, in a loop */
+		for (i = 0; i < num; i++)
+			rd_s16b(&src.core_timed[i]);
+		/* zero-initialize any entries not read */
+		if (num<CORE_TMD_MAX) C_WIPE(src.core_timed+num,CORE_TMD_MAX-num);
+		}
+	else{	/* probably in trouble anyway */
+		for (i = 0; i < CORE_TMD_MAX; i++)
+			rd_s16b(&src.core_timed[i]);
+		/* discard unused entries */
+		strip_bytes(2*(num-CORE_TMD_MAX));
+		note("Discarded unsupported timed effects");
+		}
+
 }
  
 /*
@@ -260,10 +282,6 @@ static errr rd_item(object_type *o_ptr)
 
 	u32b f[OBJECT_FLAG_STRICT_UB];
 	char buf[128];
-	s16b tmp_s16b;
-
-	/* skip 2 bytes */
-	rd_s16b(&tmp_s16b);
 
 	/* Location */
 	rd(o_ptr->loc);
@@ -278,8 +296,6 @@ static errr rd_item(object_type *o_ptr)
 
 	/* Special pval */
 	rd_s16b(&o_ptr->pval);
-
-
 	rd_byte(&o_ptr->pseudo);
 
 	if (o_ptr->pseudo && INSCRIP_NULL > o_ptr->pseudo)
@@ -482,7 +498,6 @@ static void rd_monster(monster_type *m_ptr)
 	m_ptr->lang = &monster_lang;
 	rd_s16b(&m_ptr->csleep);
 	rd_byte(&m_ptr->stunned);
-	rd_byte(&m_ptr->confused);
 	rd_byte(&m_ptr->monfear);
 }
 
@@ -750,7 +765,7 @@ static errr rd_player_spells(void)
 #define MDESC_POSS		0x02	/* Possessive (or Reflexive) */
 #define MDESC_IND1		0x04	/* Indefinites for hidden monsters */
 
-static void player_desc(char *desc, size_t max, const agent_type& agent, int mode)
+static void player_desc(char *desc, size_t max, const agent_type&, int mode)
 {	// second-person pronoun, always visible
 	// ignore the indefinite request
 	switch(mode & 0x03)

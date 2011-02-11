@@ -60,14 +60,13 @@
  */
 
 /** standard chance of using an item or device */
-int
-player_type::item_chance(int lev) const
+int player_type::item_chance(int lev) const
 {
 	/* Base chance of success */
 	int chance = p_ptr->skills[SKILL_DEVICE];
 
 	/* Confusion hurts skill */
-	if (p_ptr->timed[TMD_CONFUSED]) chance /= 2;
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED]) chance /= 2;
 
 	/* High level objects are harder */
 	chance -= MIN(50,lev);

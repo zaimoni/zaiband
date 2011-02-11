@@ -1741,7 +1741,7 @@ static void mspell_MIND_BLAST(int m_idx_ok)
 		monster_desc(ddesc, sizeof(ddesc), mon_list + m_idx_ok, MDESC_SHOW | MDESC_IND2);
 
 		msg_print("Your mind is blasted by psionic energy.");
-		if (!p_ptr->resist_confu) p_ptr->inc_timed<TMD_CONFUSED>(rand_int(4) + 4);
+		if (!p_ptr->resist_confu) p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(4) + 4);
 		take_hit(NdS(8, 8), ddesc);
 	}
 }
@@ -1761,7 +1761,7 @@ static void mspell_BRAIN_SMASH(int m_idx_ok)
 		msg_print("Your mind is blasted by psionic energy.");
 		take_hit(NdS(12, 15), ddesc);
 		if (!p_ptr->resist_blind) p_ptr->inc_timed<TMD_BLIND>(8 + rand_int(8));
-		if (!p_ptr->resist_confu) p_ptr->inc_timed<TMD_CONFUSED>(rand_int(4) + 4);
+		if (!p_ptr->resist_confu) p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(4) + 4);
 		if (!p_ptr->free_act) p_ptr->inc_timed<TMD_PARALYZED>(rand_int(4) + 4);
 		p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
 	}
@@ -1894,7 +1894,7 @@ static void mspell_SCARE(int m_idx_ok)
 	}
 	else
 	{
-		(void)p_ptr->inc_timed<TMD_AFRAID>(rand_int(4) + 4);
+		p_ptr->inc_timed<TMD_AFRAID>(rand_int(4) + 4);
 	}
 	update_smart_learn(m_idx_ok, DRS_RES_FEAR);
 }
@@ -1911,7 +1911,7 @@ static void mspell_BLIND(int m_idx_ok)
 	}
 	else
 	{
-		(void)p_ptr->set_timed<TMD_BLIND>(12 + rand_int(4));
+		p_ptr->set_timed<TMD_BLIND>(12 + rand_int(4));
 	}
 	update_smart_learn(m_idx_ok, DRS_RES_BLIND);
 }
@@ -1928,7 +1928,7 @@ static void mspell_CONF(int m_idx_ok)
 	}
 	else
 	{
-		(void)p_ptr->inc_timed<TMD_CONFUSED>(rand_int(4) + 4);
+		p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(4) + 4);
 	}
 	update_smart_learn(m_idx_ok, DRS_RES_CONFU);
 }
@@ -1945,7 +1945,7 @@ static void mspell_SLOW(int m_idx_ok)
 	}
 	else
 	{
-		(void)p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
+		p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
 	}
 	update_smart_learn(m_idx_ok, DRS_FREE);
 }
@@ -1962,7 +1962,7 @@ static void mspell_HOLD(int m_idx_ok)
 	}
 	else
 	{
-		(void)p_ptr->inc_timed<TMD_PARALYZED>(rand_int(4) + 4);
+		p_ptr->inc_timed<TMD_PARALYZED>(rand_int(4) + 4);
 	}
 	update_smart_learn(m_idx_ok, DRS_FREE);
 }
@@ -2637,29 +2637,29 @@ static bool make_attack_spell(const m_idx_type m_idx)
 	const bool seen = (!blind && m_ptr->ml);	/* Extract the "see-able-ness" */
 
 	/* Cannot cast spells when confused */
-	if (m_ptr->confused) return (FALSE);
+	if (m_ptr->core_timed[CORE_TMD_CONFUSED]) return false;
 
 	/* Cannot cast spells when nice */
-	if (m_ptr->mflag & (MFLAG_NICE)) return (FALSE);
+	if (m_ptr->mflag & (MFLAG_NICE)) return false;
 
 	{
 	/* Hack -- Extract the spell probability */
 	const int chance = (r_ptr->freq_innate + r_ptr->freq_spell) / 2;
 
 	/* Not allowed to cast spells */
-	if (!chance) return (FALSE);
+	if (!chance) return false;
 
 
 	/* Only do spells occasionally */
-	if (rand_int(100) >= chance) return (FALSE);
+	if (rand_int(100) >= chance) return false;
 	}
 
 	/* Hack -- require projectable player */
 	/* Check range */
-	if (m_ptr->cdis > MAX_RANGE) return (FALSE);
+	if (m_ptr->cdis > MAX_RANGE) return false;
 
 	/* Check path */
-	if (!projectable(m_ptr->loc, p_ptr->loc)) return (FALSE);
+	if (!projectable(m_ptr->loc, p_ptr->loc)) return false;
 
 
 	/* Extract the monster level */
@@ -2808,7 +2808,7 @@ static bool make_attack_spell(const m_idx_type m_idx)
 		if ((0 >= failrate) || (rand_int(100) < failrate))
 		{
 			msg_format("%^s tries to cast a spell, but fails.", m_name);
-			return (TRUE);
+			return true;
 		}
 	}
 
@@ -2817,7 +2817,7 @@ static bool make_attack_spell(const m_idx_type m_idx)
 	if (magic_attack_list[thrown_spell-SPELL_ORIGIN].sound_idx) sound(magic_attack_list[thrown_spell-SPELL_ORIGIN].sound_idx);
 	if (blind)
 	{
-		if (NULL!=magic_attack_list[thrown_spell-SPELL_ORIGIN].blind_msg)
+		if (magic_attack_list[thrown_spell-SPELL_ORIGIN].blind_msg)
 		{
 			if (strstr(magic_attack_list[thrown_spell-SPELL_ORIGIN].blind_msg, "%^s "))
 			{
@@ -2831,7 +2831,7 @@ static bool make_attack_spell(const m_idx_type m_idx)
 	}
 	else if (!seen)
 	{
-		if (NULL!=magic_attack_list[thrown_spell-SPELL_ORIGIN].unseen_msg)
+		if (magic_attack_list[thrown_spell-SPELL_ORIGIN].unseen_msg)
 		{
 			if (strstr(magic_attack_list[thrown_spell-SPELL_ORIGIN].unseen_msg, "%^s "))
 			{
@@ -2845,7 +2845,7 @@ static bool make_attack_spell(const m_idx_type m_idx)
 	}
 	else
 	{
-		if (NULL!=magic_attack_list[thrown_spell-SPELL_ORIGIN].seen_msg)
+		if (magic_attack_list[thrown_spell-SPELL_ORIGIN].seen_msg)
 		{
 			if (strstr(magic_attack_list[thrown_spell-SPELL_ORIGIN].seen_msg, "%^s "))
 			{
@@ -2883,7 +2883,7 @@ static bool make_attack_spell(const m_idx_type m_idx)
 
 
 	/* A spell was cast */
-	return (TRUE);
+	return true;
 }
 
 #if 0
@@ -4112,9 +4112,9 @@ static bool eat_food_floor_helper(object_type *o_ptr, monster_type *m_ptr)
 		{	/* cure fear */
 		m_ptr->monfear = 1;		/* XXX -- don't want to clone code */
 		}
-	else if (o_ptr->obj_id.sval == SV_FOOD_CURE_CONFUSION && m_ptr->confused)
+	else if (o_ptr->obj_id.sval == SV_FOOD_CURE_CONFUSION && m_ptr->core_timed[CORE_TMD_CONFUSED])
 		{	/* cure confusion */
-		m_ptr->confused = 1;	/* XXX -- don't want to clone code */
+		m_ptr->clear_core_timed<CORE_TMD_CONFUSED>();
 		}
 	return TRUE;
 }
@@ -4380,7 +4380,7 @@ static void process_monster(const m_idx_type m_idx)
 
 
 	/* Confused: Stagger */
-	if (m_ptr->confused)
+	if (m_ptr->core_timed[CORE_TMD_CONFUSED])
 	{
 		/* Stagger */
 		stagger = TRUE;

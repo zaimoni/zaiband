@@ -178,8 +178,7 @@ static void obj_set_squelch(object_type *o_ptr, int item)
 
 static bool obj_can_browse(const object_type *o_ptr)
 {
-	if (o_ptr->obj_id.tval != p_ptr->spell_book()) return FALSE;
-	return TRUE;
+	return p_ptr->spell_book() == o_ptr->obj_id.tval; 
 }
 
 
@@ -187,39 +186,35 @@ static bool obj_cast_pre(void)
 {
    	if (!p_ptr->spell_book())
 	{
-		msg_print("You cannot pray or produce magics.");
-		return FALSE;
+		return msg_print("You cannot pray or produce magics."),false;
 	}
 
 	if (p_ptr->timed[TMD_BLIND] || no_lite())
 	{
-		msg_print("You cannot see!");
-		return FALSE;
+		return msg_print("You cannot see!"),false;
 	}
 
-	if (p_ptr->timed[TMD_CONFUSED])
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED])
 	{
-		msg_print("You are too confused!");
-		return FALSE;
+		return msg_print("You are too confused!"),false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /* A prerequisite to studying */
 static bool obj_study_pre(void)
 {
-	if (!obj_cast_pre())
-		return FALSE;
+	if (!obj_cast_pre()) return false;
 
 	if (!p_ptr->new_spells)
 	{
 		const char* const p = ((p_ptr->spell_book() == TV_MAGIC_BOOK) ? "spell" : "prayer");
 		msg_format("You cannot learn any new %ss!", p);
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -276,52 +271,41 @@ static bool obj_read_pre(void)
 {
 	if (p_ptr->timed[TMD_BLIND])
 	{
-		msg_print("You can't see anything.");
-		return FALSE;
+		return msg_print("You can't see anything."),false;
 	}
 
 	if (no_lite())
 	{
-		msg_print("You have no light to read by.");
-		return FALSE;
+		return msg_print("You have no light to read by."),false;
 	}
 
-	if (p_ptr->timed[TMD_CONFUSED])
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED])
 	{
-		msg_print("You are too confused to read!");
-		return FALSE;
+		return msg_print("You are too confused to read!"),false;
 	}
 
-#if 0
-	if (p_ptr->timed[TMD_AMNESIA])
-	{
-		msg_print("You can't remember how to read!");
-		return FALSE;
-	}
-#endif
-
-	return TRUE;
+	return true;
 }
 
 /* Determine if an object is zappable */
 static bool obj_can_zap(const object_type *o_ptr)
 {
 	const object_kind *k_ptr = &object_type::k_info[o_ptr->k_idx];
-	if (o_ptr->obj_id.tval != TV_ROD) return FALSE;
+	if (o_ptr->obj_id.tval != TV_ROD) return false;
 
 	/* All still charging? */
 //	if (o_ptr->number <= (o_ptr->timeout + (k_ptr->time_base - 1)) / k_ptr->time_base) return FALSE;
-	if (o_ptr->timeout > (o_ptr->pval - k_ptr->pval)) return FALSE;
+	if (o_ptr->timeout > (o_ptr->pval - k_ptr->pval)) return false;
 
 	/* Otherwise OK */
-	return TRUE;
+	return true;
 }
 
 /* Determine if an object is activatable */
 static bool obj_can_activate(const object_type *o_ptr)
 {
-	if (!p_ptr->known(*o_ptr)) return FALSE;	/* Not known */
-	if (o_ptr->timeout) return FALSE;	/* Check the recharge */
+	if (!p_ptr->known(*o_ptr)) return false;	/* Not known */
+	if (o_ptr->timeout) return false;	/* Check the recharge */
 	return obj_has_activation(o_ptr);
 }
 

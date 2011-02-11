@@ -589,7 +589,7 @@ static void prt_health(int row, int col)
 		if (m_ptr->monfear) attr = TERM_VIOLET;
 
 		/* Confused */
-		if (m_ptr->confused) attr = TERM_UMBER;
+		if (m_ptr->core_timed[CORE_TMD_CONFUSED]) attr = TERM_UMBER;
 
 		/* Stunned */
 		if (m_ptr->stunned) attr = TERM_L_BLUE;
@@ -966,7 +966,6 @@ static const struct state_info effects[] =
 {
 	{ TMD_BLIND,     S("Blind"),      TERM_ORANGE },
 	{ TMD_PARALYZED, S("Paralyzed!"), TERM_RED },
-	{ TMD_CONFUSED,  S("Confused"),   TERM_ORANGE },
 	{ TMD_AFRAID,    S("Afraid"),     TERM_ORANGE },
 	{ TMD_IMAGE,     S("Halluc"),     TERM_ORANGE },
 	{ TMD_POISONED,  S("Poisoned"),   TERM_ORANGE },
@@ -985,6 +984,12 @@ static const struct state_info effects[] =
 	{ TMD_OPP_COLD,  S("RCold"),      TERM_WHITE },
 	{ TMD_OPP_POIS,  S("RPois"),      TERM_GREEN },
 //	{ TMD_AMNESIA,   S("Amnesiac"),   TERM_ORANGE },
+};
+
+/* For the various CORE_TMD_* effects */
+static const struct state_info effects2[] =
+{
+	{ CORE_TMD_CONFUSED,  S("Confused"),   TERM_ORANGE }
 };
 
 #define PRINT_STATE(sym, data, index, row, col) \
@@ -1184,6 +1189,15 @@ static size_t prt_study(int row, int col)
 static size_t prt_tmd(int row, int col)
 {
 	size_t i, len = 0;
+
+	for (i = 0; i < N_ELEMENTS(effects2); i++)
+	{
+		if (p_ptr->timed[effects2[i].value])
+		{
+			c_put_str(effects2[i].attr, effects2[i].str, row, col + len);
+			len += effects2[i].len;
+		}
+	}
 
 	for (i = 0; i < N_ELEMENTS(effects); i++)
 	{

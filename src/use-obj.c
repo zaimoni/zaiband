@@ -115,7 +115,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 		{
 			if (!p_ptr->resist_confu)
 			{
-				if (p_ptr->inc_timed<TMD_CONFUSED>(rand_int(10) + 10))
+				if (p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(10) + 10))
 				{
 					*ident = TRUE;
 				}
@@ -215,7 +215,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 
 		case SV_FOOD_CURE_CONFUSION:
 		{
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			break;
 		}
 
@@ -342,7 +342,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			if (!p_ptr->resist_confu)
 			{
-				if (p_ptr->inc_timed<TMD_CONFUSED>(rand_int(20) + 15))
+				if (p_ptr->inc_core_timed<CORE_TMD_CONFUSED>(rand_int(20) + 15))
 				{
 					*ident = TRUE;
 				}
@@ -524,7 +524,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			if (hp_player(NdS(4, 8))) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->set_timed<TMD_CUT>((p_ptr->timed[TMD_CUT] / 2) - 50)) *ident = TRUE;
 			break;
 		}
@@ -533,7 +533,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			if (hp_player(NdS(6, 8))) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
@@ -544,7 +544,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			if (hp_player(300)) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
@@ -555,7 +555,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			if (hp_player(1200)) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
@@ -566,18 +566,18 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			msg_print("You feel life flow through your body!");
 			restore_level();
-			(void)p_ptr->clear_timed<TMD_POISONED>();
-			(void)p_ptr->clear_timed<TMD_BLIND>();
-			(void)p_ptr->clear_timed<TMD_CONFUSED>();
-			(void)p_ptr->clear_timed<TMD_IMAGE>();
-			(void)p_ptr->clear_timed<TMD_STUN>();
-			(void)p_ptr->clear_timed<TMD_CUT>();
-			(void)do_res_stat(A_STR);
-			(void)do_res_stat(A_CON);
-			(void)do_res_stat(A_DEX);
-			(void)do_res_stat(A_WIS);
-			(void)do_res_stat(A_INT);
-			(void)do_res_stat(A_CHR);
+			p_ptr->clear_timed<TMD_POISONED>();
+			p_ptr->clear_timed<TMD_BLIND>();
+			p_ptr->clear_core_timed<CORE_TMD_CONFUSED>();
+			p_ptr->clear_timed<TMD_IMAGE>();
+			p_ptr->clear_timed<TMD_STUN>();
+			p_ptr->clear_timed<TMD_CUT>();
+			do_res_stat(A_STR);
+			do_res_stat(A_CON);
+			do_res_stat(A_DEX);
+			do_res_stat(A_WIS);
+			do_res_stat(A_INT);
+			do_res_stat(A_CHR);
 
 			/* Recalculate max. hitpoints */
 			update_stuff();
@@ -1209,7 +1209,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 		{
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
@@ -1595,7 +1595,7 @@ static bool zap_rod(object_type *o_ptr, bool *ident, int dir)
 		{
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_CONFUSED>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;

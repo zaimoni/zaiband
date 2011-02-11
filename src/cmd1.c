@@ -30,14 +30,12 @@
 void search(void)
 {
 	int chance = p_ptr->skills[SKILL_SEARCH];	/* Start with base search ability */
-
 	object_type *o_ptr;
-
 	coord t;
 
 	/* Penalize various conditions */
 	if (p_ptr->timed[TMD_BLIND] || no_lite()) chance /= 10;
-	if (p_ptr->timed[TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) chance /= 10;
+	if (p_ptr->core_timed[CORE_TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) chance /= 10;
 
 	/* Search the nearby grids, which are always in bounds */
 	for (t.y = (p_ptr->loc.y - 1); t.y <= (p_ptr->loc.y + 1); t.y++)

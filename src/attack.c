@@ -551,8 +551,7 @@ void py_attack(coord g)
 				}
 				else
 				{
-					msg_format("%^s appears confused.", m_name);
-					m_ptr->confused += 10 + rand_int(p_ptr->lev) / 5;
+					m_ptr->inc_core_timed<CORE_TMD_CONFUSED>(10 + rand_int(p_ptr->lev) / 5);
 				}
 			}
 		}

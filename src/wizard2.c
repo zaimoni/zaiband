@@ -1064,18 +1064,18 @@ static void wiz_create_artifact(int a_idx)
 static void do_cmd_wiz_cure_all(void)
 {
 	/* Remove curses */
-	(void)remove_all_curse();
+	remove_all_curse();
 
 	/* Restore stats */
-	(void)res_stat(A_STR);
-	(void)res_stat(A_INT);
-	(void)res_stat(A_WIS);
-	(void)res_stat(A_CON);
-	(void)res_stat(A_DEX);
-	(void)res_stat(A_CHR);
+	res_stat(A_STR);
+	res_stat(A_INT);
+	res_stat(A_WIS);
+	res_stat(A_CON);
+	res_stat(A_DEX);
+	res_stat(A_CHR);
 
 	/* Restore the level */
-	(void)restore_level();
+	restore_level();
 
 	/* Heal the player */
 	p_ptr->chp = p_ptr->mhp;
@@ -1086,18 +1086,18 @@ static void do_cmd_wiz_cure_all(void)
 	p_ptr->csp_frac = 0;
 
 	/* Cure stuff */
-	(void)p_ptr->clear_timed<TMD_BLIND>();
-	(void)p_ptr->clear_timed<TMD_CONFUSED>();
-	(void)p_ptr->clear_timed<TMD_POISONED>();
-	(void)p_ptr->clear_timed<TMD_AFRAID>();
-	(void)p_ptr->clear_timed<TMD_PARALYZED>();
-	(void)p_ptr->clear_timed<TMD_IMAGE>();
-	(void)p_ptr->clear_timed<TMD_STUN>();
-	(void)p_ptr->clear_timed<TMD_CUT>();
-	(void)p_ptr->clear_timed<TMD_SLOW>();
+	p_ptr->clear_timed<TMD_BLIND>();
+	p_ptr->clear_core_timed<CORE_TMD_CONFUSED>();
+	p_ptr->clear_timed<TMD_POISONED>();
+	p_ptr->clear_timed<TMD_AFRAID>();
+	p_ptr->clear_timed<TMD_PARALYZED>();
+	p_ptr->clear_timed<TMD_IMAGE>();
+	p_ptr->clear_timed<TMD_STUN>();
+	p_ptr->clear_timed<TMD_CUT>();
+	p_ptr->clear_timed<TMD_SLOW>();
 
 	/* No longer hungry */
-	(void)set_food(PY_FOOD_MAX - 1);
+	set_food(PY_FOOD_MAX - 1);
 
 	/* Redraw everything */
 	do_cmd_redraw();
@@ -1113,7 +1113,6 @@ static void do_cmd_wiz_jump(void)
 	if (p_ptr->command_arg <= 0)
 	{
 		char ppp[80];
-
 		char tmp_val[160];
 
 		/* Prompt */
