@@ -1837,9 +1837,9 @@ static bool project_o(int who, int r, coord g, int dam, int typ)
 	return (obvious);
 }
 
-bool monster_type::take_confusion(int do_conf)
+bool monster_type::take_confusion(int base, int zero_to_N_sub_1)
 {
-	if (0>=do_conf) return false;
+	if (0>=base && 0>=zero_to_N_sub_1) return false;
 
 	const monster_race* const r_ptr = race();
 
@@ -1850,14 +1850,14 @@ bool monster_type::take_confusion(int do_conf)
 		return false;
 		}
 	if (r_ptr->spell_flags[0] & (RSF0_BR_CONF | RSF0_BR_CHAO)) return false;
-	return inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
+	return inc_core_timed<CORE_TMD_CONFUSED>(base+rand_int(zero_to_N_sub_1));
 }
 
-bool player_type::take_confusion(int do_conf)
+bool player_type::take_confusion(int base, int zero_to_N_sub_1)
 {
-	if (0>=do_conf) return false;
+	if (0>=base && 0>=zero_to_N_sub_1) return false;
 	if (p_ptr->resist_confu) return false; 
-	return inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
+	return inc_core_timed<CORE_TMD_CONFUSED>(base+rand_int(zero_to_N_sub_1));
 	/* XXX should update non-cheat learning for all monsters that can see the player XXX */
 }
 
@@ -2664,7 +2664,7 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 	}
 
 	/* Confusion and Chaos breathers (and sleepers) never confuse */
-	else if (m_ptr->take_confusion(do_conf))
+	else if (m_ptr->take_confusion(do_conf, 0))
 	{
 		/* Obvious (irrational caution) */
 		if (seen) obvious = TRUE;
@@ -2942,7 +2942,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				p_ptr->inc_timed<TMD_STUN>(randint(40));
 			}
-			p_ptr->take_confusion(randint(5) + 5);
+			p_ptr->take_confusion(6, 5);
 			take_hit(dam, killer);
 			break;
 		}
@@ -2957,7 +2957,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			if (!p_ptr->resist_chaos)
 			{
-				p_ptr->take_confusion(rand_int(20) + 10);
+				p_ptr->take_confusion(10, 20);
 				p_ptr->inc_timed<TMD_IMAGE>(randint(10));
 			}
 			if (!p_ptr->resist_nethr && !p_ptr->resist_chaos)
@@ -3029,7 +3029,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			{
 				dam *= 5; dam /= (randint(6) + 6);
 			}
-			p_ptr->take_confusion(randint(20) + 10);
+			p_ptr->take_confusion(11, 20);
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_CONFU);
 			break;

@@ -599,7 +599,7 @@ struct monster_type : public agent_type
 	void disturb(int d);
 
 	/* spells1.c */
-	bool take_confusion(int do_conf);
+	bool take_confusion(int base, int zero_to_N_sub_1);
 	
 	/* xtra2.c */
 private:
@@ -1122,7 +1122,7 @@ struct player_type : public agent_type
 #endif
 
 	/* spells1.c */
-	bool take_confusion(int do_conf);
+	bool take_confusion(int base, int zero_to_N_sub_1);
 
 	/* xtra2.c */
 private:

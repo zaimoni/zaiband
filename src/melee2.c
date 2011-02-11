@@ -1741,7 +1741,7 @@ static void mspell_MIND_BLAST(int m_idx_ok)
 		monster_desc(ddesc, sizeof(ddesc), mon_list + m_idx_ok, MDESC_SHOW | MDESC_IND2);
 
 		msg_print("Your mind is blasted by psionic energy.");
-		p_ptr->take_confusion(rand_int(4) + 4);
+		p_ptr->take_confusion(4, 4);
 		take_hit(NdS(8, 8), ddesc);
 	}
 }
@@ -1761,7 +1761,7 @@ static void mspell_BRAIN_SMASH(int m_idx_ok)
 		msg_print("Your mind is blasted by psionic energy.");
 		take_hit(NdS(12, 15), ddesc);
 		if (!p_ptr->resist_blind) p_ptr->inc_timed<TMD_BLIND>(8 + rand_int(8));
-		p_ptr->take_confusion(rand_int(4) + 4);
+		p_ptr->take_confusion(4, 4);
 		if (!p_ptr->free_act) p_ptr->inc_timed<TMD_PARALYZED>(rand_int(4) + 4);
 		p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
 	}
@@ -1918,7 +1918,7 @@ static void mspell_BLIND(int m_idx_ok)
 
 static void mspell_CONF(int m_idx_ok)
 {
-	if (p_ptr->std_save() || !p_ptr->take_confusion(rand_int(4) + 4))
+	if (p_ptr->std_save() || !p_ptr->take_confusion(4, 4))
 	{
 		msg_print("You disbelieve the feeble spell.");
 	}

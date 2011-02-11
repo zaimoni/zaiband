@@ -386,7 +386,7 @@ void hit_trap(coord g)
 		case GAS_CONFUSE:
 		{
 			msg_print("You are surrounded by a gas of scintillating colors!");
-			p_ptr->take_confusion(rand_int(20) + 10);
+			p_ptr->take_confusion(10, 20);
 			break;
 		}
 

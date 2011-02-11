@@ -525,7 +525,7 @@ void py_attack(coord g)
 				msg_print("Your hands stop glowing.");
 
 				/* Confuse the monster */
-				if (!m_ptr->take_confusion(10 + rand_int(p_ptr->lev) / 5))
+				if (!m_ptr->take_confusion(10, p_ptr->lev/5))
 				{
 					msg_format("%^s is unaffected.", m_name);
 				}

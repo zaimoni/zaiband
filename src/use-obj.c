@@ -113,10 +113,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 
 		case SV_FOOD_CONFUSION:
 		{
-			if (p_ptr->take_confusion(rand_int(10) + 10))
-			{
-				*ident = TRUE;
-			}
+			if (p_ptr->take_confusion(10, 10)) *ident = TRUE;
 			break;
 		}
 
@@ -337,10 +334,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 
 		case SV_POTION_CONFUSION:
 		{
-			if (p_ptr->take_confusion(rand_int(20) + 15))
-			{
-				*ident = TRUE;
-			}
+			if (p_ptr->take_confusion(15, 20)) *ident = TRUE;
 			break;
 		}
 

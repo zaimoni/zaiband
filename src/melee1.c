@@ -701,7 +701,7 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 		case RBE_COLD:
 		{
 			/* Obvious */
-			obvious = TRUE;
+			obvious = true;
 
 			/* Message */
 			msg_print("You are covered with frost!");
@@ -725,7 +725,7 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 			{
 				if (p_ptr->inc_timed<TMD_BLIND>(10 + randint(rlev)))
 				{
-					obvious = TRUE;
+					obvious = true;
 				}
 			}
 
@@ -741,9 +741,9 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 			take_hit(damage, ddesc);
 
 			/* Increase "confused" */
-			if (p_ptr->take_confusion(3 + randint(rlev)))
+			if (p_ptr->take_confusion(4, rlev))
 			{
-				obvious = TRUE;
+				obvious = true;
 			}
 
 			/* Learn about the player */
@@ -761,18 +761,18 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 			if (p_ptr->resist_fear)
 			{
 				msg_print("You stand your ground!");
-				obvious = TRUE;
+				obvious = true;
 			}
 			else if (p_ptr->std_save())
 			{
 				msg_print("You stand your ground!");
-				obvious = TRUE;
+				obvious = true;
 			}
 			else
 			{
 				if (p_ptr->inc_timed<TMD_AFRAID>(3 + randint(rlev)))
 				{
-					obvious = TRUE;
+					obvious = true;
 				}
 			}
 
