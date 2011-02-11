@@ -442,11 +442,8 @@ int tot_dam_aux(const object_type *o_ptr, int tdam, const monster_type *m_ptr)
 void py_attack(coord g)
 {
 	int num = 0, k, bonus, chance;
-
 	const object_type* const o_ptr = &p_ptr->inventory[INVEN_WIELD]; /* Get the weapon */
-
 	char m_name[80];
-
 	bool fear = FALSE;
 	bool do_quake = FALSE;
 
@@ -454,27 +451,18 @@ void py_attack(coord g)
 	/* Get the monster */
 	monster_type* const m_ptr = m_ptr_from_m_idx(cave_m_idx[g.y][g.x]);
 	monster_race* const r_ptr = m_ptr->race();
-	monster_lore* const l_ptr = m_ptr->lore();
 
-
-	/* Disturb the player */
-	disturb(0, 0);
-
-
-	/* Disturb the monster */
-	m_ptr->csleep = 0;
-
+	disturb(0, 0); /* Disturb the player */
+	m_ptr->csleep = 0; /* Disturb the monster */
 
 	/* Extract monster name (or "it") */
 	monster_desc(m_name, sizeof(m_name), m_ptr, 0);
-
 
 	if (m_ptr->ml)	/* if visible */
 		{
 		monster_race_track(m_ptr->r_idx);	/* Auto-Recall if possible */
 		health_track(cave_m_idx[g.y][g.x]);	/* Track a new monster */
 		}
-
 
 	/* Handle player fear */
 	if (p_ptr->timed[TMD_AFRAID])
@@ -486,11 +474,9 @@ void py_attack(coord g)
 		return;
 	}
 
-
 	/* Calculate the "attack quality" */
 	bonus = p_ptr->to_h + o_ptr->to_h;
 	chance = (p_ptr->skills[SKILL_TO_HIT_MELEE] + (bonus * BTH_PLUS_ADJ));
-
 
 	/* Attack once for each legal blow */
 	while (num++ < p_ptr->num_blow)
@@ -539,19 +525,9 @@ void py_attack(coord g)
 				msg_print("Your hands stop glowing.");
 
 				/* Confuse the monster */
-				if (r_ptr->flags[2] & RF2_NO_CONF)
-				{
-					if (m_ptr->ml) l_ptr->flags[2] |= RF2_NO_CONF;
-
-					msg_format("%^s is unaffected.", m_name);
-				}
-				else if (rand_int(100) < r_ptr->level)
+				if (!m_ptr->take_confusion(10 + rand_int(p_ptr->lev) / 5))
 				{
 					msg_format("%^s is unaffected.", m_name);
-				}
-				else
-				{
-					m_ptr->inc_core_timed<CORE_TMD_CONFUSED>(10 + rand_int(p_ptr->lev) / 5);
 				}
 			}
 		}

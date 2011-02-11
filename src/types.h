@@ -598,6 +598,9 @@ struct monster_type : public agent_type
 	void wake_up();
 	void disturb(int d);
 
+	/* spells1.c */
+	bool take_confusion(int do_conf);
+	
 	/* xtra2.c */
 private:
 	bool set_core_timed_clean(int idx, int v);

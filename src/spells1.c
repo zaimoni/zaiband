@@ -1837,6 +1837,21 @@ static bool project_o(int who, int r, coord g, int dam, int typ)
 	return (obvious);
 }
 
+bool monster_type::take_confusion(int do_conf)
+{
+	if (0>=do_conf) return false;
+
+	const monster_race* const r_ptr = race();
+
+	/* Confusion and Chaos breathers (and sleepers) never confuse */
+	if (r_ptr->flags[2] & RF2_NO_CONF)
+		{
+		if (ml) lore()->flags[2] |= RF2_NO_CONF;
+		return false;
+		}
+	if (r_ptr->spell_flags[0] & (RSF0_BR_CONF | RSF0_BR_CHAO)) return false;
+	return inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
+}
 
 
 /*
@@ -2641,14 +2656,10 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 	}
 
 	/* Confusion and Chaos breathers (and sleepers) never confuse */
-	else if (do_conf &&
-	         !(r_ptr->flags[2] & RF2_NO_CONF) &&
-	         !(r_ptr->spell_flags[0] & (RSF0_BR_CONF | RSF0_BR_CHAO)))
+	else if (m_ptr->take_confusion(do_conf))
 	{
 		/* Obvious (irrational caution) */
 		if (seen) obvious = TRUE;
-
-		m_ptr->inc_core_timed<CORE_TMD_CONFUSED>(do_conf);
 	}
 
 

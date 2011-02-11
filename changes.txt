@@ -12,7 +12,7 @@ Changes Zaiband 3.0.10
 - tiles are broken again (pretty sure objects won't work).  Leaving on for those energetic enough to debug them.
 - Temporary poison resistance fixed.
 - monster breeders fixed.
-- The following status effects have been rationalized to work the same for both player and monsters
+- The following status effects have been rationalized towards working the same for both player and monsters
 ** Confusion
 
 Changes Zaiband 3.0.9
