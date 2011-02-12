@@ -577,8 +577,7 @@ struct monster_type : public agent_type
 	s16b r_idx;			/**< Monster race index */
 	s16b csleep;		/**< Inactive counter */
 	byte stunned;		/**< Monster is stunned */
-	/* byte confused; */		/**< Monster is confused */
-	byte monfear;		/**< Monster is afraid */
+	/* byte monfear; */		/**< Monster is afraid */
 
 	/* following are not saved */
 	byte cdis;			/**< Current dis from player */

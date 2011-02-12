@@ -14,6 +14,7 @@ Changes Zaiband 3.0.10
 - monster breeders fixed.
 - The following status effects have been rationalized towards working the same for both player and monsters
 ** Confusion
+** Fear
 
 Changes Zaiband 3.0.9
 - The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:

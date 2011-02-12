@@ -1078,19 +1078,19 @@ static bool cast_mage_spell(int spell)
 
 		case SPELL_MASS_BANISHMENT:
 		{
-			(void)mass_banishment();
+			mass_banishment();
 			break;
 		}
 
 		case SPELL_RESIST_FIRE:
 		{
-			(void)p_ptr->inc_timed<TMD_OPP_FIRE>(randint(20) + 20);
+			p_ptr->inc_timed<TMD_OPP_FIRE>(randint(20) + 20);
 			break;
 		}
 
 		case SPELL_RESIST_COLD:
 		{
-			(void)p_ptr->inc_timed<TMD_OPP_COLD>(randint(20) + 20);
+			p_ptr->inc_timed<TMD_OPP_COLD>(randint(20) + 20);
 			break;
 		}
 
@@ -1101,40 +1101,40 @@ static bool cast_mage_spell(int spell)
 
 		case SPELL_RESIST_POISON:
 		{
-			(void)p_ptr->inc_timed<TMD_OPP_POIS>(randint(20) + 20);
+			p_ptr->inc_timed<TMD_OPP_POIS>(randint(20) + 20);
 			break;
 		}
 
 		case SPELL_RESISTANCE:
 		{
 			int time = randint(20) + 20;
-			(void)p_ptr->inc_timed<TMD_OPP_ACID>(time);
-			(void)p_ptr->inc_timed<TMD_OPP_ELEC>(time);
-			(void)p_ptr->inc_timed<TMD_OPP_FIRE>(time);
-			(void)p_ptr->inc_timed<TMD_OPP_COLD>(time);
-			(void)p_ptr->inc_timed<TMD_OPP_POIS>(time);
+			p_ptr->inc_timed<TMD_OPP_ACID>(time);
+			p_ptr->inc_timed<TMD_OPP_ELEC>(time);
+			p_ptr->inc_timed<TMD_OPP_FIRE>(time);
+			p_ptr->inc_timed<TMD_OPP_COLD>(time);
+			p_ptr->inc_timed<TMD_OPP_POIS>(time);
 			break;
 		}
 
 		case SPELL_HEROISM:
 		{
-			(void)hp_player(10);
-			(void)p_ptr->inc_timed<TMD_HERO>(randint(25) + 25);
-			(void)p_ptr->clear_timed<TMD_AFRAID>();
+			hp_player(10);
+			p_ptr->inc_timed<TMD_HERO>(randint(25) + 25);
+			p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 			break;
 		}
 
 		case SPELL_SHIELD:
 		{
-			(void)p_ptr->inc_timed<TMD_SHIELD>(randint(20) + 30);
+			p_ptr->inc_timed<TMD_SHIELD>(randint(20) + 30);
 			break;
 		}
 
 		case SPELL_BERSERKER:
 		{
-			(void)hp_player(30);
-			(void)p_ptr->inc_timed<TMD_SHERO>(randint(25) + 25);
-			(void)p_ptr->clear_timed<TMD_AFRAID>();
+			hp_player(30);
+			p_ptr->inc_timed<TMD_SHERO>(randint(25) + 25);
+			p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 			break;
 		}
 
@@ -1142,11 +1142,11 @@ static bool cast_mage_spell(int spell)
 		{
 			if (!p_ptr->timed[TMD_FAST])
 			{
-				(void)p_ptr->set_timed<TMD_FAST>(randint(20) + plev);
+				p_ptr->set_timed<TMD_FAST>(randint(20) + plev);
 			}
 			else
 			{
-				(void)p_ptr->inc_timed<TMD_FAST>(randint(5));
+				p_ptr->inc_timed<TMD_FAST>(randint(5));
 			}
 			break;
 		}
@@ -1174,7 +1174,7 @@ static bool cast_mage_spell(int spell)
 
 		case SPELL_RUNE_OF_PROTECTION: /* rune of protection */
 		{
-			(void)warding_glyph();
+			warding_glyph();
 			break;
 		}
 
@@ -1191,65 +1191,64 @@ static bool cast_mage_spell(int spell)
 	}
 
 	/* Success */
-	return (TRUE);
+	return true;
 }
 
 
 static bool cast_priest_spell(int spell)
 {
 	int dir;
-
 	int plev = p_ptr->lev;
 
 	switch (spell)
 	{
 		case PRAYER_DETECT_EVIL:
 		{
-			(void)detect_monsters_evil();
+			detect_monsters_evil();
 			break;
 		}
 
 		case PRAYER_CURE_LIGHT_WOUNDS:
 		{
-			(void)hp_player(NdS(2, 10));
-			(void)p_ptr->dec_timed<TMD_CUT>(10);
+			hp_player(NdS(2, 10));
+			p_ptr->dec_timed<TMD_CUT>(10);
 			break;
 		}
 
 		case PRAYER_BLESS:
 		{
-			(void)p_ptr->inc_timed<TMD_BLESSED>(randint(12) + 12);
+			p_ptr->inc_timed<TMD_BLESSED>(randint(12) + 12);
 			break;
 		}
 
 		case PRAYER_REMOVE_FEAR:
 		{
-			(void)p_ptr->clear_timed<TMD_AFRAID>();
+			p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 			break;
 		}
 
 		case PRAYER_CALL_LIGHT:
 		{
-			(void)lite_area(NdS(2, (plev / 2)), (plev / 10) + 1);
+			lite_area(NdS(2, (plev / 2)), (plev / 10) + 1);
 			break;
 		}
 
 		case PRAYER_FIND_TRAPS:
 		{
-			(void)detect_traps();
+			detect_traps();
 			break;
 		}
 
 		case PRAYER_DETECT_DOORS_STAIRS:
 		{
-			(void)detect_doors();
-			(void)detect_stairs();
+			detect_doors();
+			detect_stairs();
 			break;
 		}
 
 		case PRAYER_SLOW_POISON:
 		{
-			(void)p_ptr->set_timed<TMD_POISONED>(p_ptr->timed[TMD_POISONED] / 2);
+			p_ptr->set_timed<TMD_POISONED>(p_ptr->timed[TMD_POISONED] / 2);
 			break;
 		}
 
@@ -1361,33 +1360,33 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_TURN_UNDEAD:
 		{
-			(void)turn_undead();
+			turn_undead();
 			break;
 		}
 
 		case PRAYER_PRAYER:
 		{
-			(void)p_ptr->inc_timed<TMD_BLESSED>(randint(48) + 48);
+			p_ptr->inc_timed<TMD_BLESSED>(randint(48) + 48);
 			break;
 		}
 
 		case PRAYER_DISPEL_UNDEAD:
 		{
-			(void)dispel_undead(randint(plev * 3));
+			dispel_undead(randint(plev * 3));
 			break;
 		}
 
 		case PRAYER_HEAL:
 		{
-			(void)hp_player(300);
-			(void)p_ptr->clear_timed<TMD_STUN>();
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			hp_player(300);
+			p_ptr->clear_timed<TMD_STUN>();
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 
 		case PRAYER_DISPEL_EVIL:
 		{
-			(void)dispel_evil(randint(plev * 3));
+			dispel_evil(randint(plev * 3));
 			break;
 		}
 
@@ -1399,24 +1398,24 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_HOLY_WORD:
 		{
-			(void)dispel_evil(randint(plev * 4));
-			(void)hp_player(1000);
-			(void)p_ptr->clear_timed<TMD_AFRAID>();
-			(void)p_ptr->clear_timed<TMD_POISONED>();
-			(void)p_ptr->clear_timed<TMD_STUN>();
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			dispel_evil(randint(plev * 4));
+			hp_player(1000);
+			p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
+			p_ptr->clear_timed<TMD_POISONED>();
+			p_ptr->clear_timed<TMD_STUN>();
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 
 		case PRAYER_DETECT_MONSTERS:
 		{
-			(void)detect_monsters_normal();
+			detect_monsters_normal();
 			break;
 		}
 
 		case PRAYER_DETECTION:
 		{
-			(void)detect_all();
+			detect_all();
 			break;
 		}
 
@@ -1427,7 +1426,7 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_PROBING:
 		{
-			(void)probing();
+			probing();
 			break;
 		}
 
@@ -1439,8 +1438,8 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_CURE_SERIOUS_WOUNDS2:
 		{
-			(void)hp_player(NdS(4, 10));
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			hp_player(NdS(4, 10));
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 

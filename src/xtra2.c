@@ -71,8 +71,17 @@ typedef struct
 
 static core_timed_effect effects2[] =
 {
-	{"confused.", "no longer confused.", PR_CONFUSED, 0, MSG_CONFUSED}
+	{"confused.", "no longer confused.", PR_CONFUSED, 0, MSG_CONFUSED},
+	{"terrified!", "bolder now.", PR_AFRAID, 0, MSG_AFRAID }
 };
+
+/*
+ * this would be nice for afraid
+ * "%^s recovers %s courage."
+ * with MDESC_PRO2 | MDESC_POSS for the second %s
+ */
+
+ZAIBAND_STATIC_ASSERT(N_ELEMENTS(effects2)==CORE_TMD_MAX);
 
 bool agent_type::set_core_timed_clean(int idx, int v)
 {
@@ -196,8 +205,6 @@ static timed_effect effects[] =
 	{ "You are blind.", "You can see again.", (PR_MAP | PR_BLIND),
 	  (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS), MSG_BLIND },
 	{ "You are paralyzed!", "You can move again.", PR_STATE, 0, MSG_PARALYZED },
-	{ "You are confused!", "You feel less confused now.", PR_CONFUSED, 0, MSG_CONFUSED },
-	{ "You are terrified!", "You feel bolder now.", PR_AFRAID, 0, MSG_AFRAID },
 	{ "You feel drugged!", "You can see clearly again.", PR_MAP, 0, MSG_DRUGGED },
 	{ "You are poisoned!", "You are no longer poisoned.", PR_POISONED, 0, MSG_POISONED },
 	{ "", "", 0, 0, 0 },  /* TMD_CUT -- handled seperately */
@@ -212,6 +219,8 @@ static timed_effect effects[] =
 	{ "Your eyes begin to tingle!", "Your eyes stop tingling.", 0, (PU_BONUS | PU_MONSTERS), MSG_INFRARED },
 	{ "You feel resistant to poison!", "You feel less resistant to poison", PR_OPPOSE_ELEMENTS, 0, MSG_RES_POIS },
 };
+
+ZAIBAND_STATIC_ASSERT(N_ELEMENTS(effects)==TMD_MAX-4);
 
 /*
  * Set a timed event (except timed resists, cutting and stunning).
@@ -1176,55 +1185,15 @@ bool mon_take_hit(const m_idx_type m_idx, int dam, bool *fear, const char* note)
 		}
 
 		delete_monster_idx(m_idx);	/* Delete the monster */
-		(*fear) = FALSE;			/* Not afraid */
+		(*fear) = false;			/* Not afraid */
 		lite_spot(dead_mon_loc);	/* XXX screen update XXX */
-		return (TRUE);				/* Monster is dead */
+		return true;				/* Monster is dead */
 	}
 
-
-	/* Mega-Hack -- Pain cancels fear */
-	if (m_ptr->monfear && (dam > 0))
-	{
-		int tmp = randint(dam);
-
-		/* Cure a little fear */
-		if (tmp < m_ptr->monfear)
-		{
-			m_ptr->monfear -= tmp;	/* Reduce fear */
-		}
-
-		/* Cure all the fear */
-		else
-		{
-			m_ptr->monfear = 0;		/* Cure fear */
-			(*fear) = FALSE;		/* No more fear */
-		}
-	}
-
-	/* Sometimes a monster gets scared by damage */
-	if (!m_ptr->monfear && !(r_ptr->flags[2] & RF2_NO_FEAR) && (dam > 0))
-	{	/* Percentage of fully healthy */
-		const int percentage = (100L * m_ptr->chp) / m_ptr->mhp;
-
-		/*
-		 * Run (sometimes) if at 10% or less of max hit points,
-		 * or (usually) when hit for half its current hit points
-		 */
-		if ((randint(10) >= percentage) ||
-		    ((dam >= m_ptr->chp) && (rand_int(100) < 80)))
-		{
-			(*fear) = TRUE;	/* Hack -- note fear */
-
-			/* Hack -- Add some timed fear */
-			m_ptr->monfear = (randint(10) +
-			                  (((dam >= m_ptr->chp) && (percentage > 7)) ?
-			                   20 : ((11 - percentage) * 5)));
-		}
-	}
-
+	/* XXX AI should be handling getting scared by damage XXX */
 
 	/* Not dead yet */
-	return (FALSE);
+	return false;
 }
 
 
@@ -1310,7 +1279,7 @@ static void look_mon_desc(char *buf, size_t max, const m_idx_type m_idx)
 
 	if (m_ptr->csleep) my_strcat(buf, ", asleep", max);
 	if (m_ptr->core_timed[CORE_TMD_CONFUSED]) my_strcat(buf, ", confused", max);
-	if (m_ptr->monfear) my_strcat(buf, ", afraid", max);
+	if (m_ptr->core_timed[CORE_TMD_AFRAID]) my_strcat(buf, ", afraid", max);
 	if (m_ptr->stunned) my_strcat(buf, ", stunned", max);
 }
 

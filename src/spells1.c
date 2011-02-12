@@ -2672,13 +2672,9 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 
 
 	/* Fear */
-	if (do_fear)
-	{
-		tmp = m_ptr->monfear + do_fear;	/* Increase fear */
-		m_ptr->monfear = MIN(tmp, 200);	/* Set fear */
-	}
+	m_ptr->inc_core_timed<CORE_TMD_AFRAID>(do_fear);
 
-
+	
 	/* If another monster did the damage, hurt the monster by hand */
 	if (who > 0)
 	{

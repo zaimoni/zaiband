@@ -1089,7 +1089,7 @@ static void do_cmd_wiz_cure_all(void)
 	p_ptr->clear_timed<TMD_BLIND>();
 	p_ptr->clear_core_timed<CORE_TMD_CONFUSED>();
 	p_ptr->clear_timed<TMD_POISONED>();
-	p_ptr->clear_timed<TMD_AFRAID>();
+	p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 	p_ptr->clear_timed<TMD_PARALYZED>();
 	p_ptr->clear_timed<TMD_IMAGE>();
 	p_ptr->clear_timed<TMD_STUN>();

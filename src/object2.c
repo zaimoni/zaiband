@@ -4117,7 +4117,7 @@ static bool is_moronic_to_quaff(const object_type& o)
 	case SV_POTION_DEC_DEX: return !p_ptr->sustain[A_DEX];
 	case SV_POTION_DEC_CON: return !p_ptr->sustain[A_CON];
 	case SV_POTION_DEC_CHR: return !p_ptr->sustain[A_CHR];
-	case SV_POTION_BOLDNESS: return 0==p_ptr->timed[TMD_AFRAID];
+	case SV_POTION_BOLDNESS: return 0==p_ptr->core_timed[CORE_TMD_AFRAID];
 	case SV_POTION_CURE_LIGHT: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->timed[TMD_CUT]);
 	case SV_POTION_CURE_SERIOUS: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && 0==p_ptr->timed[TMD_CUT]);
 	case SV_POTION_CURE_CRITICAL:	/* fallthrough intentional */

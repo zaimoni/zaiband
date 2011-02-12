@@ -1343,7 +1343,7 @@ static int choose_attack_spell(const m_idx_type m_idx, u32b *f_attack)
 		/*** Try to pick an appropriate spell type ***/
 
 		/* Hurt badly or afraid, attempt to flee */
-		if (has_escape && ((m_ptr->chp < m_ptr->mhp / 4) || m_ptr->monfear))
+		if (has_escape && ((m_ptr->chp < m_ptr->mhp / 4) || m_ptr->core_timed[CORE_TMD_AFRAID]))
 		{
 			/* Choose escape spell */
 			f_mask[0] = RSF0_ESCAPE_MASK;
@@ -1894,7 +1894,7 @@ static void mspell_SCARE(int m_idx_ok)
 	}
 	else
 	{
-		p_ptr->inc_timed<TMD_AFRAID>(rand_int(4) + 4);
+		p_ptr->inc_core_timed<CORE_TMD_AFRAID>(rand_int(4) + 4);
 	}
 	update_smart_learn(m_idx_ok, DRS_RES_FEAR);
 }
@@ -2015,16 +2015,7 @@ static void mspell_HEAL(int m_idx_ok)
 	if (p_ptr->health_who == m_idx_ok) p_ptr->redraw |= (PR_HEALTH);
 
 	/* Cancel fear */
-	if (m.monfear)
-	{
-		char m_poss[80];	
-
-		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(m_poss, sizeof(m_poss), &m, MDESC_PRO2 | MDESC_POSS);
-
-		m.monfear = 0;
-		msg_format("%^s recovers %s courage.", m_name, m_poss);
-	}
+	m.clear_core_timed<CORE_TMD_AFRAID>();
 }
 
 static void mspell_BLINK(int m_idx_ok)
@@ -3099,10 +3090,10 @@ static bool mon_will_run(const m_idx_type m_idx)
 	monster_race* const r_ptr = m_ptr->race();
 
 	/* Keep monsters from running too far away */
-	if (m_ptr->cdis > MAX_SIGHT + 5) return (FALSE);
+	if (m_ptr->cdis > MAX_SIGHT + 5) return false;
 
 	/* All "afraid" monsters will run away */
-	if (m_ptr->monfear) return (TRUE);
+	if (m_ptr->core_timed[CORE_TMD_AFRAID]) return true;
 
 	/* KBB: do not run if the player can't attack you anyway */
 	/* assumes player gets 1 move; not so good against fast players */
@@ -3110,7 +3101,7 @@ static bool mon_will_run(const m_idx_type m_idx)
 	int mon_moves;
 	int player_moves;
 	m_ptr->move_ratio(player_moves, mon_moves, *p_ptr, 0, 1);	/* pessimize */
-	if (square_momentarily_safe_from_player(m_ptr->loc,p_ptr->loc,player_moves)) return FALSE;
+	if (square_momentarily_safe_from_player(m_ptr->loc,p_ptr->loc,player_moves)) return false;
 	}
 
 #if 0
@@ -3133,7 +3124,7 @@ static bool mon_will_run(const m_idx_type m_idx)
 	{	/* KBB: check for melee instakill chance; do not run if we have it */
 		int m_min, m_median, m_max;
 		m_ptr->melee_analyze(m_min,m_median,m_max,p_ptr->loc);
-		if (m_max > p_ptr->apparent_health()) return FALSE;
+		if (m_max > p_ptr->apparent_health()) return false;
 	}
 
 	/* KBB: do not run if the player is swamped */
@@ -4079,8 +4070,8 @@ static bool eat_food_floor_ok(const object_type *o_ptr)
 {
 	if (   o_ptr->obj_id.tval == TV_FOOD
 		&& o_ptr->obj_id.sval >= SV_FOOD_CURE_POISON)
-		return (TRUE);
-	return (FALSE);
+		return true;
+	return false;
 }
 
 /* XXX would like template function here XXX */
@@ -4094,35 +4085,34 @@ static bool eat_lite_ok(const object_type *o_ptr)
 	if (   o_ptr->obj_id.tval == TV_LITE
 		&& 0<o_ptr->pval
 		&& !o_ptr->is_artifact())
-		return (TRUE);
-	return (FALSE);
+		return true;
+	return false;
 }
 
 static bool eat_food_floor_helper(object_type *o_ptr, monster_type *m_ptr)
 {
-	if 		(o_ptr->obj_id.sval == SV_FOOD_CURE_PARANOIA && m_ptr->monfear)
+	if 		(o_ptr->obj_id.sval == SV_FOOD_CURE_PARANOIA)
 		{	/* cure fear */
-		m_ptr->monfear = 1;		/* XXX -- don't want to clone code */
+		m_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 		}
-	else if (o_ptr->obj_id.sval == SV_FOOD_CURE_CONFUSION && m_ptr->core_timed[CORE_TMD_CONFUSED])
+	else if (o_ptr->obj_id.sval == SV_FOOD_CURE_CONFUSION)
 		{	/* cure confusion */
 		m_ptr->clear_core_timed<CORE_TMD_CONFUSED>();
 		}
-	return TRUE;
+	return true;
 }
 
 static bool take_item_helper(object_type *o_ptr, monster_type *m_ptr)
 {
 	object_type tmp = *o_ptr;
 	monster_carry(m_ptr - mon_list, &tmp);			/* Carry the object */
-	return TRUE;
+	return true;
 }
 
-static bool eat_lite_helper(object_type *o_ptr, monster_type *m_ptr)
+static bool eat_lite_helper(object_type *o_ptr, monster_type*)
 {
-	(void)(m_ptr);		/* unused parameter */
 	o_ptr->pval = 0;	/* no light left! */
-	return FALSE;
+	return false;
 }
 
 static bool dont_destroy_this(object_type *o_ptr, monster_type *m_ptr)
@@ -4866,25 +4856,9 @@ NOTE: Vulnerable items must be moved away in initial generation.
 	/* Learn things from observable monster */
 	if (m_ptr->ml) l_ptr->flags[1] |= learn_RF1;
 
-	/* Hack -- get "bold" if out of options */
-	if (!do_turn && !do_move && m_ptr->monfear)
-	{
-		m_ptr->monfear = 0;	/* No longer afraid */
-
-		/* Message if seen */
-		if (m_ptr->ml)
-		{
-			char m_name[80];
-
-			/* Get the monster name */
-			monster_desc(m_name, sizeof(m_name), m_ptr, 0);
-
-			/* Dump a message */
-			msg_format("%^s turns to fight!", m_name);
-		}
-
-		/* XXX XXX XXX Actually do something now (?) */
-	}
+	/* XXX get "bold" if out of options */
+	/* if we have appropriate inventory, use it (sort of need inventory first) */
+	/* otherwise consider a safe route to an appropriate item */
 }
 
 
@@ -4902,11 +4876,11 @@ static bool monster_can_flow(const monster_type* const m_ptr)
 		    (cave_cost[fy][fx] < MONSTER_FLOW_DEPTH) &&
 		    (cave_cost[fy][fx] < m_ptr->race()->aaf))
 		{
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 

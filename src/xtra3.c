@@ -586,7 +586,7 @@ static void prt_health(int row, int col)
 		m_ptr->stars_color(len, attr);
 
 		/* Afraid */
-		if (m_ptr->monfear) attr = TERM_VIOLET;
+		if (m_ptr->core_timed[CORE_TMD_AFRAID]) attr = TERM_VIOLET;
 
 		/* Confused */
 		if (m_ptr->core_timed[CORE_TMD_CONFUSED]) attr = TERM_UMBER;
@@ -966,7 +966,6 @@ static const struct state_info effects[] =
 {
 	{ TMD_BLIND,     S("Blind"),      TERM_ORANGE },
 	{ TMD_PARALYZED, S("Paralyzed!"), TERM_RED },
-	{ TMD_AFRAID,    S("Afraid"),     TERM_ORANGE },
 	{ TMD_IMAGE,     S("Halluc"),     TERM_ORANGE },
 	{ TMD_POISONED,  S("Poisoned"),   TERM_ORANGE },
 	{ TMD_PROTEVIL,  S("ProtEvil"),   TERM_L_GREEN },
@@ -982,14 +981,15 @@ static const struct state_info effects[] =
 	{ TMD_OPP_ELEC,  S("RElec"),      TERM_BLUE },
 	{ TMD_OPP_FIRE,  S("RFire"),      TERM_RED },
 	{ TMD_OPP_COLD,  S("RCold"),      TERM_WHITE },
-	{ TMD_OPP_POIS,  S("RPois"),      TERM_GREEN },
+	{ TMD_OPP_POIS,  S("RPois"),      TERM_GREEN }
 //	{ TMD_AMNESIA,   S("Amnesiac"),   TERM_ORANGE },
 };
 
 /* For the various CORE_TMD_* effects */
 static const struct state_info effects2[] =
 {
-	{ CORE_TMD_CONFUSED,  S("Confused"),   TERM_ORANGE }
+	{ CORE_TMD_CONFUSED,  S("Confused"),   TERM_ORANGE },
+	{ CORE_TMD_AFRAID,    S("Afraid"),     TERM_ORANGE }
 };
 
 #define PRINT_STATE(sym, data, index, row, col) \

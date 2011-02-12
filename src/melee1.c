@@ -770,7 +770,7 @@ static void apply_exact_damage(byte effect,int damage,byte rlev,const m_idx_type
 			}
 			else
 			{
-				if (p_ptr->inc_timed<TMD_AFRAID>(3 + randint(rlev)))
+				if (p_ptr->inc_core_timed<CORE_TMD_AFRAID>(3 + randint(rlev)))
 				{
 					obvious = true;
 				}

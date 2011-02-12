@@ -459,44 +459,6 @@ static bool monster_condition_timeout(monster_type& m)
 	}
 
 
-	/* Handle "fear" */
-	if (m.monfear)
-	{
-		/* Amount of "boldness" */
-		int d = randint(m.race()->level / 10 + 1);
-
-		/* Still afraid */
-		if (m.monfear > d)
-		{
-			/* Reduce the fear */
-			m.monfear -= d;
-		}
-
-		/* Recover from fear, take note if seen */
-		else
-		{
-			/* No longer afraid */
-			m.monfear = 0;
-
-			/* Visual note */
-			if (m.ml)
-			{
-				char m_name[80];
-				char m_poss[80];
-
-				/* Get the monster name/poss */
-				monster_desc(m_name, sizeof(m_name), &m, 0);
-				monster_desc(m_poss, sizeof(m_poss), &m, MDESC_PRO2 | MDESC_POSS);
-
-				/* Dump a message */
-				msg_format("%^s recovers %s courage.", m_name, m_poss);
-
-				/* Hack -- Update the health bar */
-				if (p_ptr->health_who == &m-mon_list) p_ptr->redraw |= (PR_HEALTH);
-			}
-		}
-	}
-
 	{
 	int i;
 	for(i=0; i<CORE_TMD_MAX; ++i) m.dec_core_timed(i,1);		
@@ -2095,7 +2057,7 @@ static void process_player(void)
 			if ((p_ptr->chp == p_ptr->mhp) &&
 			    (p_ptr->csp == p_ptr->msp) &&
 			    !p_ptr->timed[TMD_BLIND]  && !p_ptr->core_timed[CORE_TMD_CONFUSED] &&
-			    !p_ptr->timed[TMD_POISONED] && !p_ptr->timed[TMD_AFRAID] &&
+			    !p_ptr->timed[TMD_POISONED] && !p_ptr->core_timed[CORE_TMD_AFRAID] &&
 			    !p_ptr->timed[TMD_STUN] && !p_ptr->timed[TMD_CUT] &&
 			    !p_ptr->timed[TMD_SLOW] && !p_ptr->timed[TMD_PARALYZED] &&
 			    !p_ptr->timed[TMD_IMAGE] && !p_ptr->word_recall)
@@ -2875,7 +2837,7 @@ void play_game(bool new_game)
 				p_ptr->clear_timed<TMD_BLIND>(); 
 				p_ptr->clear_core_timed<CORE_TMD_CONFUSED>(); 
 				p_ptr->clear_timed<TMD_POISONED>(); 
-				p_ptr->clear_timed<TMD_AFRAID>(); 
+				p_ptr->clear_core_timed<CORE_TMD_AFRAID>(); 
 				p_ptr->clear_timed<TMD_PARALYZED>(); 
 				p_ptr->clear_timed<TMD_IMAGE>(); 
 				p_ptr->clear_timed<TMD_STUN>(); 

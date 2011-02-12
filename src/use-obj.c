@@ -103,7 +103,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 		{
 			if (!p_ptr->resist_fear)
 			{
-				if (p_ptr->inc_timed<TMD_AFRAID>(rand_int(10) + 10))
+				if (p_ptr->inc_core_timed<CORE_TMD_AFRAID>(rand_int(10) + 10))
 				{
 					*ident = TRUE;
 				}
@@ -160,7 +160,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 		case SV_FOOD_STUPIDITY:
 		{
 			take_hit(NdS(8, 8), "poisonous food");
-			(void)do_dec_stat(A_INT);
+			do_dec_stat(A_INT);
 			*ident = TRUE;
 			break;
 		}
@@ -168,7 +168,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 		case SV_FOOD_NAIVETY:
 		{
 			take_hit(NdS(8, 8), "poisonous food");
-			(void)do_dec_stat(A_WIS);
+			do_dec_stat(A_WIS);
 			*ident = TRUE;
 			break;
 		}
@@ -176,7 +176,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 		case SV_FOOD_UNHEALTH:
 		{
 			take_hit(NdS(10, 10), "poisonous food");
-			(void)do_dec_stat(A_CON);
+			do_dec_stat(A_CON);
 			*ident = TRUE;
 			break;
 		}
@@ -184,7 +184,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 		case SV_FOOD_DISEASE:
 		{
 			take_hit(NdS(10, 10), "poisonous food");
-			(void)do_dec_stat(A_STR);
+			do_dec_stat(A_STR);
 			*ident = TRUE;
 			break;
 		}
@@ -203,7 +203,7 @@ static bool eat_food(object_type *o_ptr, bool *ident)
 
 		case SV_FOOD_CURE_PARANOIA:
 		{
-			if (p_ptr->clear_timed<TMD_AFRAID>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_AFRAID>()) *ident = TRUE;
 			break;
 		}
 
@@ -415,8 +415,8 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			msg_print("Massive explosions rupture your body!");
 			take_hit(NdS(50, 20), "a potion of Detonation");
-			(void)p_ptr->inc_timed<TMD_STUN>(75);
-			(void)p_ptr->inc_timed<TMD_CUT>(5000);
+			p_ptr->inc_timed<TMD_STUN>(75);
+			p_ptr->inc_timed<TMD_CUT>(5000);
 			*ident = TRUE;
 			break;
 		}
@@ -455,7 +455,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 
 		case SV_POTION_BOLDNESS:
 		{
-			if (p_ptr->clear_timed<TMD_AFRAID>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_AFRAID>()) *ident = TRUE;
 			break;
 		}
 
@@ -487,7 +487,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		case SV_POTION_HEROISM:
 		{
 			if (hp_player(10)) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_AFRAID>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_AFRAID>()) *ident = TRUE;
 			if (p_ptr->inc_timed<TMD_HERO>(randint(25) + 25)) *ident = TRUE;
 			break;
 		}
@@ -495,7 +495,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		case SV_POTION_BERSERK_STRENGTH:
 		{
 			if (hp_player(30)) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_AFRAID>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_AFRAID>()) *ident = TRUE;
 			if (p_ptr->inc_timed<TMD_SHERO>(randint(25) + 25)) *ident = TRUE;
 			break;
 		}
@@ -1245,7 +1245,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 			}
 			else
 			{
-				(void)p_ptr->inc_timed<TMD_FAST>(5);
+				p_ptr->inc_timed<TMD_FAST>(5);
 			}
 			break;
 		}
@@ -1275,7 +1275,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 			k = 3 * p_ptr->lev;
 			if (p_ptr->inc_timed<TMD_PROTEVIL>(randint(25) + k)) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_AFRAID>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_AFRAID>()) *ident = TRUE;
 			if (hp_player(50)) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
@@ -1849,15 +1849,15 @@ static bool activate_object(object_type *o_ptr, int dir)
 			case ACT_RAGE_BLESS_RESIST:
 			{
 				msg_format("Your %s glows many colours...", o_name);
-				(void)hp_player(30);
-				(void)p_ptr->clear_timed<TMD_AFRAID>();
-				(void)p_ptr->inc_timed<TMD_SHERO>(randint(50) + 50);
-				(void)p_ptr->inc_timed<TMD_BLESSED>(randint(50) + 50);
-				(void)p_ptr->inc_timed<TMD_OPP_ACID>(randint(50) + 50);
-				(void)p_ptr->inc_timed<TMD_OPP_ELEC>(randint(50) + 50);
-				(void)p_ptr->inc_timed<TMD_OPP_FIRE>(randint(50) + 50);
-				(void)p_ptr->inc_timed<TMD_OPP_COLD>(randint(50) + 50);
-				(void)p_ptr->inc_timed<TMD_OPP_POIS>(randint(50) + 50);
+				hp_player(30);
+				p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
+				p_ptr->inc_timed<TMD_SHERO>(randint(50) + 50);
+				p_ptr->inc_timed<TMD_BLESSED>(randint(50) + 50);
+				p_ptr->inc_timed<TMD_OPP_ACID>(randint(50) + 50);
+				p_ptr->inc_timed<TMD_OPP_ELEC>(randint(50) + 50);
+				p_ptr->inc_timed<TMD_OPP_FIRE>(randint(50) + 50);
+				p_ptr->inc_timed<TMD_OPP_COLD>(randint(50) + 50);
+				p_ptr->inc_timed<TMD_OPP_POIS>(randint(50) + 50);
 				break;
 			}
 
@@ -1865,8 +1865,8 @@ static bool activate_object(object_type *o_ptr, int dir)
 			{
 				msg_format("Your %s glows a bright white...", o_name);
 				msg_print("You feel much better...");
-				(void)hp_player(1000);
-				(void)p_ptr->clear_timed<TMD_CUT>();
+				hp_player(1000);
+				p_ptr->clear_timed<TMD_CUT>();
 				break;
 			}
 
@@ -1994,11 +1994,11 @@ static bool activate_object(object_type *o_ptr, int dir)
 				msg_format("Your %s glows bright green...", o_name);
 				if (!p_ptr->timed[TMD_FAST])
 				{
-					(void)p_ptr->inc_timed<TMD_FAST>(randint(20) + 20);
+					p_ptr->inc_timed<TMD_FAST>(randint(20) + 20);
 				}
 				else
 				{
-					(void)p_ptr->inc_timed<TMD_FAST>(5);
+					p_ptr->inc_timed<TMD_FAST>(5);
 				}
 				break;
 			}
@@ -2006,8 +2006,8 @@ static bool activate_object(object_type *o_ptr, int dir)
 			case ACT_REM_FEAR_POIS:
 			{
 				msg_format("Your %s glows deep blue...", o_name);
-				(void)p_ptr->clear_timed<TMD_AFRAID>();
-				(void)p_ptr->clear_timed<TMD_POISONED>();
+				p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
+				p_ptr->clear_timed<TMD_POISONED>();
 				break;
 			}
 

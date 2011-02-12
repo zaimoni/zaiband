@@ -465,7 +465,7 @@ void py_attack(coord g)
 		}
 
 	/* Handle player fear */
-	if (p_ptr->timed[TMD_AFRAID])
+	if (p_ptr->core_timed[CORE_TMD_AFRAID])
 	{
 		/* Message */
 		msg_format("You are too afraid to attack %s!", m_name);
@@ -556,7 +556,7 @@ void py_attack(coord g)
 void
 player_type::melee_analyze(monster_type* m_ptr, int& min_dam, int& median_dam, int& max_dam)
 {
-	if (timed[TMD_AFRAID])
+	if (core_timed[CORE_TMD_AFRAID])
 	{	/* fear negates melee damage */
 		min_dam = median_dam = max_dam = 0;
 		return;
