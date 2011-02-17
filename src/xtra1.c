@@ -1156,14 +1156,14 @@ static void calc_bonuses(void)
 	/*** Temporary flags ***/
 
 	/* Apply temporary "stun" */
-	if (p_ptr->timed[TMD_STUN] > 50)
+	if (p_ptr->core_timed[CORE_TMD_STUN] > 50)
 	{
 		p_ptr->to_h -= 20;
 		p_ptr->dis_to_h -= 20;
 		p_ptr->to_d -= 20;
 		p_ptr->dis_to_d -= 20;
 	}
-	else if (p_ptr->timed[TMD_STUN])
+	else if (p_ptr->core_timed[CORE_TMD_STUN])
 	{
 		p_ptr->to_h -= 5;
 		p_ptr->dis_to_h -= 5;
@@ -1195,10 +1195,10 @@ static void calc_bonuses(void)
 	}
 
 	/* Temporary "fast" */
-	if (p_ptr->timed[TMD_FAST]) tmp_speed += 10;
+	if (p_ptr->core_timed[CORE_TMD_FAST]) tmp_speed += 10;
 
 	/* Temporary "slow" */
-	if (p_ptr->timed[TMD_SLOW]) tmp_speed -= 10;
+	if (p_ptr->core_timed[CORE_TMD_SLOW]) tmp_speed -= 10;
 
 	/* Temporary see invisible */
 	if (p_ptr->timed[TMD_SINVIS]) p_ptr->see_inv = TRUE;

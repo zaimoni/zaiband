@@ -62,24 +62,46 @@ static void SubjectLinkVerbPhrase(const agent_type& subject, const char* const p
 		
 }
 
+static void SubjectVerbPronounPhrase(const agent_type& subject, const char* const verb, const char* const phrase, u16b message_type)
+{
+	assert(subject.lang);
+	char subject_name[80];
+	char poss_pronoun[80];
+	if (subject.lang->self_desc)
+	{	/* player character; hard-code second person singular */
+		subject.lang->self_desc(subject_name, sizeof(subject_name), subject, 0);
+		subject.lang->self_desc(poss_pronoun, sizeof(poss_pronoun), subject, MDESC_PRO2 | MDESC_POSS);
+		message_format(message_type,"%^s %s %s %s", subject_name, verb, poss_pronoun, phrase);
+	}
+
+	/* monster; hard-code third person singular */	
+	else
+	{
+		subject.lang->desc(subject_name, sizeof(subject_name), subject, 0);
+		subject.lang->desc(poss_pronoun, sizeof(poss_pronoun), subject, MDESC_PRO2 | MDESC_POSS);
+		/* XXX assume regular verb XXX */
+		message_format(message_type,"%^s %ss %s %s", subject_name, verb, poss_pronoun, phrase);
+	}
+		
+}
+
 typedef struct
 {
   const char *on_begin_phrase, *on_end_phrase;
+  const char *on_begin_verb, *on_begin_poss_phrase;
+  const char *on_end_verb, *on_end_poss_phrase;
   u32b flag_redraw, flag_update;
   int msg;
 } core_timed_effect;
 
 static core_timed_effect effects2[] =
 {
-	{"confused.", "no longer confused.", PR_CONFUSED, 0, MSG_CONFUSED},
-	{"terrified!", "bolder now.", PR_AFRAID, 0, MSG_AFRAID }
+	{ "moving faster.", "slow down.", NULL, NULL, NULL, NULL, 0, PU_BONUS, MSG_SPEED },
+	{ "moving slower.", "speed up.", NULL, NULL, NULL, NULL, 0, PU_BONUS, MSG_SLOW },
+	{"confused.", "no longer confused.", NULL, NULL, NULL, NULL, PR_CONFUSED, 0, MSG_CONFUSED},
+	{"terrified!", "bolder now.", NULL, NULL, "recover", "courage.", PR_AFRAID, 0, MSG_AFRAID },
+	{"dazed.", "no longer stunned.", NULL, NULL, NULL, NULL, PR_STUN, PU_BONUS, MSG_STUN }
 };
-
-/*
- * this would be nice for afraid
- * "%^s recovers %s courage."
- * with MDESC_PRO2 | MDESC_POSS for the second %s
- */
 
 ZAIBAND_STATIC_ASSERT(N_ELEMENTS(effects2)==CORE_TMD_MAX);
 
@@ -95,9 +117,47 @@ bool agent_type::set_core_timed_clean(int idx, int v)
 	/* Open */
 	if (v)
 	{
-		if (!core_timed[idx])
+		/* stun needs special handling when increasing */
+		if (CORE_TMD_STUN==idx && v>core_timed[CORE_TMD_STUN])
+			{
+			unsigned int old_aux = stun_level(core_timed[CORE_TMD_STUN]);
+			unsigned int new_aux = stun_level(v);
+			if (old_aux<new_aux)
+				{
+				/* range 0..3 for both, so new_aux must be 1..3 */
+				switch(new_aux)
+				{
+				case 1:
+					SubjectLinkVerbPhrase(*this, one_in_(2) ? effect.on_begin_phrase : "heavily stunned.", MSG_RECOVER);
+					break;	
+				case 2:
+					SubjectLinkVerbPhrase(*this, "heavily stunned.", MSG_RECOVER);
+					break;	
+				case 3:
+					SubjectLinkVerbPhrase(*this, "knocked out.", MSG_RECOVER);
+					break;	
+				}
+				notice = TRUE;
+				}
+		}
+
+		/* normal case */
+		else if (!core_timed[idx])
 		{
-			SubjectLinkVerbPhrase(*this, effect.on_begin_phrase, effect.msg);
+			if (effect.on_begin_phrase)
+				{
+				if (effect.on_begin_verb && effect.on_begin_poss_phrase && one_in_(2))
+					{
+					SubjectVerbPronounPhrase(*this, effect.on_begin_verb, effect.on_begin_poss_phrase, MSG_RECOVER);
+					}
+				else{
+					SubjectLinkVerbPhrase(*this, effect.on_begin_phrase, MSG_RECOVER);
+					}
+				}
+			else if (effect.on_begin_verb && effect.on_begin_poss_phrase)
+				{
+				SubjectVerbPronounPhrase(*this, effect.on_begin_verb, effect.on_begin_poss_phrase, MSG_RECOVER);
+				}
 			notice = TRUE;
 		}
 	}
@@ -107,7 +167,20 @@ bool agent_type::set_core_timed_clean(int idx, int v)
 	{
 		if (core_timed[idx])
 		{
-			SubjectLinkVerbPhrase(*this, effect.on_end_phrase, MSG_RECOVER);
+			if (effect.on_end_phrase)
+				{
+				if (effect.on_end_verb && effect.on_end_poss_phrase && one_in_(2))
+					{
+					SubjectVerbPronounPhrase(*this, effect.on_end_verb, effect.on_end_poss_phrase, MSG_RECOVER);
+					}
+				else{
+					SubjectLinkVerbPhrase(*this, effect.on_end_phrase, MSG_RECOVER);
+					}
+				}
+			else if (effect.on_end_verb && effect.on_end_poss_phrase)
+				{
+				SubjectVerbPronounPhrase(*this, effect.on_end_verb, effect.on_end_poss_phrase, MSG_RECOVER);
+				}
 			notice = TRUE;
 		}
 	}
@@ -188,7 +261,6 @@ static bool set_oppose_acid(int v,player_type& p);
 static bool set_oppose_elec(int v,player_type& p);
 static bool set_oppose_fire(int v,player_type& p);
 static bool set_oppose_cold(int v,player_type& p);
-static bool set_stun(int v,player_type& p);
 static bool set_cut(int v,player_type& p);
 
 typedef struct
@@ -200,15 +272,12 @@ typedef struct
 
 static timed_effect effects[] =
 {
-	{ "You feel yourself moving faster!", "You feel yourself slow down.", 0, PU_BONUS, MSG_SPEED },
-	{ "You feel yourself moving slower!", "You feel yourself speed up.", 0, PU_BONUS, MSG_SLOW },
 	{ "You are blind.", "You can see again.", (PR_MAP | PR_BLIND),
 	  (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS), MSG_BLIND },
 	{ "You are paralyzed!", "You can move again.", PR_STATE, 0, MSG_PARALYZED },
 	{ "You feel drugged!", "You can see clearly again.", PR_MAP, 0, MSG_DRUGGED },
 	{ "You are poisoned!", "You are no longer poisoned.", PR_POISONED, 0, MSG_POISONED },
 	{ "", "", 0, 0, 0 },  /* TMD_CUT -- handled seperately */
-	{ "", "", 0, 0, 0 },  /* TMD_STUN -- handled seperately */
 	{ "You feel safe from evil!", "You no longer feel safe from evil.", 0, 0, MSG_PROT_EVIL },
 	{ "You feel invulnerable!", "You feel vulnerable once more.", 0, PU_BONUS, MSG_INVULN },
 	{ "You feel like a hero!", "The heroism wears off.", 0, PU_BONUS, MSG_HERO },
@@ -234,8 +303,7 @@ bool player_type::set_timed_clean(int idx, int v)
 	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
 
 	/* Hack -- call other functions */
-	if (idx == TMD_STUN) return set_stun(v,*this);
-	else if (idx == TMD_CUT) return set_cut(v,*this);
+	if (idx == TMD_CUT) return set_cut(v,*this);
 	else if (idx == TMD_OPP_ACID) return set_oppose_acid(v,*this);
 	else if (idx == TMD_OPP_ELEC) return set_oppose_elec(v,*this);
 	else if (idx == TMD_OPP_FIRE) return set_oppose_fire(v,*this);
@@ -424,74 +492,6 @@ bool set_oppose_cold(int v,player_type& p)
 
 	/* Redraw */
 	p.redraw |= PR_OPPOSE_ELEMENTS;
-
-	/* Handle stuff */
-	handle_stuff();
-
-	/* Result */
-	return (TRUE);
-}
-
-
-static const char* new_stun_level[3] =	{	"You have been stunned.",
-											"You have been heavily stunned.",
-											"You have been knocked out."
-										};
-
-/*
- * Set "p_ptr->stun", notice observable changes
- *
- * Note the special code to only notice "range" changes.
- */
-bool set_stun(int v,player_type& p)
-{
-	unsigned int old_aux, new_aux;
-
-	bool notice = FALSE;
-
-	/* Hack -- Force good values */
-	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
-
-	old_aux = stun_level(p.timed[TMD_STUN]);
-	new_aux = stun_level(v);
-
-	/* Increase cut */
-	if (new_aux > old_aux)
-	{
-		/* range 0..3 for both, so new_aux must be 1..3 */
-		message(MSG_STUN, new_stun_level[new_aux-1]);
-
-		/* Notice */
-		notice = TRUE;
-	}
-
-	/* Decrease cut */
-	else if (new_aux < old_aux)
-	{
-		/* Describe the state */
-		if (0==new_aux)
-		{
-			message(MSG_RECOVER, "You are no longer stunned.");
-		}
-
-		/* Notice */
-		notice = TRUE;
-	}
-
-	/* Use the value */
-	p.timed[TMD_STUN] = v;
-
-	/* No change */
-	if (!notice) return (FALSE);
-
-	/* Disturb */
-	if (OPTION(disturb_state)) disturb(0, 0);
-
-	/* Recalculate bonuses */
-	p.update |= (PU_BONUS);
-
-	/* Redraw the "stun" */
-	p.redraw |= (PR_STUN);
 
 	/* Handle stuff */
 	handle_stuff();
@@ -1280,7 +1280,7 @@ static void look_mon_desc(char *buf, size_t max, const m_idx_type m_idx)
 	if (m_ptr->csleep) my_strcat(buf, ", asleep", max);
 	if (m_ptr->core_timed[CORE_TMD_CONFUSED]) my_strcat(buf, ", confused", max);
 	if (m_ptr->core_timed[CORE_TMD_AFRAID]) my_strcat(buf, ", afraid", max);
-	if (m_ptr->stunned) my_strcat(buf, ", stunned", max);
+	if (m_ptr->core_timed[CORE_TMD_STUN]) my_strcat(buf, ", stunned", max);
 }
 
 

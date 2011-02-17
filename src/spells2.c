@@ -408,7 +408,7 @@ void self_knowledge(void)
 	if (p_ptr->core_timed[CORE_TMD_CONFUSED]) info[i++] = "You are confused.";
 	if (p_ptr->core_timed[CORE_TMD_AFRAID]) info[i++] = "You are terrified.";
 	if (p_ptr->timed[TMD_CUT]) info[i++] = "You are bleeding.";
-	if (p_ptr->timed[TMD_STUN]) info[i++] = "You are stunned.";
+	if (p_ptr->core_timed[CORE_TMD_STUN]) info[i++] = "You are stunned.";
 	if (p_ptr->timed[TMD_POISONED]) info[i++] = "You are poisoned.";
 	if (p_ptr->timed[TMD_IMAGE]) info[i++] = "You are hallucinating.";
 
@@ -1875,7 +1875,6 @@ void aggravate_monsters(int who)
 	for (i = 1; i < mon_max; i++)
 	{
 		monster_type *m_ptr = &mon_list[i];
-		monster_race *r_ptr = m_ptr->race();
 
 		/* Paranoia -- Skip dead monsters */
 		if (!m_ptr->r_idx) continue;
@@ -1898,12 +1897,13 @@ void aggravate_monsters(int who)
 		/* Speed up monsters in line of sight */
 		if (player_has_los_bold(m_ptr->loc.y, m_ptr->loc.x))
 		{
-			/* Speed up (instantly) to racial base + 10 */
-			if (m_ptr->speed < r_ptr->speed + 10)
+			if (!m_ptr->core_timed[CORE_TMD_FAST])
 			{
-				/* Speed up */
-				m_ptr->speed = r_ptr->speed + 10;
-				speed = TRUE;
+				if (m_ptr->inc_core_timed<CORE_TMD_FAST>(randint(25) + 15)) speed = TRUE;
+			}
+			else
+			{
+				m_ptr->inc_core_timed<CORE_TMD_FAST>(5);
 			}
 		}
 	}
@@ -2291,14 +2291,14 @@ void earthquake(coord g, int r)
 				{
 					msg_print("You are bashed by rubble!");
 					damage = NdS(10, 4);
-					(void)p_ptr->inc_timed<TMD_STUN>(randint(50));
+					p_ptr->inc_core_timed<CORE_TMD_STUN>(randint(50));
 					break;
 				}
 				case 3:
 				{
 					msg_print("You are crushed between the floor and ceiling!");
 					damage = NdS(10, 4);
-					(void)p_ptr->inc_timed<TMD_STUN>(randint(50));
+					p_ptr->inc_core_timed<CORE_TMD_STUN>(randint(50));
 					break;
 				}
 			}

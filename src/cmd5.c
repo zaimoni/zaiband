@@ -72,7 +72,7 @@ s16b spell_chance(int spell)
 	if (chance < minfail) chance = minfail;
 
 	/* Stunning makes spells harder (after minfail) */
-	unsigned int stunned = stun_level(p_ptr->timed[TMD_STUN]);
+	unsigned int stunned = stun_level(p_ptr->core_timed[CORE_TMD_STUN]);
 	if (stunned)
 		{
 		chance += (2<=stunned) ? 25 : 15;

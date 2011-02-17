@@ -497,7 +497,6 @@ static void rd_monster(monster_type *m_ptr)
 	rd_agent(*m_ptr);
 	m_ptr->lang = &monster_lang;
 	rd_s16b(&m_ptr->csleep);
-	rd_byte(&m_ptr->stunned);
 }
 
 

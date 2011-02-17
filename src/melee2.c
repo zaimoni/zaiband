@@ -1408,7 +1408,7 @@ static int choose_attack_spell(const m_idx_type m_idx, u32b *f_attack)
 		}
 
 		/* Haste self if we aren't already somewhat hasted (rarely) */
-		else if (has_haste && (rand_int(100) < (20 + r_ptr->speed - m_ptr->speed)))
+		else if (has_haste && m_ptr->core_timed[CORE_TMD_FAST] && one_in_(5))
 		{
 			/* Choose haste spell */
 			f_mask[0] = RSF0_HASTE_MASK;
@@ -1763,7 +1763,7 @@ static void mspell_BRAIN_SMASH(int m_idx_ok)
 		if (!p_ptr->resist_blind) p_ptr->inc_timed<TMD_BLIND>(8 + rand_int(8));
 		p_ptr->take_confusion(4, 4);
 		if (!p_ptr->free_act) p_ptr->inc_timed<TMD_PARALYZED>(rand_int(4) + 4);
-		p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
+		p_ptr->inc_core_timed<CORE_TMD_SLOW>(rand_int(4) + 4);
 	}
 }
 
@@ -1937,7 +1937,7 @@ static void mspell_SLOW(int m_idx_ok)
 	}
 	else
 	{
-		p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
+		p_ptr->inc_core_timed<CORE_TMD_SLOW>(rand_int(4) + 4);
 	}
 	update_smart_learn(m_idx_ok, DRS_FREE);
 }
@@ -2947,7 +2947,7 @@ static bool square_momentarily_unseen_by_player(const m_idx_type m_idx,coord m_l
 static bool player_could_attack_monster(coord p_loc, coord m_loc)
 {
 	if (0 < p_ptr->timed[TMD_PARALYZED]) return FALSE;	/* paralyzed is no attack */
-	if (100 <= p_ptr->timed[TMD_STUN]) return FALSE;	/* knocked out is no attack */
+	if (100 <= p_ptr->core_timed[CORE_TMD_STUN]) return FALSE;	/* knocked out is no attack */
 
 	const int d = distance(p_loc.y,p_loc.x,m_loc.y,m_loc.x);	/* Compute distance */
 	if (1>=d) return TRUE;										/* melee is attackable */

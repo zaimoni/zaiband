@@ -1232,7 +1232,7 @@ bool make_attack_normal(const m_idx_type m_idx)
 				}
 
 				/* Apply the stun */
-				if (k) (void)p_ptr->inc_timed<TMD_STUN>(k);
+				if (k) p_ptr->inc_core_timed<CORE_TMD_STUN>(k);
 			}
 		}
 

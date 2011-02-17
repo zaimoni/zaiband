@@ -413,56 +413,8 @@ static bool regenerate_monster(monster_type& m)
 
 static bool monster_condition_timeout(monster_type& m)
 {
-	/* Handle "stun" */
-	if (m.stunned)
-	{
-		int d = 1;
-
-		/* Make a "saving throw" against stun */
-		if (rand_int(5000) <= m.race()->level * m.race()->level)
-		{
-			/* Recover fully */
-			d = m.stunned;
-		}
-
-		/* Hack -- Recover from stun */
-		if (m.stunned > d)
-		{
-			/* Recover somewhat */
-			m.stunned -= d;
-		}
-
-		/* Fully recover */
-		else
-		{
-			/* Recover fully */
-			m.stunned = 0;
-
-			/* Message if visible */
-			if (m.ml)
-			{
-				char m_name[80];
-
-				/* Get the monster name */
-				monster_desc(m_name, sizeof(m_name), &m, 0);
-
-				/* Dump a message */
-				msg_format("%^s is no longer stunned.", m_name);
-
-				/* Hack -- Update the health bar */
-				if (p_ptr->health_who == &m-mon_list) p_ptr->redraw |= (PR_HEALTH);
-			}
-		}
-
-		/* Still stunned */
-		if (m.stunned) return false;
-	}
-
-
-	{
 	int i;
 	for(i=0; i<CORE_TMD_MAX; ++i) m.dec_core_timed(i,1);		
-	}
 
 	return false;
 }
@@ -921,7 +873,7 @@ static void process_world(void)
 	/* Various things interfere with healing */
 	if (p_ptr->timed[TMD_PARALYZED]) regen_amount = 0;
 	if (p_ptr->timed[TMD_POISONED]) regen_amount = 0;
-	if (p_ptr->timed[TMD_STUN]) regen_amount = 0;
+	if (p_ptr->core_timed[CORE_TMD_STUN]) regen_amount = 0;
 	if (p_ptr->timed[TMD_CUT]) regen_amount = 0;
 
 	/* Regenerate Hit Points if needed */
@@ -938,25 +890,30 @@ static void process_world(void)
 		switch(i)
 		{
 		case TMD_CUT:		{
-							unsigned int bleeding = cut_level(p_ptr->timed[TMD_CUT]);
-
 							/* mortal wounds do not heal */
-							if (7 > bleeding) (void)p_ptr->dec_timed(i, adjust);
+							if (7 > cut_level(p_ptr->timed[TMD_CUT])) p_ptr->dec_timed(i, adjust);
 							break;
 							};
-		case TMD_POISONED:	/* fall-through intentional */
-		case TMD_STUN:		{	
-							(void)p_ptr->dec_timed(i, adjust);
+		case TMD_POISONED:	{	
+							p_ptr->dec_timed(i, adjust);
 							break;
 							};
-		default :	(void)p_ptr->dec_timed(i, 1);
+		default :	p_ptr->dec_timed(i, 1);
 		};
 
-	for(i=0; i<CORE_TMD_MAX; ++i) p_ptr->dec_core_timed(i,1);
+	for(i=0; i<CORE_TMD_MAX; ++i)
+		switch(i)
+		{
+		case CORE_TMD_STUN:	{	
+							p_ptr->dec_core_timed(i, adjust);
+							break;
+							};
+		default: p_ptr->dec_core_timed(i,1);
+		};
 	}
 
 	/* Paralyzed or Knocked Out: reset energy to 0 */
-	if ((p_ptr->timed[TMD_PARALYZED]) || (p_ptr->timed[TMD_STUN] >= 100))
+	if ((p_ptr->timed[TMD_PARALYZED]) || (p_ptr->core_timed[CORE_TMD_STUN] >= 100))
 		p_ptr->energy = 0;
 
 	monster_scan(monster_condition_timeout);
@@ -2032,7 +1989,7 @@ static void process_player(void)
 	int i;
 
 	/* should actually be able to move */
-	assert(!p_ptr->timed[TMD_PARALYZED] && (100 > p_ptr->timed[TMD_STUN]) && (150 <= p_ptr->energy));
+	assert(!p_ptr->timed[TMD_PARALYZED] && (100 > p_ptr->core_timed[CORE_TMD_STUN]) && (150 <= p_ptr->energy));
 
 	/*** Check for interrupts ***/
 
@@ -2058,8 +2015,8 @@ static void process_player(void)
 			    (p_ptr->csp == p_ptr->msp) &&
 			    !p_ptr->timed[TMD_BLIND]  && !p_ptr->core_timed[CORE_TMD_CONFUSED] &&
 			    !p_ptr->timed[TMD_POISONED] && !p_ptr->core_timed[CORE_TMD_AFRAID] &&
-			    !p_ptr->timed[TMD_STUN] && !p_ptr->timed[TMD_CUT] &&
-			    !p_ptr->timed[TMD_SLOW] && !p_ptr->timed[TMD_PARALYZED] &&
+			    !p_ptr->core_timed[CORE_TMD_STUN] && !p_ptr->timed[TMD_CUT] &&
+			    !p_ptr->core_timed[CORE_TMD_SLOW] && !p_ptr->timed[TMD_PARALYZED] &&
 			    !p_ptr->timed[TMD_IMAGE] && !p_ptr->word_recall)
 			{
 				disturb(0, 0);
@@ -2582,6 +2539,10 @@ static void dungeon(void)
 
 			/* Give this monster some energy */
 			m.energy += agent_type::extract_energy[m.speed];
+
+			/* but knocked out monsters have no energy */
+			if (100 <= m.core_timed[CORE_TMD_STUN]) m.energy = 0;
+			
 		}
 
 		/* Count game turns */
@@ -2840,7 +2801,7 @@ void play_game(bool new_game)
 				p_ptr->clear_core_timed<CORE_TMD_AFRAID>(); 
 				p_ptr->clear_timed<TMD_PARALYZED>(); 
 				p_ptr->clear_timed<TMD_IMAGE>(); 
-				p_ptr->clear_timed<TMD_STUN>(); 
+				p_ptr->clear_core_timed<CORE_TMD_STUN>(); 
 				p_ptr->clear_timed<TMD_CUT>(); 
 
 				/* Hack -- Prevent starvation */

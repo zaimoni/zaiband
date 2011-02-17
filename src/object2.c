@@ -4122,7 +4122,7 @@ static bool is_moronic_to_quaff(const object_type& o)
 	case SV_POTION_CURE_SERIOUS: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && 0==p_ptr->timed[TMD_CUT]);
 	case SV_POTION_CURE_CRITICAL:	/* fallthrough intentional */
 	case SV_POTION_HEALING:
-	case SV_POTION_STAR_HEALING: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && 0==p_ptr->timed[TMD_POISONED] && 0==p_ptr->timed[TMD_STUN] && 0==p_ptr->timed[TMD_CUT]);
+	case SV_POTION_STAR_HEALING: return (p_ptr->chp>=p_ptr->mhp && 0==p_ptr->timed[TMD_BLIND] && 0==p_ptr->core_timed[CORE_TMD_CONFUSED] && 0==p_ptr->timed[TMD_POISONED] && 0==p_ptr->core_timed[CORE_TMD_STUN] && 0==p_ptr->timed[TMD_CUT]);
 	case SV_POTION_RESTORE_MANA: return (p_ptr->csp>=p_ptr->msp);
 	case SV_POTION_RESTORE_EXP: return (p_ptr->exp>=p_ptr->max_exp);
 	case SV_POTION_RES_STR: return (p_ptr->stat_cur[A_STR]==p_ptr->stat_max[A_STR]);

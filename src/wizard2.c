@@ -1092,9 +1092,9 @@ static void do_cmd_wiz_cure_all(void)
 	p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 	p_ptr->clear_timed<TMD_PARALYZED>();
 	p_ptr->clear_timed<TMD_IMAGE>();
-	p_ptr->clear_timed<TMD_STUN>();
+	p_ptr->clear_core_timed<CORE_TMD_STUN>();
 	p_ptr->clear_timed<TMD_CUT>();
-	p_ptr->clear_timed<TMD_SLOW>();
+	p_ptr->clear_core_timed<CORE_TMD_SLOW>();
 
 	/* No longer hungry */
 	set_food(PY_FOOD_MAX - 1);

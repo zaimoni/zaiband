@@ -592,8 +592,11 @@ static void prt_health(int row, int col)
 		if (m_ptr->core_timed[CORE_TMD_CONFUSED]) attr = TERM_UMBER;
 
 		/* Stunned */
-		if (m_ptr->stunned) attr = TERM_L_BLUE;
+		if (m_ptr->core_timed[CORE_TMD_STUN]) attr = TERM_L_BLUE;
 
+		/* Knocked out */
+		if (100 <= m_ptr->core_timed[CORE_TMD_STUN]) attr = TERM_BLUE;
+		
 		/* Asleep */
 		if (m_ptr->csleep) attr = TERM_BLUE;
 
@@ -1029,7 +1032,7 @@ static size_t prt_cut(int row, int col)
  */
 static size_t prt_stun(int row, int col)
 {
-	PRINT_STATE(>, stun_data, p_ptr->timed[TMD_STUN], row, col);
+	PRINT_STATE(>, stun_data, p_ptr->core_timed[CORE_TMD_STUN], row, col);
 	return 0;
 }
 

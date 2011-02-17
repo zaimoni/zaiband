@@ -2238,7 +2238,14 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 		case GF_OLD_CLONE:	/* Clone monsters (Ignore "dam") */
 		{
 			m_ptr->chp = m_ptr->mhp;					/* Heal fully */
-			if (m_ptr->speed < 150) m_ptr->speed += 10;	/* Speed up */
+			if (!m_ptr->core_timed[CORE_TMD_FAST])
+			{
+				m_ptr->inc_core_timed<CORE_TMD_FAST>(randint(25) + 15);
+			}
+			else
+			{
+				m_ptr->inc_core_timed<CORE_TMD_FAST>(5);
+			}
 
 			/* Attempt to clone. */
 			if (multiply_monster(cave_m_idx[g.y][g.x])) note = " spawns!";
@@ -2275,9 +2282,14 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 
 		case GF_OLD_SPEED:	/* Speed Monster (Ignore "dam") */
 		{
-			/* Speed up */
-			if (m_ptr->speed < 150) m_ptr->speed += 10;
-			note = " starts moving faster.";
+			if (!m_ptr->core_timed[CORE_TMD_FAST])
+			{
+				m_ptr->inc_core_timed<CORE_TMD_FAST>(randint(25) + 15);
+			}
+			else
+			{
+				m_ptr->inc_core_timed<CORE_TMD_FAST>(5);
+			}
 
 			/* No "real" damage */
 			dam = 0;
@@ -2297,8 +2309,7 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 			/* Normal monsters slow down */
 			else
 			{
-				if (m_ptr->speed > 60) m_ptr->speed -= 10;
-				note = " starts moving slower.";
+				(m_ptr->inc_core_timed<CORE_TMD_SLOW>(randint(25) + 15));
 			}
 
 			/* No "real" damage */
@@ -2648,19 +2659,7 @@ static bool project_m(int who, int r, coord g, int dam, int typ)
 		/* Obvious (irrational caution) */
 		if (seen) obvious = TRUE;
 
-		/* Get confused */
-		if (m_ptr->stunned)
-		{
-			note = " is more dazed.";
-			tmp = m_ptr->stunned + (do_stun / 2);
-		}
-		else
-		{
-			note = " is dazed.";
-			tmp = do_stun;
-		}
-
-		m_ptr->stunned = MIN(tmp, 200);	/* Apply stun */
+		m_ptr->inc_core_timed<CORE_TMD_STUN>(MIN(do_stun, 200));
 	}
 
 	/* Confusion and Chaos breathers (and sleepers) never confuse */
@@ -2889,8 +2888,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			take_hit(dam, killer);
 			if (!p_ptr->resist_sound)
 			{
-				int k = (randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
-				(void)p_ptr->inc_timed<TMD_STUN>(k);
+				p_ptr->inc_core_timed<CORE_TMD_STUN>(randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
 			}
 			break;
 		}
@@ -2936,7 +2934,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (blind) msg_print("You are hit by something!");
 			if (!p_ptr->resist_sound)
 			{
-				p_ptr->inc_timed<TMD_STUN>(randint(40));
+				p_ptr->inc_core_timed<CORE_TMD_STUN>(randint(40));
 			}
 			p_ptr->take_confusion(6, 5);
 			take_hit(dam, killer);
@@ -3010,7 +3008,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				p_ptr->inc_timed<TMD_STUN>(randint((dam > 90) ? 35 : (dam / 3 + 5)));
+				p_ptr->inc_core_timed<CORE_TMD_STUN>(randint((dam > 90) ? 35 : (dam / 3 + 5)));
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_SOUND);
@@ -3071,7 +3069,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (blind) msg_print("You are hit by something!");
 			if (!p_ptr->resist_sound)
 			{
-				(void)p_ptr->inc_timed<TMD_STUN>(randint(20));
+				p_ptr->inc_core_timed<CORE_TMD_STUN>(randint(20));
 			}
 			take_hit(dam, killer);
 			break;
@@ -3081,7 +3079,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 		case GF_INERTIA:
 		{
 			if (blind) msg_print("You are hit by something strange!");
-			(void)p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
+			p_ptr->inc_core_timed<CORE_TMD_SLOW>(rand_int(4) + 4);
 			take_hit(dam, killer);
 			break;
 		}
@@ -3096,7 +3094,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else if (!blind && !p_ptr->resist_blind)
 			{
-				(void)p_ptr->inc_timed<TMD_BLIND>(randint(5) + 2);
+				p_ptr->inc_timed<TMD_BLIND>(randint(5) + 2);
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_LITE);
@@ -3113,7 +3111,7 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			}
 			else if (!blind && !p_ptr->resist_blind)
 			{
-				(void)p_ptr->inc_timed<TMD_BLIND>(randint(5) + 2);
+				p_ptr->inc_timed<TMD_BLIND>(randint(5) + 2);
 			}
 			take_hit(dam, killer);
 			update_smart_learn(who, DRS_RES_DARK);
@@ -3137,7 +3135,6 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 				case 6: case 7: case 8: case 9:
 				{
 					static const char* const time_drain[A_MAX] =	{	"strong","bright","wise","agile","hale","beautiful"	};
-
 					k = rand_int(A_MAX);
 
 					msg_format("You're not as %s as you used to be...", time_drain[k]);
@@ -3175,11 +3172,10 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			if (randint(127) > p_ptr->lev)
 				teleport_player(5);
 
-			(void)p_ptr->inc_timed<TMD_SLOW>(rand_int(4) + 4);
+			p_ptr->inc_core_timed<CORE_TMD_SLOW>(rand_int(4) + 4);
 			if (!p_ptr->resist_sound)
 			{
-				int k = (randint((dam > 90) ? 35 : (dam / 3 + 5)));
-				(void)p_ptr->inc_timed<TMD_STUN>(k);
+				p_ptr->inc_core_timed<CORE_TMD_STUN>(randint((dam > 90) ? 35 : (dam / 3 + 5)));
 			}
 			take_hit(dam, killer);
 			break;
@@ -3208,11 +3204,11 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 			cold_dam(dam, killer);
 			if (!p_ptr->resist_shard)
 			{
-				(void)p_ptr->inc_timed<TMD_CUT>(NdS(5, 8));
+				p_ptr->inc_timed<TMD_CUT>(NdS(5, 8));
 			}
 			if (!p_ptr->resist_sound)
 			{
-				(void)p_ptr->inc_timed<TMD_STUN>(randint(15));
+				p_ptr->inc_core_timed<CORE_TMD_STUN>(randint(15));
 			}
 			update_smart_learn(who, DRS_RES_COLD);
 			break;
@@ -3224,7 +3220,6 @@ static bool project_p(int who, int r, int y, int x, int dam, int typ)
 		{
 			/* No damage */
 			dam = 0;
-
 			break;
 		}
 	}

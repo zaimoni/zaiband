@@ -897,14 +897,14 @@ static bool cast_mage_spell(int spell)
 		case SPELL_WONDER: /* wonder */
 		{
 			if (!get_aim_dir(&dir)) return (FALSE);
-			(void)spell_wonder(dir);
+			spell_wonder(dir);
 			break;
 		}
 
 		case SPELL_POLYMORPH_OTHER:
 		{
 			if (!get_aim_dir(&dir)) return (FALSE);
-			(void)poly_monster(dir);
+			poly_monster(dir);
 			break;
 		}
 
@@ -915,7 +915,7 @@ static bool cast_mage_spell(int spell)
 
 		case SPELL_MASS_SLEEP:
 		{
-			(void)sleep_monsters();
+			sleep_monsters();
 			break;
 		}
 
@@ -930,7 +930,7 @@ static bool cast_mage_spell(int spell)
 		case SPELL_SLOW_MONSTER:
 		{
 			if (!get_aim_dir(&dir)) return (FALSE);
-			(void)slow_monster(dir);
+			slow_monster(dir);
 			break;
 		}
 
@@ -949,7 +949,7 @@ static bool cast_mage_spell(int spell)
 		case SPELL_TELEPORT_OTHER:
 		{
 			if (!get_aim_dir(&dir)) return (FALSE);
-			(void)teleport_monster(dir);
+			teleport_monster(dir);
 			break;
 		}
 
@@ -1140,13 +1140,13 @@ static bool cast_mage_spell(int spell)
 
 		case SPELL_HASTE_SELF:
 		{
-			if (!p_ptr->timed[TMD_FAST])
+			if (!p_ptr->core_timed[CORE_TMD_FAST])
 			{
-				p_ptr->set_timed<TMD_FAST>(randint(20) + plev);
+				p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(20) + plev);
 			}
 			else
 			{
-				p_ptr->inc_timed<TMD_FAST>(randint(5));
+				p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(5));
 			}
 			break;
 		}
@@ -1321,20 +1321,20 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_CURE_CRITICAL_WOUNDS:
 		{
-			(void)hp_player(NdS(6, 10));
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			hp_player(NdS(6, 10));
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 
 		case PRAYER_SENSE_INVISIBLE:
 		{
-			(void)p_ptr->inc_timed<TMD_SINVIS>(randint(24) + 24);
+			p_ptr->inc_timed<TMD_SINVIS>(randint(24) + 24);
 			break;
 		}
 
 		case PRAYER_PROTECTION_FROM_EVIL:
 		{
-			(void)p_ptr->inc_timed<TMD_PROTEVIL>(randint(25) + 3 * p_ptr->lev);
+			p_ptr->inc_timed<TMD_PROTEVIL>(randint(25) + 3 * p_ptr->lev);
 			break;
 		}
 
@@ -1352,9 +1352,9 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_CURE_MORTAL_WOUNDS:
 		{
-			(void)hp_player(NdS(8, 10));
-			(void)p_ptr->clear_timed<TMD_STUN>();
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			hp_player(NdS(8, 10));
+			p_ptr->clear_core_timed<CORE_TMD_STUN>();
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 
@@ -1379,7 +1379,7 @@ static bool cast_priest_spell(int spell)
 		case PRAYER_HEAL:
 		{
 			hp_player(300);
-			p_ptr->clear_timed<TMD_STUN>();
+			p_ptr->clear_core_timed<CORE_TMD_STUN>();
 			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
@@ -1402,7 +1402,7 @@ static bool cast_priest_spell(int spell)
 			hp_player(1000);
 			p_ptr->clear_core_timed<CORE_TMD_AFRAID>();
 			p_ptr->clear_timed<TMD_POISONED>();
-			p_ptr->clear_timed<TMD_STUN>();
+			p_ptr->clear_core_timed<CORE_TMD_STUN>();
 			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
@@ -1445,46 +1445,46 @@ static bool cast_priest_spell(int spell)
 
 		case PRAYER_CURE_MORTAL_WOUNDS2:
 		{
-			(void)hp_player(NdS(8, 10));
-			(void)p_ptr->clear_timed<TMD_STUN>();
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			hp_player(NdS(8, 10));
+			p_ptr->clear_core_timed<CORE_TMD_STUN>();
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 
 		case PRAYER_HEALING:
 		{
-			(void)hp_player(2000);
-			(void)p_ptr->clear_timed<TMD_STUN>();
-			(void)p_ptr->clear_timed<TMD_CUT>();
+			hp_player(2000);
+			p_ptr->clear_core_timed<CORE_TMD_STUN>();
+			p_ptr->clear_timed<TMD_CUT>();
 			break;
 		}
 
 		case PRAYER_RESTORATION:
 		{
-			(void)do_res_stat(A_STR);
-			(void)do_res_stat(A_INT);
-			(void)do_res_stat(A_WIS);
-			(void)do_res_stat(A_DEX);
-			(void)do_res_stat(A_CON);
-			(void)do_res_stat(A_CHR);
+			do_res_stat(A_STR);
+			do_res_stat(A_INT);
+			do_res_stat(A_WIS);
+			do_res_stat(A_DEX);
+			do_res_stat(A_CON);
+			do_res_stat(A_CHR);
 			break;
 		}
 
 		case PRAYER_REMEMBRANCE:
 		{
-			(void)restore_level();
+			restore_level();
 			break;
 		}
 
 		case PRAYER_DISPEL_UNDEAD2:
 		{
-			(void)dispel_undead(randint(plev * 4));
+			dispel_undead(randint(plev * 4));
 			break;
 		}
 
 		case PRAYER_DISPEL_EVIL2:
 		{
-			(void)dispel_evil(randint(plev * 4));
+			dispel_evil(randint(plev * 4));
 			break;
 		}
 

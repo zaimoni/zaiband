@@ -1569,8 +1569,8 @@ static const char *show_speed()
 {
 	static char buffer[10];
 	int tmp = p_ptr->speed;
-	if (p_ptr->timed[TMD_FAST]) tmp -= 10;
-	if (p_ptr->timed[TMD_SLOW]) tmp += 10;
+	if (p_ptr->core_timed[CORE_TMD_FAST]) tmp -= 10;
+	if (p_ptr->core_timed[CORE_TMD_SLOW]) tmp += 10;
 	if (p_ptr->searching) tmp += 10;
 	if (tmp == 110) return "Normal";
 	strnfmt(buffer, sizeof(buffer), "%d", tmp - 110);

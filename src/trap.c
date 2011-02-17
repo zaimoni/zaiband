@@ -316,7 +316,7 @@ void hit_trap(coord g)
 				msg_print("A small dart hits you!");
 				dam = NdS(1, 4);
 				take_hit(dam, name);
-				(void)p_ptr->inc_timed<TMD_SLOW>(rand_int(20) + 20);
+				p_ptr->inc_core_timed<CORE_TMD_SLOW>(rand_int(20) + 20);
 			}
 			else
 			{

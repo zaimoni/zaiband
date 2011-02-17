@@ -294,7 +294,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 
 		case SV_POTION_SLOWNESS:
 		{
-			if (p_ptr->inc_timed<TMD_SLOW>(randint(25) + 15)) *ident = TRUE;
+			if (p_ptr->inc_core_timed<CORE_TMD_SLOW>(randint(25) + 15)) *ident = TRUE;
 			break;
 		}
 
@@ -365,12 +365,12 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			msg_print("Your nerves and muscles feel weak and lifeless!");
 			take_hit(NdS(10, 10), "a potion of Ruination");
-			(void)dec_stat(A_DEX, 25, TRUE);
-			(void)dec_stat(A_WIS, 25, TRUE);
-			(void)dec_stat(A_CON, 25, TRUE);
-			(void)dec_stat(A_STR, 25, TRUE);
-			(void)dec_stat(A_CHR, 25, TRUE);
-			(void)dec_stat(A_INT, 25, TRUE);
+			dec_stat(A_DEX, 25, TRUE);
+			dec_stat(A_WIS, 25, TRUE);
+			dec_stat(A_CON, 25, TRUE);
+			dec_stat(A_STR, 25, TRUE);
+			dec_stat(A_CHR, 25, TRUE);
+			dec_stat(A_INT, 25, TRUE);
 			*ident = TRUE;
 			break;
 		}
@@ -415,7 +415,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 		{
 			msg_print("Massive explosions rupture your body!");
 			take_hit(NdS(50, 20), "a potion of Detonation");
-			p_ptr->inc_timed<TMD_STUN>(75);
+			p_ptr->inc_core_timed<CORE_TMD_STUN>(75);
 			p_ptr->inc_timed<TMD_CUT>(5000);
 			*ident = TRUE;
 			break;
@@ -461,13 +461,13 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 
 		case SV_POTION_SPEED:
 		{
-			if (!p_ptr->timed[TMD_FAST])
+			if (!p_ptr->core_timed[CORE_TMD_FAST])
 			{
-				if (p_ptr->inc_timed<TMD_FAST>(randint(25) + 15)) *ident = TRUE;
+				if (p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(25) + 15)) *ident = TRUE;
 			}
 			else
 			{
-				(void)p_ptr->inc_timed<TMD_FAST>(5);
+				p_ptr->inc_core_timed<CORE_TMD_FAST>(5);
 			}
 			break;
 		}
@@ -523,7 +523,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -534,7 +534,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -545,7 +545,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -558,7 +558,7 @@ static bool quaff_potion(object_type *o_ptr, bool *ident)
 			p_ptr->clear_timed<TMD_BLIND>();
 			p_ptr->clear_core_timed<CORE_TMD_CONFUSED>();
 			p_ptr->clear_timed<TMD_IMAGE>();
-			p_ptr->clear_timed<TMD_STUN>();
+			p_ptr->clear_core_timed<CORE_TMD_STUN>();
 			p_ptr->clear_timed<TMD_CUT>();
 			do_res_stat(A_STR);
 			do_res_stat(A_CON);
@@ -1075,7 +1075,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 
 		case SV_STAFF_SLOWNESS:
 		{
-			if (p_ptr->inc_timed<TMD_SLOW>(randint(30) + 15)) *ident = TRUE;
+			if (p_ptr->inc_core_timed<CORE_TMD_SLOW>(randint(30) + 15)) *ident = TRUE;
 			break;
 		}
 
@@ -1198,7 +1198,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
 			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -1206,7 +1206,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 		case SV_STAFF_HEALING:
 		{
 			if (hp_player(300)) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -1239,13 +1239,13 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 
 		case SV_STAFF_SPEED:
 		{
-			if (!p_ptr->timed[TMD_FAST])
+			if (!p_ptr->core_timed[CORE_TMD_FAST])
 			{
-				if (p_ptr->inc_timed<TMD_FAST>(randint(30) + 15)) *ident = TRUE;
+				if (p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(30) + 15)) *ident = TRUE;
 			}
 			else
 			{
-				p_ptr->inc_timed<TMD_FAST>(5);
+				p_ptr->inc_core_timed<CORE_TMD_FAST>(5);
 			}
 			break;
 		}
@@ -1277,7 +1277,7 @@ static bool use_staff(object_type *o_ptr, bool *ident)
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
 			if (p_ptr->clear_core_timed<CORE_TMD_AFRAID>()) *ident = TRUE;
 			if (hp_player(50)) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -1584,7 +1584,7 @@ static bool zap_rod(object_type *o_ptr, bool *ident, int dir)
 			if (p_ptr->clear_timed<TMD_BLIND>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_POISONED>()) *ident = TRUE;
 			if (p_ptr->clear_core_timed<CORE_TMD_CONFUSED>()) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -1592,7 +1592,7 @@ static bool zap_rod(object_type *o_ptr, bool *ident, int dir)
 		case SV_ROD_HEALING:
 		{
 			if (hp_player(500)) *ident = TRUE;
-			if (p_ptr->clear_timed<TMD_STUN>()) *ident = TRUE;
+			if (p_ptr->clear_core_timed<CORE_TMD_STUN>()) *ident = TRUE;
 			if (p_ptr->clear_timed<TMD_CUT>()) *ident = TRUE;
 			break;
 		}
@@ -1611,13 +1611,13 @@ static bool zap_rod(object_type *o_ptr, bool *ident, int dir)
 
 		case SV_ROD_SPEED:
 		{
-			if (!p_ptr->timed[TMD_FAST])
+			if (!p_ptr->core_timed[CORE_TMD_FAST])
 			{
-				if (p_ptr->inc_timed<TMD_FAST>(randint(30) + 15)) *ident = TRUE;
+				if (p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(30) + 15)) *ident = TRUE;
 			}
 			else
 			{
-				(void)p_ptr->inc_timed<TMD_FAST>(5);
+				p_ptr->inc_core_timed<CORE_TMD_FAST>(5);
 			}
 			break;
 		}
@@ -1775,17 +1775,16 @@ static bool activate_object(object_type *o_ptr, int dir)
 			{
 				msg_format("The %s glows a deep green...", o_name);
 				wiz_lite();
-				(void)detect_traps();
-				(void)detect_doors();
-				(void)detect_stairs();
+				detect_traps();
+				detect_doors();
+				detect_stairs();
 				break;
 			}
 
 			case ACT_PROT_EVIL:
 			{
 				msg_format("The %s lets out a shrill wail...", o_name);
-				k = 3 * p_ptr->lev;
-				(void)p_ptr->inc_timed<TMD_PROTEVIL>(randint(25) + k);
+				p_ptr->inc_timed<TMD_PROTEVIL>(randint(25) + 3 * p_ptr->lev);
 				break;
 			}
 
@@ -1799,13 +1798,13 @@ static bool activate_object(object_type *o_ptr, int dir)
 			case ACT_HASTE2:
 			{
 				msg_format("The %s glows brightly...", o_name);
-				if (!p_ptr->timed[TMD_FAST])
+				if (!p_ptr->core_timed[CORE_TMD_FAST])
 				{
-					(void)p_ptr->inc_timed<TMD_FAST>(randint(75) + 75);
+					p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(75) + 75);
 				}
 				else
 				{
-					(void)p_ptr->inc_timed<TMD_FAST>(5);
+					p_ptr->inc_core_timed<CORE_TMD_FAST>(5);
 				}
 				break;
 			}
@@ -1903,19 +1902,19 @@ static bool activate_object(object_type *o_ptr, int dir)
 			{
 				msg_format("Your %s glows deep blue...", o_name);
 				msg_print("You feel a warm tingling inside...");
-				(void)hp_player(500);
-				(void)p_ptr->clear_timed<TMD_CUT>();
+				hp_player(500);
+				p_ptr->clear_timed<TMD_CUT>();
 				break;
 			}
 
 			case ACT_RESIST:
 			{
 				msg_format("Your %s glows many colours...", o_name);
-				(void)p_ptr->inc_timed<TMD_OPP_ACID>(randint(20) + 20);
-				(void)p_ptr->inc_timed<TMD_OPP_ELEC>(randint(20) + 20);
-				(void)p_ptr->inc_timed<TMD_OPP_FIRE>(randint(20) + 20);
-				(void)p_ptr->inc_timed<TMD_OPP_COLD>(randint(20) + 20);
-				(void)p_ptr->inc_timed<TMD_OPP_POIS>(randint(20) + 20);
+				p_ptr->inc_timed<TMD_OPP_ACID>(randint(20) + 20);
+				p_ptr->inc_timed<TMD_OPP_ELEC>(randint(20) + 20);
+				p_ptr->inc_timed<TMD_OPP_FIRE>(randint(20) + 20);
+				p_ptr->inc_timed<TMD_OPP_COLD>(randint(20) + 20);
+				p_ptr->inc_timed<TMD_OPP_POIS>(randint(20) + 20);
 				break;
 			}
 
@@ -1992,13 +1991,13 @@ static bool activate_object(object_type *o_ptr, int dir)
 			case ACT_HASTE1:
 			{
 				msg_format("Your %s glows bright green...", o_name);
-				if (!p_ptr->timed[TMD_FAST])
+				if (!p_ptr->core_timed[CORE_TMD_FAST])
 				{
-					p_ptr->inc_timed<TMD_FAST>(randint(20) + 20);
+					p_ptr->inc_core_timed<CORE_TMD_FAST>(randint(20) + 20);
 				}
 				else
 				{
-					p_ptr->inc_timed<TMD_FAST>(5);
+					p_ptr->inc_core_timed<CORE_TMD_FAST>(5);
 				}
 				break;
 			}

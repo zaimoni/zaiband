@@ -183,7 +183,6 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_s16b(m_ptr->r_idx);
 	wr_agent(*m_ptr);
 	wr_s16b(m_ptr->csleep);
-	wr_byte(m_ptr->stunned);
 }
 
 

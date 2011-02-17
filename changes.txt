@@ -13,8 +13,12 @@ Changes Zaiband 3.0.10
 - Temporary poison resistance fixed.
 - monster breeders fixed.
 - The following status effects have been rationalized towards working the same for both player and monsters
+** Haste
+** Slowing
 ** Confusion
 ** Fear
+** Stunning
+
 
 Changes Zaiband 3.0.9
 - The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:
