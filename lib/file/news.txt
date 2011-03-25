@@ -1,6 +1,6 @@
 
               **************************************************
-              ** Zaiband 3.0.9 Alpha **    Zaimoni Angband    **
+              ** Zaiband 3.0.10 Alpha **   Zaimoni Angband    **
               **************************************************
 
            Based on Moria:   Copyright (c) 1985 Robert Alan Koeneke
@@ -14,7 +14,7 @@
 
                  Angband 2.9.0 - 3.0.x by Robert Ruehlmann
 
-          Zaiband 3.0.6 - 3.0.9 Alpha by Kenneth 'Bessarion' Boyd
+          Zaiband 3.0.6 - 3.0.10 Alpha by Kenneth 'Bessarion' Boyd
 
       Send comments, bug reports, and patches, to "zaimoni@zaimoni.com"
        Visit the Zaiband Home Page at "http://www.zaimoni.com/zaiband"
