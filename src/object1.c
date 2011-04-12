@@ -514,7 +514,7 @@ static bool obj_desc_show_armor(const object_type *o_ptr)
 static bool object_desc_append_name(const object_type *o_ptr)
 {
 	/* if unaware, never append the name of the object */
-	if (!p_ptr->aware(*o_ptr) && !(o_ptr->ident & IDENT_STORE)) return FALSE;
+	if (!p_ptr->aware(*o_ptr) && !(o_ptr->ident & IDENT_STORE)) return false;
 
 	/* Analyze the object */
 	switch (o_ptr->obj_id.tval)
@@ -530,9 +530,9 @@ static bool object_desc_append_name(const object_type *o_ptr)
 	case TV_ROD:	/* Rods */
 	case TV_SCROLL:	/* Scrolls */
 	case TV_POTION:	/* Potions */
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /*
@@ -683,6 +683,13 @@ enum object_desc_mode	{	ODESC_BASE = 0,
  */
 void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, object_desc_mode mode)
 {
+	/* if faced with an empty item, short-circuit to prevent an assert */
+	if (0==o_ptr->k_idx)
+	{
+		my_strcpy(buf, "(nothing)", max);
+		return;
+	}
+
 	object_kind *k_ptr = &object_type::k_info[o_ptr->k_idx];
 	const char* basenm = k_ptr->name();	/* Extract default "base" string */
 	const char* modstr = "";				/* Assume no "modifier" string */
@@ -709,8 +716,8 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, bool pref, obj
 	if (o_ptr->ident & IDENT_STORE)
 	{
 		/* Pretend known and aware */
-		aware = TRUE;
-		known = TRUE;
+		aware = true;
+		known = true;
 	}
 
 	/* Allow flavors to be hidden when aware */
@@ -1752,7 +1759,7 @@ const char* describe_use(int i)
 /*
  * Check an item against the item tester info
  */
-bool item_tester_okay(const object_type *o_ptr)
+static bool item_tester_okay(const object_type *o_ptr)
 {
 	/* Hack -- allow listing empty slots */
 	if (item_tester_full) return TRUE;

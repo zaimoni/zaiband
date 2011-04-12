@@ -239,7 +239,6 @@ extern void do_cmd_rest(void);
 
 /* cmd3.c */
 extern void do_cmd_inven(void);
-extern void do_cmd_equip(void);
 extern void wield_item(object_type *o_ptr, int item);
 extern void do_cmd_destroy(void);
 extern void do_cmd_target(void);
@@ -386,7 +385,6 @@ extern char index_to_label(int i);
 extern s16b wield_slot(const object_type *o_ptr);
 extern const char* mention_use(int i);
 extern const char* describe_use(int i);
-extern bool item_tester_okay(const object_type *o_ptr);
 extern int scan_floor(int *items, int size, coord g, int mode);
 extern void display_inven(void);
 extern void display_equip(void);
