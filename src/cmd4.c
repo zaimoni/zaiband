@@ -2908,42 +2908,25 @@ void do_cmd_save_screen(void)
  */
 static void do_cmd_knowledge_artifacts(void)
 {
-	int i, k, z;
-
 	char file_name[1024];
-
-	char o_name[80];
-
-	coord t;
-
-	bool *okay;
-
 
 	/* Temporary file */
 	FILE* fff = my_fopen_temp(file_name, sizeof(file_name));
+	if (!fff) return; /* Failure */
 
-	/* Failure */
-	if (!fff) return;
-
-	/* Allocate the "okay" array */
-	C_MAKE(okay, z_info->a_max, bool);
+	int i, k, z;
+	char o_name[80];
+	coord t;
+	bool * const okay = C_ZNEW(z_info->a_max, bool);
 
 	/* Scan the artifacts */
 	for (k = 0; k < z_info->a_max; k++)
 	{
-		artifact_type *a_ptr = &object_type::a_info[k];
-
-		/* Default */
-		okay[k] = FALSE;
-
-		/* Skip "empty" artifacts */
-		if (!a_ptr->_name) continue;
-
-		/* Skip "uncreated" artifacts */
-		if (!a_ptr->cur_num) continue;
-
-		/* Assume okay */
-		okay[k] = TRUE;
+		artifact_type * const a_ptr = &object_type::a_info[k];
+		okay[k] = false; /* Default */
+		if (!a_ptr->_name) continue; /* Skip "empty" artifacts */
+		if (!a_ptr->cur_num) continue; /* Skip "uncreated" artifacts */
+		okay[k] = true; /* Assume okay */
 	}
 
 	/* Check the dungeon */
@@ -3003,34 +2986,26 @@ static void do_cmd_knowledge_artifacts(void)
 		/* Real object */
 		if (z)
 		{
-			object_type object_type_body;
-			object_type *i_ptr = &object_type_body;	/* Get local object */
+			object_type o;
 
-			/* Create fake object */
-			object_prep(i_ptr, z);
-
-			/* Make it an artifact */
-			i_ptr->name1 = k;
+			object_prep(&o, z); /* Create fake object */
+			o.name1 = k; /* Make it an artifact */
 
 			/* Describe the artifact */
-			object_desc_spoil(o_name, sizeof(o_name), i_ptr, FALSE, ODESC_BASE);
+			object_desc_spoil(o_name, sizeof(o_name), &o, false, ODESC_BASE);
 		}
 
 		/* Hack -- Build the artifact name */
 		fprintf(fff, "     The %s\n", o_name);
 	}
 
-	/* Free the "okay" array */
-	FREE(okay);
-
-	/* Close the file */
-	my_fclose(fff);
+	FREE(okay); /* Free the "okay" array */
+	my_fclose(fff); /* Close the file */
 
 	/* Display the file contents */
 	show_file(file_name, "Known (or lost) artifacts", 0, 0);
 
-	/* Remove the file */
-	fd_kill(file_name);
+	fd_kill(file_name); /* Remove the file */
 }
 
 
@@ -3041,34 +3016,26 @@ static void do_cmd_knowledge_artifacts(void)
  */
 static void do_cmd_knowledge_uniques(void)
 {
-	int i, n;
 	char file_name[1024];
-	u16b why = 2;
-	u16b *who;
-	int killed = 0;
-	char header[80];
-
 
 	/* Temporary file */
 	FILE* fff = my_fopen_temp(file_name, sizeof(file_name));
+	if (!fff) return; /* Failure */
 
-	/* Failure */
-	if (!fff) return;
-
-	/* Allocate the "who" array */
-	C_MAKE(who, z_info->r_max, u16b);
+	int i, n;
+	u16b why = 2;
+	int killed = 0;
+	char header[80];
+	u16b * const who = C_ZNEW(z_info->r_max, u16b);
 
 	/* Collect matching monsters */
 	for (i = 1, n = 0; i < z_info->r_max; i++)
 	{
-		monster_race *r_ptr = &monster_type::r_info[i];
-		monster_lore *l_ptr = &monster_type::l_list[i];
-
 		/* Require known monsters */
-		if (!OPTION(adult_know) && !l_ptr->sights) continue;
+		if (!OPTION(adult_know) && !monster_type::l_list[i].sights) continue;
 
 		/* Require unique monsters */
-		if (!(r_ptr->flags[0] & RF0_UNIQUE)) continue;
+		if (!(monster_type::r_info[i].flags[0] & RF0_UNIQUE)) continue;
 
 		/* Collect "appropriate" monsters */
 		who[n++] = i;
@@ -3081,12 +3048,11 @@ static void do_cmd_knowledge_uniques(void)
 	/* Sort the array by dungeon depth of monsters */
 	ang_sort(who, &why, n);
 
-
 	/* Print the monsters */
 	for (i = 0; i < n; i++)
 	{
-		monster_race *r_ptr = &monster_type::r_info[who[i]];
-		bool dead = (r_ptr->max_num == 0);
+		monster_race * const r_ptr = &monster_type::r_info[who[i]];
+		bool dead = (0 == r_ptr->max_num);
 
 		if (dead) killed++;
 
@@ -3101,11 +3067,8 @@ static void do_cmd_knowledge_uniques(void)
 	/* Construct header line */
 	strnfmt(header, sizeof(header), "Uniques: %d known, %d killed", n, killed);
 
-	/* Display the file contents */
-	show_file(file_name, header, 0, 0);
-
-	/* Remove the file */
-	fd_kill(file_name);
+	show_file(file_name, header, 0, 0); /* Display the file contents */
+	fd_kill(file_name); /* Remove the file */
 }
 
 
@@ -3165,35 +3128,24 @@ static void do_cmd_knowledge_objects(void)
  */
 static void do_cmd_knowledge_kills(void)
 {
-	int n, i;
-
 	char file_name[1024];
 
-	u16b *who;
-	u16b why = 4;
-
-
 	/* Temporary file */
-	FILE* fff = my_fopen_temp(file_name, sizeof(file_name));
+	FILE* const fff = my_fopen_temp(file_name, sizeof(file_name));
+	if (!fff) return; /* Failure */
 
-	/* Failure */
-	if (!fff) return;
-
-
-	/* Allocate the "who" array */
-	C_MAKE(who, z_info->r_max, u16b);
+	int n, i;
+	u16b why = 4;
+	u16b * const who = C_ZNEW(z_info->r_max, u16b);
 
 	/* Collect matching monsters */
 	for (n = 0, i = 1; i < z_info->r_max - 1; i++)
 	{
-		monster_race *r_ptr = &monster_type::r_info[i];
-		monster_lore *l_ptr = &monster_type::l_list[i];
-
 		/* Require non-unique monsters */
-		if (r_ptr->flags[0] & RF0_UNIQUE) continue;
+		if (monster_type::r_info[i].flags[0] & RF0_UNIQUE) continue;
 
 		/* Collect "appropriate" monsters */
-		if (l_ptr->pkills > 0) who[n++] = i;
+		if (monster_type::l_list[i].pkills > 0) who[n++] = i;
 	}
 
 	/* Select the sort method */
@@ -3206,25 +3158,18 @@ static void do_cmd_knowledge_kills(void)
 	/* Print the monsters (highest kill counts first) */
 	for (i = n - 1; i >= 0; i--)
 	{
-		monster_race *r_ptr = &monster_type::r_info[who[i]];
-		monster_lore *l_ptr = &monster_type::l_list[who[i]];
-
 		/* Print a message */
 		fprintf(fff, "     %-40s  %5d\n",
-		        r_ptr->name(), l_ptr->pkills);
+		        monster_type::r_info[who[i]].name(), monster_type::l_list[who[i]].pkills);
 	}
 
-	/* Free the "who" array */
-	FREE(who);
-
-	/* Close the file */
-	my_fclose(fff);
+	FREE(who); /* Free the "who" array */
+	my_fclose(fff); /* Close the file */
 
 	/* Display the file contents */
 	show_file(file_name, "Kill counts", 0, 0);
 
-	/* Remove the file */
-	fd_kill(file_name);
+	fd_kill(file_name); /* Remove the file */
 }
 
 

@@ -571,7 +571,7 @@ static void spoil_mon_desc(const char* const fname)
 	        "----", "---", "---", "---", "--", "--", "-----------");
 
 	/* Allocate the "who" array */
-	C_MAKE(who, z_info->r_max, u16b);
+	who = C_ZNEW(z_info->r_max, u16b);
 
 	/* Scan the monsters (except the ghost) */
 	for (i = 1; i < z_info->r_max - 1; i++)
@@ -714,15 +714,13 @@ static void spoil_mon_info(const char* const fname)
 	text_out("------------------------------------------\n\n");
 
 	/* Allocate the "who" array */
-	C_MAKE(who, z_info->r_max, u16b);
+	who = C_ZNEW(z_info->r_max, u16b);
 
 	/* Scan the monsters */
 	for (i = 1; i < z_info->r_max; i++)
 	{
-		monster_race *r_ptr = &monster_type::r_info[i];
-
 		/* Use that monster */
-		if (r_ptr->_name) who[count++] = (u16b)i;
+		if (monster_type::r_info[i]._name) who[count++] = (u16b)i;
 	}
 
 	/* Select the sort method */

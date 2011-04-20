@@ -174,15 +174,10 @@ int macro_find_ready(const char* pat)
  */
 errr macro_add(const char* pat, const char* act)
 {
-	int n;
-
-
 	/* Paranoia -- require data */
-	if (!pat || !act) return (-1);
+	if (!pat || !act) return -1;
 
-
-	/* Look for any existing macro */
-	n = macro_find_exact(pat);
+	int n = macro_find_exact(pat); /* Look for any existing macro */
 
 	/* Replace existing macro */
 	if (n >= 0)
@@ -195,7 +190,7 @@ errr macro_add(const char* pat, const char* act)
 	else
 	{
 		/* Boundary check */
-		if (MACRO_MAX <= (macro__num+1)) return (-1);
+		if (MACRO_MAX <= (macro__num+1)) return -1;
 
 		/* Get a new index */
 		n = macro__num++;
@@ -204,14 +199,9 @@ errr macro_add(const char* pat, const char* act)
 		macro__pat[n] = string_make(pat);
 	}
 
-	/* Save the action */
-	macro__act[n] = string_make(act);
-
-	/* Efficiency */
-	macro__use[(byte)(pat[0])] = TRUE;
-
-	/* Success */
-	return (0);
+	macro__act[n] = string_make(act); /* Save the action */
+	macro__use[(byte)(pat[0])] = TRUE; /* Efficiency */
+	return 0; /* Success */
 }
 
 
@@ -221,11 +211,8 @@ errr macro_add(const char* pat, const char* act)
  */
 void macro_init(void)
 {
-	/* Macro patterns */
-	C_MAKE(macro__pat, MACRO_MAX, const char*);
-
-	/* Macro actions */
-	C_MAKE(macro__act, MACRO_MAX, const char*);
+	macro__pat = C_ZNEW(MACRO_MAX, const char*); /* Macro patterns */
+	macro__act = C_ZNEW(MACRO_MAX, const char*); /* Macro actions */
 }
 
 

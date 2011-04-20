@@ -494,11 +494,7 @@ void display_monlist(void)
 
 	monster_race *r_ptr;
 
-	u16b* race_counts;
-
-
-	/* Allocate the array */
-	C_MAKE(race_counts, z_info->r_max, u16b);
+	u16b * const race_counts = C_ZNEW(z_info->r_max, u16b);
 
 	/* Iterate over mon_list */
 	for (idx = 1; idx < mon_max; idx++)

@@ -856,10 +856,8 @@ static void race_aux_hook(birth_menu r_str)
 static int get_player_race(void)
 {
 	int i, res;
-	birth_menu *races;
 	byte tmp8u = p_ptr->prace;
-
-	C_MAKE(races, z_info->p_max, birth_menu);
+	birth_menu * const races = C_ZNEW(z_info->p_max, birth_menu);
 
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
@@ -872,21 +870,13 @@ static int get_player_race(void)
 		races[i].grayed = FALSE;
 	}
 
-	res = get_player_choice(races, z_info->p_max, tmp8u,
-	                                 RACE_COL, 15, &tmp8u,
-	                                 "birth.txt", race_aux_hook);
-
-	/* Free memory */
-	FREE(races);
-
-	/* No selection? */
-	if (res < 0) return (res);
-
-	/* Save the race pointer */
-	p_ptr->set_race(tmp8u);
-
-	/* Success */
-	return (TRUE);
+	res = get_player_choice(races, z_info->p_max, tmp8u, RACE_COL, 15,
+	                        &tmp8u, "birth.txt", race_aux_hook);
+	
+	FREE(races); /* Free memory */
+	if (res < 0) return res; /* No selection? */
+	p_ptr->set_race(tmp8u); /* Save the race pointer */
+	return true; /* Success */
 }
 
 
@@ -927,10 +917,8 @@ static void class_aux_hook(birth_menu c_str)
 static int get_player_class(void)
 {
 	int i, res;
-	birth_menu *classes;
 	byte tmp8u = p_ptr->pclass;
-
-	C_MAKE(classes, z_info->c_max, birth_menu);
+	birth_menu * const classes = C_ZNEW(z_info->c_max, birth_menu);
 
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
@@ -942,27 +930,19 @@ static int get_player_class(void)
 	for (i = 0; i < z_info->c_max; i++)
 	{
 		/* Analyze */
-		if (!(p_ptr->rp_ptr->choice & (1L << i))) classes[i].grayed = TRUE;
-		else classes[i].grayed = FALSE;
+		classes[i].grayed = (p_ptr->rp_ptr->choice & (1L << i)) ? false : true;
 
 		/* Save the string */
 		classes[i].name = player_type::class_name(i);
 	}
 
-	res = get_player_choice(classes, z_info->c_max, tmp8u,
-	                                  CLASS_COL, 20, &tmp8u,
-	                                  "birth.txt", class_aux_hook);
+	res = get_player_choice(classes, z_info->c_max, tmp8u, CLASS_COL, 20,
+	                        &tmp8u, "birth.txt", class_aux_hook);
 
-	/* Free memory */
-	FREE(classes);
-
-	/* No selection? */
-	if (res < 0) return (res);
-
-	/* Set class */
-	p_ptr->set_class(tmp8u);
-
-	return (TRUE);
+	FREE(classes); /* Free memory */
+	if (res < 0) return res; /* No selection? */
+	p_ptr->set_class(tmp8u); /* Set class */
+	return TRUE;
 }
 
 

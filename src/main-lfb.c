@@ -670,7 +670,7 @@ int fb_read_tiles(char *name, bool quitonerr)
 	total = infoheader.biWidth * infoheader.biHeight;
 
 	/* Allocate image memory */
-	C_MAKE(tmp, total, byte);
+	tmp = C_ZNEW(total, byte);
 
 	/* Read the data */
 	for (y = 0; y < infoheader.biHeight; y++)

@@ -92,15 +92,6 @@ inline T* COPY(T* P1,const T* P2)
 	(WIPE(RNEW(T)))
 
 
-/** Allocate a wiped array of type T[N], assign to pointer P */
-#define C_MAKE(P,N,T) \
-	((P)=C_ZNEW(N,T))
-
-/** Allocate a wiped thing of type T, assign to pointer P */
-#define MAKE(P,T) \
-	((P)=ZNEW(T))
-
-
 /** Free one thing at P, return NULL */
 #define FREE(P) \
 	(mem_free(P))

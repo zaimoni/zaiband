@@ -227,7 +227,7 @@ errr process_pref_file_command(char *buf)
 	if (!buf[0]) return (0);
 
 	/* Skip "blank" lines */
-	if (isspace((unsigned char)buf[0])) return (0);
+	if (isspace((unsigned char)buf[0])) return 0;
 
 	/* Skip comments */
 	if (buf[0] == '#') return (0);
@@ -250,11 +250,11 @@ errr process_pref_file_command(char *buf)
 			i = strtol(zz[0], NULL, 0);
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
-			if ((i < 0) || (i >= (long)z_info->r_max)) return (1);
+			if ((i < 0) || (i >= (long)z_info->r_max)) return 1;
 			r_ptr = &monster_type::r_info[i];
 			if (n1) r_ptr->x._attr = (byte)n1;
 			if (n2) r_ptr->x._char = (char)n2;
-			return (0);
+			return 0;
 		}
 	}
 
@@ -268,11 +268,11 @@ errr process_pref_file_command(char *buf)
 			i = strtol(zz[0], NULL, 0);
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
-			if ((i < 0) || (i >= (long)z_info->k_max)) return (1);
+			if ((i < 0) || (i >= (long)z_info->k_max)) return 1;
 			k_ptr = &object_type::k_info[i];
 			if (n1) k_ptr->x._attr = (byte)n1;
 			if (n2) k_ptr->x._char = (char)n2;
-			return (0);
+			return 0;
 		}
 	}
 
@@ -286,11 +286,11 @@ errr process_pref_file_command(char *buf)
 			i = strtol(zz[0], NULL, 0);
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
-			if ((i < 0) || (i >= (long)z_info->f_max)) return (1);
+			if ((i < 0) || (i >= (long)z_info->f_max)) return 1;
 			f_ptr = &feature_type::f_info[i];
 			if (n1) f_ptr->x._attr = (byte)n1;
 			if (n2) f_ptr->x._char = (char)n2;
-			return (0);
+			return 0;
 		}
 	}
 
@@ -304,11 +304,11 @@ errr process_pref_file_command(char *buf)
 			i = strtol(zz[0], NULL, 0);
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
-			if ((i < 0) || (i >= (long)z_info->flavor_max)) return (1);
+			if ((i < 0) || (i >= (long)z_info->flavor_max)) return 1;
 			flavor_ptr = &object_kind::flavor_info[i];
 			if (n1) flavor_ptr->x._attr = (byte)n1;
 			if (n2) flavor_ptr->x._char = (char)n2;
-			return (0);
+			return 0;
 		}
 	}
 
@@ -321,10 +321,10 @@ errr process_pref_file_command(char *buf)
 			i = strtol(zz[0], NULL, 0);
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
-			if ((i < 0) || (i >= (long)N_ELEMENTS(misc_to_attr))) return (1);
+			if ((i < 0) || (i >= (long)N_ELEMENTS(misc_to_attr))) return 1;
 			misc_to_attr[i] = (byte)n1;
 			misc_to_char[i] = (char)n2;
-			return (0);
+			return 0;
 		}
 	}
 
@@ -336,9 +336,9 @@ errr process_pref_file_command(char *buf)
 		{
 			i = strtol(zz[0], NULL, 0) % 128;
 			n1 = strtol(zz[1], NULL, 0);
-			if ((i < 0) || (i >= (long)N_ELEMENTS(tval_to_attr))) return (1);
+			if ((i < 0) || (i >= (long)N_ELEMENTS(tval_to_attr))) return 1;
 			if (n1) tval_to_attr[i] = (byte)n1;
-			return (0);
+			return 0;
 		}
 	}
 
@@ -347,7 +347,7 @@ errr process_pref_file_command(char *buf)
 	else if (buf[0] == 'A')
 	{
 		text_to_ascii(macro_buffer, sizeof(macro_buffer), buf+2);
-		return (0);
+		return 0;
 	}
 
 	/* Process "P:<str>" -- create macro */
@@ -356,20 +356,19 @@ errr process_pref_file_command(char *buf)
 		char tmp[1024];
 		text_to_ascii(tmp, sizeof(tmp), buf+2);
 		if (macro_add(tmp, macro_buffer)) return (1);
-		return (0);
+		return 0;
 	}
 
 	/* Process "C:<num>:<str>" -- create keymap */
 	else if (buf[0] == 'C')
 	{
 		long mode;
-
 		char tmp[1024];
 
-		if (tokenize(buf+2, 2, zz) != 2) return (1);
+		if (tokenize(buf+2, 2, zz) != 2) return 1;
 
 		mode = strtol(zz[0], NULL, 0);
-		if ((mode < 0) || (mode >= KEYMAP_MODES)) return (1);
+		if ((mode < 0) || (mode >= KEYMAP_MODES)) return 1;
 
 		text_to_ascii(tmp, sizeof(tmp), zz[1]);
 		if (!tmp[0] || tmp[1]) return (1);
@@ -379,7 +378,7 @@ errr process_pref_file_command(char *buf)
 
 		keymap_act[mode][i] = string_make(macro_buffer);
 
-		return (0);
+		return 0;
 	}
 
 
@@ -389,12 +388,12 @@ errr process_pref_file_command(char *buf)
 		if (tokenize(buf+2, 5, zz) == 5)
 		{
 			i = strtol(zz[0], NULL, 0);
-			if ((i < 0) || (i >= MAX_COLORS)) return (1);
+			if ((i < 0) || (i >= MAX_COLORS)) return 1;
 			angband_color_table[i][0] = (byte)strtol(zz[1], NULL, 0);
 			angband_color_table[i][1] = (byte)strtol(zz[2], NULL, 0);
 			angband_color_table[i][2] = (byte)strtol(zz[3], NULL, 0);
 			angband_color_table[i][3] = (byte)strtol(zz[4], NULL, 0);
-			return (0);
+			return 0;
 		}
 	}
 
@@ -403,9 +402,7 @@ errr process_pref_file_command(char *buf)
 	/* Process "T:<template>:<modifier chr>:<modifier name>:..." */
 	else if (buf[0] == 'T')
 	{
-		int tok;
-
-		tok = tokenize(buf + 2, MAX_MACRO_MOD + 2, zz);
+		int tok = tokenize(buf + 2, MAX_MACRO_MOD + 2, zz);
 
 		/* Trigger template */
 		if (tok >= 4)
@@ -440,10 +437,6 @@ errr process_pref_file_command(char *buf)
 		/* Macro trigger */
 		else if (tok >= 2)
 		{
-			char *buf;
-			const char* s;
-			char *t;
-
 			if (max_macrotrigger >= MAX_MACRO_TRIGGER)
 			{
 				msg_print("Too many macro triggers!");
@@ -451,11 +444,11 @@ errr process_pref_file_command(char *buf)
 			}
 
 			/* Buffer for the trigger name */
-			C_MAKE(buf, strlen(zz[0]) + 1, char);
+			char *buf = C_ZNEW(strlen(zz[0]) + 1, char);
 
 			/* Simulate strcpy() and skip the '\' escape character */
-			s = zz[0];
-			t = buf;
+			const char *s = zz[0];
+			char *t = buf;
 
 			while (*s)
 			{
@@ -475,19 +468,9 @@ errr process_pref_file_command(char *buf)
 			/* Normal keycode */
 			macro_trigger_keycode[0][max_macrotrigger] = string_make(zz[1]);
 
-			/* Special shifted keycode */
-			if (tok == 3)
-			{
-				macro_trigger_keycode[1][max_macrotrigger] = string_make(zz[2]);
-			}
-			/* Shifted keycode is the same as the normal keycode */
-			else
-			{
-				macro_trigger_keycode[1][max_macrotrigger] = string_make(zz[1]);
-			}
-
-			/* Count triggers */
-			max_macrotrigger++;
+			macro_trigger_keycode[1][max_macrotrigger++] /* count trigger while we're here */ 
+				= string_make(zz[3 == tok ? 2 /* Special shifted keycode */
+					                      : 1]); /* Shifted keycode is the same as the normal keycode */
 		}
 
 		return 0;
@@ -502,12 +485,12 @@ errr process_pref_file_command(char *buf)
 			if (options[i].text && streq(options[i].text, buf + 2))
 			{
 				op_ptr->opt[i] = FALSE;
-				return (0);
+				return 0;
 			}
 		}
 
 		/* Ignore unknown options */
-		return (0);
+		return 0;
 	}
 
 	/* Process "Y:<str>" -- turn option on */
@@ -519,32 +502,30 @@ errr process_pref_file_command(char *buf)
 			if (options[i].text && streq(options[i].text, buf + 2))
 			{
 				op_ptr->opt[i] = TRUE;
-				return (0);
+				return 0;
 			}
 		}
 
 		/* Ignore unknown options */
-		return (0);
+		return 0;
 	}
 
 
 	/* Process "W:<win>:<flag>:<value>" -- window flags */
 	else if (buf[0] == 'W')
 	{
-		long win, flag, value;
-
 		if (tokenize(buf + 2, 3, zz) == 3)
 		{
-			win = strtol(zz[0], NULL, 0);
-			flag = strtol(zz[1], NULL, 0);
-			value = strtol(zz[2], NULL, 0);
+			long win = strtol(zz[0], NULL, 0);
+			long flag = strtol(zz[1], NULL, 0);
+			long value = strtol(zz[2], NULL, 0);
 
 			/* Ignore illegal windows */
 			/* Hack -- Ignore the main window */
-			if ((win <= 0) || (win >= ANGBAND_TERM_MAX)) return (1);
+			if ((win <= 0) || (win >= ANGBAND_TERM_MAX)) return 1;
 
 			/* Ignore illegal flags */
-			if ((flag < 0) || (flag >= (int)N_ELEMENTS(window_flag_desc))) return (1);
+			if ((flag < 0) || (flag >= (int)N_ELEMENTS(window_flag_desc))) return 1;
 
 			/* Require a real flag */
 			if (window_flag_desc[flag])
@@ -562,7 +543,7 @@ errr process_pref_file_command(char *buf)
 			}
 
 			/* Success */
-			return (0);
+			return 0;
 		}
 	}
 
@@ -583,9 +564,7 @@ errr process_pref_file_command(char *buf)
 		}
 	}
 
-
-	/* Failure */
-	return (1);
+	return 1; /* Failure */
 }
 
 

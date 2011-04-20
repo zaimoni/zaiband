@@ -2834,7 +2834,7 @@ static XImage *ReadFONT(Display *dpy, char *Name, u16b size)
 	}
 
 	/* Allocate image memory */
-	C_MAKE(Data, total, char);
+	Data = C_ZNEW(total, char);
 
 	Res = XCreateImage(dpy, visual, depth, ZPixmap, 0,
 	                   Data, size * 32, size * 128,
@@ -3053,7 +3053,7 @@ static errr term_data_init(term_data *td, int i)
 
 
 	/* Prepare the standard font */
-	MAKE(td->fnt, infofnt);
+	td->fnt = ZNEW(infofnt);
 	Infofnt_set(td->fnt);
 	if (Infofnt_init_data(font)) quit_fmt("Couldn't load the requested font. (%s)", font);
 
@@ -3073,7 +3073,7 @@ static errr term_data_init(term_data *td, int i)
 	}
 
 	/* Create a top-window */
-	MAKE(td->win, infowin);
+	td->win = ZNEW(infowin);
 	Infowin_set(td->win);
 	Infowin_init_top(x, y, wid, hgt, 0,
 	                 Metadpy->fg, Metadpy->bg);
@@ -3252,7 +3252,7 @@ errr init_xpj(int argc, char **argv)
 
 
 	/* Prepare cursor color */
-	MAKE(xor, infoclr);
+	xor = ZNEW(infoclr);
 	Infoclr_set(xor);
 	Infoclr_init_ppn(Metadpy->fg, Metadpy->bg, "xor", 0);
 
@@ -3262,7 +3262,7 @@ errr init_xpj(int argc, char **argv)
 	{
 		Pixell pixel;
 
-		MAKE(clr[i], infoclr);
+		clr[i] = ZNEW(infoclr);
 
 		Infoclr_set(clr[i]);
 

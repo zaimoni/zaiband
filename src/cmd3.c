@@ -794,11 +794,11 @@ void do_cmd_query_symbol(void)
 	char sym, query;
 	char buf[128];
 
-	bool all = FALSE;
-	bool uniq = FALSE;
-	bool norm = FALSE;
+	bool all = false;
+	bool uniq = false;
+	bool norm = false;
 
-	bool recall = FALSE;
+	bool recall = false;
 
 	u16b why = 0;
 	u16b *who;
@@ -808,47 +808,48 @@ void do_cmd_query_symbol(void)
 	if (!get_com("Enter character to be identified: ", &sym)) return;
 
 	/* Describe */
-	if (sym == KTRL('A'))
+	switch(sym)
 	{
-		all = TRUE;
+	case KTRL('A'):
+		all = true;
 		strcpy(buf, "Full monster list.");
-	}
-	else if (sym == KTRL('U'))
-	{
-		all = uniq = TRUE;
+		break;
+	case KTRL('U'):
+		all = uniq = true;
 		strcpy(buf, "Unique monster list.");
-	}
-	else if (sym == KTRL('N'))
-	{
-		all = norm = TRUE;
+		break;
+	case KTRL('N'):
+		all = norm = true;
 		strcpy(buf, "Non-unique monster list.");
-	}
-	else
-	{
+		break;
+	default:
 		/* Find that character info, and describe it */
 		for (i = 0; ident_info[i] && sym != ident_info[i][0]; ++i);
 
 		strnfmt(buf, sizeof(buf), "%c - %s.", sym,
 			(ident_info[i] ? ident_info[i] + 2 : "Unknown Symbol"));
+//		break;
 	}
 
 	prt(buf, 0, 0);	/* Display the result */
-	C_MAKE(who, z_info->r_max, u16b);	/* Allocate the "who" array */
+	who = C_ZNEW(z_info->r_max, u16b);	/* Allocate the "who" array */
 
 	/* Collect matching monsters */
 	for (n = 0, i = 1; i < z_info->r_max - 1; i++)
 	{
 		monster_race *r_ptr = &monster_type::r_info[i];
-		monster_lore *l_ptr = &monster_type::l_list[i];
 
 		/* Nothing to recall */
-		if (!OPTION(adult_know) && !l_ptr->sights) continue;
+		if (!OPTION(adult_know) && !monster_type::l_list[i].sights) continue;
 
-		/* Require non-unique monsters if needed */
-		if (norm && (r_ptr->flags[0] & RF0_UNIQUE)) continue;
-
-		/* Require unique monsters if needed */
-		if (uniq && !(r_ptr->flags[0] & RF0_UNIQUE)) continue;
+		if (r_ptr->flags[0] & RF0_UNIQUE)
+		{	/* Require unique monsters if needed */
+			if (norm) continue;
+		}
+		else
+		{	/* Require non-unique monsters if needed */
+			if (uniq) continue;
+		}
 
 		/* Collect "appropriate" monsters */
 		if (all || (r_ptr->d._char == sym)) who[n++] = i;

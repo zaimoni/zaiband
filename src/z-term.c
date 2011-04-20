@@ -311,8 +311,7 @@ static errr term_win_nuke(term_win *s)
 	KILL(s->vta);
 	KILL(s->vtc);
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
 
 
@@ -324,20 +323,20 @@ static errr term_win_init(term_win *s, int w, int h)
 	int y;
 
 	/* Make the window access arrays */
-	C_MAKE(s->a, h, byte*);
-	C_MAKE(s->c, h, char*);
+	s->a = C_ZNEW(h, byte*);
+	s->c = C_ZNEW(h, char*);
 
 	/* Make the window content arrays */
-	C_MAKE(s->va, h * w, byte);
-	C_MAKE(s->vc, h * w, char);
+	s->va = C_ZNEW(h * w, byte);
+	s->vc = C_ZNEW(h * w, char);
 
 	/* Make the terrain access arrays */
-	C_MAKE(s->ta, h, byte*);
-	C_MAKE(s->tc, h, char*);
+	s->ta = C_ZNEW(h, byte*);
+	s->tc = C_ZNEW(h, char*);
 
 	/* Make the terrain content arrays */
-	C_MAKE(s->vta, h * w, byte);
-	C_MAKE(s->vtc, h * w, char);
+	s->vta = C_ZNEW(h * w, byte);
+	s->vtc = C_ZNEW(h * w, char);
 
 	/* Prepare the window access arrays */
 	for (y = 0; y < h; y++)
@@ -349,8 +348,7 @@ static errr term_win_init(term_win *s, int w, int h)
 		s->tc[y] = s->vtc + w * y;
 	}
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
 
 
@@ -392,13 +390,9 @@ static errr term_win_copy(term_win *s, term_win *f, int w, int h)
 	s->cu = f->cu;
 	s->cv = f->cv;
 
-	/* Copy resize hook */
-	s->resize_hook = f->resize_hook;
-
-	/* Success */
-	return (0);
+	s->resize_hook = f->resize_hook; /* Copy resize hook */
+	return 0; /* Success */
 }
-
 
 
 /*** External hooks ***/
@@ -2031,10 +2025,8 @@ errr Term_inkey(ui_event_data *ch, bool wait, bool take)
 	/* If requested, advance the queue, wrap around if necessary */
 	if (take && (++Term->key_tail == Term->key_size)) Term->key_tail = 0;
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
-
 
 
 /*** Extra routines ***/
@@ -2044,14 +2036,9 @@ errr Term_inkey(ui_event_data *ch, bool wait, bool take)
  */
 errr Term_set_resize_hook(void (*hook)(void))
 {
-	/* Ensure hook */
-	if (!hook) return (-1);
-
-	/* Set hook */
-	Term->scr->resize_hook = hook;
-
-	/* Success */
-	return (0);
+	if (!hook) return -1; /* Ensure hook */
+	Term->scr->resize_hook = hook; /* Set hook */
+	return 0; /* Success */
 }
 
 /**
@@ -2064,26 +2051,17 @@ errr Term_save(void)
 	int w = Term->wid;
 	int h = Term->hgt;
 
-	term_win *mem;
+	term_win *mem = ZNEW(term_win); /* Allocate window */
 
-	/* Allocate window */
-	MAKE(mem, term_win);
-
-	/* Initialize window */
-	term_win_init(mem, w, h);
-
-	/* Grab */
-	term_win_copy(mem, Term->scr, w, h);
+	term_win_init(mem, w, h); /* Initialize window */
+	term_win_copy(mem, Term->scr, w, h); /* Grab */
 
 	/* Front of the queue */
 	mem->next = Term->mem;
 	Term->mem = mem;
 
-	/* Nuke the resize hook (safety) */
-	Term->scr->resize_hook = NULL;
-
-	/* Success */
-	return (0);
+	Term->scr->resize_hook = NULL; /* Nuke the resize hook (safety) */
+	return 0; /* Success */
 }
 
 
@@ -2099,22 +2077,13 @@ errr Term_load(void)
 	int w = Term->wid;
 	int h = Term->hgt;
 
-	term_win *tmp;
-
 	/* Pop off window from the list */
 	if (Term->mem)
 	{
-		/* Save pointer to old mem */
-		tmp = Term->mem;
-
-		/* Forget it */
-		Term->mem = Term->mem->next;
-
-		/* Load */
-		term_win_copy(Term->scr, tmp, w, h);
-
-		/* Free the old window */
-		(void)term_win_nuke(tmp);
+		term_win *tmp = Term->mem; /* Save pointer to old mem */
+		Term->mem = Term->mem->next; /* Forget it */
+		term_win_copy(Term->scr, tmp, w, h); /* Load */
+		term_win_nuke(tmp); /* Free the old window */
 	}
 
 	/* Assume change */
@@ -2133,8 +2102,7 @@ errr Term_load(void)
 	if (Term->scr->resize_hook && (w != Term->wid) && (h != Term->hgt))
 		Term->scr->resize_hook();
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
 
 
@@ -2146,67 +2114,47 @@ errr Term_resize(int w, int h)
 {
 	int i;
 
-	int wid, hgt;
-
-	byte *hold_x1;
-	byte *hold_x2;
-
-	term_win *hold_old;
-	term_win *hold_scr;
-	term_win *hold_mem;
-	term_win *hold_tmp;
-
-
 	/* Resizing is forbidden */
-	if (Term->fixed_shape) return (-1);
-
+	if (Term->fixed_shape) return -1;
 
 	/* Ignore illegal changes */
-	if ((w < 1) || (h < 1)) return (-1);
-
+	if ((w < 1) || (h < 1)) return -1;
 
 	/* Ignore non-changes */
-	if ((Term->wid == w) && (Term->hgt == h)) return (1);
-
+	if ((Term->wid == w) && (Term->hgt == h)) return 1;
 
 	/* Minimum dimensions */
-	wid = MIN(Term->wid, w);
-	hgt = MIN(Term->hgt, h);
+	const int wid = MIN(Term->wid, w);
+	const int hgt = MIN(Term->hgt, h);
 
 	/* Save scanners */
-	hold_x1 = Term->x1;
-	hold_x2 = Term->x2;
+	byte * const hold_x1 = Term->x1;
+	byte * const hold_x2 = Term->x2;
 
 	/* Save old window */
-	hold_old = Term->old;
+	term_win * const hold_old = Term->old;
 
 	/* Save old window */
-	hold_scr = Term->scr;
+	term_win * const hold_scr = Term->scr;
 
 	/* Save old window */
-	hold_mem = Term->mem;
+	term_win * const hold_mem = Term->mem;
 
 	/* Save old window */
-	hold_tmp = Term->tmp;
+	term_win * const hold_tmp = Term->tmp;
 
 	/* Create new scanners */
-	C_MAKE(Term->x1, h, byte);
-	C_MAKE(Term->x2, h, byte);
+	Term->x1 = C_ZNEW(h, byte);
+	Term->x2 = C_ZNEW(h, byte);
 
-	/* Create new window */
-	MAKE(Term->old, term_win);
-
-	/* Initialize new window */
-	term_win_init(Term->old, w, h);
+	Term->old = ZNEW(term_win); /* Create new window */
+	term_win_init(Term->old, w, h); /* Initialize new window */
 
 	/* Save the contents */
 	term_win_copy(Term->old, hold_old, wid, hgt);
 
-	/* Create new window */
-	MAKE(Term->scr, term_win);
-
-	/* Initialize new window */
-	term_win_init(Term->scr, w, h);
+	Term->scr = ZNEW(term_win); /* Create new window */
+	term_win_init(Term->scr, w, h); /* Initialize new window */
 
 	/* Save the contents */
 	term_win_copy(Term->scr, hold_scr, wid, hgt);
@@ -2214,11 +2162,8 @@ errr Term_resize(int w, int h)
 	/* If needed */
 	if (hold_mem)
 	{
-		/* Create new window */
-		MAKE(Term->mem, term_win);
-
-		/* Initialize new window */
-		term_win_init(Term->mem, w, h);
+		Term->mem = ZNEW(term_win); /* Create new window */
+		term_win_init(Term->mem, w, h); /* Initialize new window */
 
 		/* Save the contents */
 		term_win_copy(Term->mem, hold_mem, wid, hgt);
@@ -2227,11 +2172,8 @@ errr Term_resize(int w, int h)
 	/* If needed */
 	if (hold_tmp)
 	{
-		/* Create new window */
-		MAKE(Term->tmp, term_win);
-
-		/* Initialize new window */
-		term_win_init(Term->tmp, w, h);
+		Term->tmp = ZNEW(term_win); /* Create new window */
+		term_win_init(Term->tmp, w, h); /* Initialize new window */
 
 		/* Save the contents */
 		term_win_copy(Term->tmp, hold_tmp, wid, hgt);
@@ -2241,21 +2183,15 @@ errr Term_resize(int w, int h)
 	FREE(hold_x1);
 	FREE(hold_x2);
 
-	/* Nuke */
-	term_win_nuke(hold_old);
-
-	/* Kill */
-	FREE(hold_old);
+	term_win_nuke(hold_old); /* Nuke */
+	FREE(hold_old); /* Kill */
 
 	/* Illegal cursor */
 	if (Term->old->cx >= w) Term->old->cu = 1;
 	if (Term->old->cy >= h) Term->old->cu = 1;
 
-	/* Nuke */
-	term_win_nuke(hold_scr);
-
-	/* Kill */
-	FREE(hold_scr);
+	term_win_nuke(hold_scr); /* Nuke */
+	FREE(hold_scr); /* Kill */
 
 	/* Illegal cursor */
 	if (Term->scr->cx >= w) Term->scr->cu = 1;
@@ -2264,11 +2200,8 @@ errr Term_resize(int w, int h)
 	/* If needed */
 	if (hold_mem)
 	{
-		/* Nuke */
-		term_win_nuke(hold_mem);
-
-		/* Kill */
-		FREE(hold_mem);
+		term_win_nuke(hold_mem); /* Nuke */
+		FREE(hold_mem); /* Kill */
 
 		/* Illegal cursor */
 		if (Term->mem->cx >= w) Term->mem->cu = 1;
@@ -2278,11 +2211,8 @@ errr Term_resize(int w, int h)
 	/* If needed */
 	if (hold_tmp)
 	{
-		/* Nuke */
-		term_win_nuke(hold_tmp);
-
-		/* Kill */
-		FREE(hold_tmp);
+		term_win_nuke(hold_tmp); /* Nuke */
+		FREE(hold_tmp); /* Kill */
 
 		/* Illegal cursor */
 		if (Term->tmp->cx >= w) Term->tmp->cu = 1;
@@ -2320,8 +2250,7 @@ errr Term_resize(int w, int h)
 		Term_event_push(&evt);
 	}
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
 
 
@@ -2441,42 +2370,25 @@ errr term_init(term *t, int w, int h, int k)
 {
 	int y;
 
-
-	/* Wipe it */
-	(void)WIPE(t);
-
-	/* Prepare the input queue */
-	t->key_head = t->key_tail = 0;
-
-	/* Determine the input queue size */
-	t->key_size = k;
+	WIPE(t); /* Wipe it */
+	t->key_head = t->key_tail = 0; /* Prepare the input queue */
+	t->key_size = k; /* Determine the input queue size */
 
 	/* Allocate the input queue */
-	C_MAKE(t->key_queue, t->key_size, ui_event_data);
-
+	t->key_queue = C_ZNEW(t->key_size, ui_event_data);
 
 	/* Save the size */
 	t->wid = w;
 	t->hgt = h;
 
 	/* Allocate change arrays */
-	C_MAKE(t->x1, h, byte);
-	C_MAKE(t->x2, h, byte);
+	t->x1 = C_ZNEW(h, byte);
+	t->x2 = C_ZNEW(h, byte);
 
-
-	/* Allocate "displayed" */
-	MAKE(t->old, term_win);
-
-	/* Initialize "displayed" */
-	term_win_init(t->old, w, h);
-
-
-	/* Allocate "requested" */
-	MAKE(t->scr, term_win);
-
-	/* Initialize "requested" */
-	term_win_init(t->scr, w, h);
-
+	t->old = ZNEW(term_win); /* Allocate "displayed" */
+	term_win_init(t->old, w, h); /* Initialize "displayed" */
+	t->scr = ZNEW(term_win); /* Allocate "requested" */
+	term_win_init(t->scr, w, h); /* Initialize "requested" */
 
 	/* Assume change */
 	for (y = 0; y < h; y++)
@@ -2490,15 +2402,11 @@ errr term_init(term *t, int w, int h, int k)
 	t->y1 = 0;
 	t->y2 = h - 1;
 
-	/* Force "total erase" */
-	t->total_erase = TRUE;
-
+	t->total_erase = TRUE; /* Force "total erase" */
 
 	/* Default "blank" */
 	t->attr_blank = 0;
 	t->char_blank = ' ';
 
-
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }

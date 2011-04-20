@@ -57,11 +57,8 @@ static errr init_names(void)
 	int i;
 
 	/* Temporary space for names, while reading and randomizing them. */
-	const char** names;
-
-	/* Allocate the "names" array */
 	/* ToDo: Make sure the memory is freed correctly in case of errors */
-	C_MAKE(names, z_info->a_max, const char*);
+	const char** names = C_ZNEW(z_info->a_max, const char*);
 
 	for (i = 0; i < z_info->a_max; i++)
 	{
@@ -90,8 +87,7 @@ static errr init_names(void)
 		name_size += strlen(names[i-1]) + 2;	/* skip first char */
 	}
 
-	C_MAKE(a_base, name_size, char);
-
+	a_base = C_ZNEW(name_size, char);
 	a_next = a_base + 1;	/* skip first char */
 
 	for (i = 1; i < z_info->a_max; i++)
@@ -105,10 +101,7 @@ static errr init_names(void)
 	/* Free the old names */
 	FREE(artifact_type::a_name);
 
-	for (i = 0; i < z_info->a_max; i++)
-	{
-		string_free(names[i]);
-	}
+	for (i = 0; i < z_info->a_max; i++) string_free(names[i]);
 
 	/* Free the "names" array */
 	FREE((void*)names);
@@ -119,7 +112,7 @@ static errr init_names(void)
 	a_head.name_size = name_size;
 
 	/* Success */
-	return (0);
+	return 0;
 }
 
 
@@ -1359,47 +1352,29 @@ static bool artifacts_acceptable(void)
 }
 
 
-static errr scramble(void)
+static void scramble(void)
 {
 	/* Allocate the "kinds" array */
-	C_MAKE(kinds, z_info->a_max, s16b);
+	kinds = C_ZNEW(z_info->a_max, s16b);
 
-	while (1)
-	{
+	do	{
 		int a_idx;
 
 		/* Generate all the artifacts. */
-		for (a_idx = 1; a_idx < z_info->a_max; a_idx++)
-		{
-			scramble_artifact(a_idx);
+		for (a_idx = 1; a_idx < z_info->a_max; a_idx++) scramble_artifact(a_idx);
 		}
+	while(!artifacts_acceptable());
 
-		if (artifacts_acceptable()) break;
-	}
-
-	/* Free the "kinds" array */
-	FREE(kinds);
-
-	/* Success */
-	return (0);
+	FREE(kinds); /* Free the "kinds" array */
 }
 
 
 static errr do_randart_aux(bool full)
 {
-	errr result;
-
-	/* Generate random names */
-	if ((result = init_names()) != 0) return (result);
-
-	if (full)
-	{
-		/* Randomize the artifacts */
-		if ((result = scramble()) != 0) return (result);
-	}
-
-	/* Success */
-	return (0);
+	const errr result = init_names(); /* Generate random names */
+	if (0 != result) return result;
+	if (full) scramble();
+	return 0; /* Success */
 }
 
 
@@ -1411,18 +1386,16 @@ static errr do_randart_aux(bool full)
  */
 errr do_randart(u32b randart_seed, bool full)
 {
-	errr err;
-
 	/* Prepare to use the Angband "simple" RNG. */
 	Rand_value = randart_seed;
 	Rand_quick = TRUE;
 
 	/* Generate the random artifact (names) */
-	err = do_randart_aux(full);
+	errr err = do_randart_aux(full);
 
 	/* When done, resume use of the Angband "complex" RNG. */
 	Rand_quick = FALSE;
 
-	return (err);
+	return err;
 }
 

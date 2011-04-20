@@ -398,7 +398,6 @@ static errr init_info_raw(int fd, header *head)
 {
 	header test;
 
-
 	/* Read and verify the header */
 	if (fd_read(fd, (char*)(&test), sizeof(header)) ||
 	    (test.v_major != head->v_major) ||
@@ -410,8 +409,7 @@ static errr init_info_raw(int fd, header *head)
 	    (test.head_size != head->head_size) ||
 	    (test.info_size != head->info_size))
 	{
-		/* Error */
-		return (-1);
+		return -1; /* Error */
 	}
 
 
@@ -419,7 +417,7 @@ static errr init_info_raw(int fd, header *head)
 	*head = test;
 
 	/* Allocate the "*_info" array */
-	C_MAKE(head->info_ptr, head->info_size, char);
+	head->info_ptr = C_ZNEW(head->info_size, char);
 
 	/* Read the "*_info" array */
 	fd_read(fd, (char*)head->info_ptr, head->info_size);
@@ -427,7 +425,7 @@ static errr init_info_raw(int fd, header *head)
 	if (head->name_size)
 	{
 		/* Allocate the "*_name" array */
-		C_MAKE(head->name_ptr, head->name_size, char);
+		head->name_ptr = C_ZNEW(head->name_size, char);
 
 		/* Read the "*_name" array */
 		fd_read(fd, head->name_ptr, head->name_size);
@@ -436,14 +434,13 @@ static errr init_info_raw(int fd, header *head)
 	if (head->text_size)
 	{
 		/* Allocate the "*_text" array */
-		C_MAKE(head->text_ptr, head->text_size, char);
+		head->text_ptr = C_ZNEW(head->text_size, char);
 
 		/* Read the "*_text" array */
 		fd_read(fd, head->text_ptr, head->text_size);
 	}
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
 
 
@@ -541,13 +538,13 @@ static errr init_info(const char* const filename, header *head)
 		/*** Make the fake arrays ***/
 
 		/* Allocate the "*_info" array */
-		C_MAKE(head->info_ptr, head->info_size, char);
+		head->info_ptr = C_ZNEW(head->info_size, char);
 
 		/* MegaHack -- make "fake" arrays */
 		if (z_info)
 		{
-			C_MAKE(head->name_ptr, z_info->fake_name_size, char);
-			C_MAKE(head->text_ptr, z_info->fake_text_size, char);
+			head->name_ptr = C_ZNEW(z_info->fake_name_size, char);
+			head->text_ptr = C_ZNEW(z_info->fake_text_size, char);
 		}
 
 
@@ -604,7 +601,7 @@ static errr init_info(const char* const filename, header *head)
 				plog_fmt("Cannot create the '%s' file!", buf);
 
 				/* Continue */
-				return (0);
+				return 0;
 			}
 		}
 
@@ -627,7 +624,7 @@ static errr init_info(const char* const filename, header *head)
 			plog_fmt("Cannot write the '%s' file!", buf);
 
 			/* Continue */
-			return (0);
+			return 0;
 		}
 
 		/* Dump to the file */
@@ -693,7 +690,7 @@ static errr init_info(const char* const filename, header *head)
 #endif /* ALLOW_TEMPLATES */
 
 	/* Success */
-	return (0);
+	return 0;
 }
 
 
@@ -1349,80 +1346,50 @@ static errr init_other(void)
 {
 	int i;
 
-
 	/*** Prepare the various "bizarre" arrays ***/
-
-	/* Initialize the "macro" package */
-	macro_init();
-
-	/* Initialize the "quark" package */
-	quarks_init();
-
-	/* Initialize the "message" package */
-	messages_init();
+	macro_init(); /* Initialize the "macro" package */
+	quarks_init(); /* Initialize the "quark" package */
+	messages_init(); /* Initialize the "message" package */
 
 	/*** Prepare grid arrays ***/
 
 	/* Array of grids */
-	C_MAKE(temp_g, TEMP_MAX, coord);
+	temp_g = C_ZNEW(TEMP_MAX, coord);
 
 	/* Hack -- use some memory twice */
 	temp_y = ((byte*)(temp_g)) + 0;
 	temp_x = ((byte*)(temp_g)) + TEMP_MAX;
 
-
 	/*** Prepare dungeon arrays ***/
-
-	/* Padded into array */
-	C_MAKE(cave_info, DUNGEON_HGT, byte_wid);
-
-	/* Feature array */
-	C_MAKE(cave_feat, DUNGEON_HGT, byte_wid);
+	cave_info = C_ZNEW(DUNGEON_HGT, byte_wid); /* info */
+	cave_feat = C_ZNEW(DUNGEON_HGT, byte_wid); /* features */
 
 	/* Entity arrays */
-	C_MAKE(cave_o_idx, DUNGEON_HGT, s16b_wid);
-	C_MAKE(cave_m_idx, DUNGEON_HGT, s16b_wid);
+	cave_o_idx = C_ZNEW(DUNGEON_HGT, s16b_wid); /* object */
+	cave_m_idx = C_ZNEW(DUNGEON_HGT, s16b_wid); /* monster */
 
 	/* Flow arrays */
-	C_MAKE(cave_cost, DUNGEON_HGT, byte_wid);
-	C_MAKE(cave_when, DUNGEON_HGT, byte_wid);
+	cave_cost = C_ZNEW(DUNGEON_HGT, byte_wid);
+	cave_when = C_ZNEW(DUNGEON_HGT, byte_wid);
 
 	/*** Prepare entity arrays ***/
-
-	/* Objects */
-	C_MAKE(o_list, z_info->o_max, object_type);
-
-	/* Monsters */
-	C_MAKE(mon_list, z_info->m_max, monster_type);
-
+	o_list = C_ZNEW(z_info->o_max, object_type); /* Objects */
+	mon_list = C_ZNEW(z_info->m_max, monster_type); /* Monsters */
 
 	/*** Prepare lore array ***/
-
-	/* Lore */
-	C_MAKE(monster_type::l_list, z_info->r_max, monster_lore);
-
+	monster_type::l_list = C_ZNEW(z_info->r_max, monster_lore);
 
 	/*** Prepare quest array ***/
-
-	/* Quests */
-	C_MAKE(q_list, MAX_Q_IDX, quest);
-
+	q_list = C_ZNEW(MAX_Q_IDX, quest);
 
 	/*** Prepare the player object awareness ***/
-
-	/* Allocate it */
-	C_MAKE(p_ptr->object_awareness, z_info->k_max, byte);
+	p_ptr->object_awareness = C_ZNEW(z_info->k_max, byte);
 
 	/*** Prepare the inventory ***/
-
-	/* Allocate it */
-	C_MAKE(p_ptr->inventory, INVEN_TOTAL, object_type);
-
+	p_ptr->inventory = C_ZNEW(INVEN_TOTAL, object_type);
 
 	/*** Prepare the stores ***/
-
-	/* Allocate the stores */
-	C_MAKE(store, MAX_STORES, store_type);
+	store = C_ZNEW(MAX_STORES, store_type);
 
 	/* Fill in each store */
 	for (i = 0; i < MAX_STORES; i++)
@@ -1436,7 +1403,7 @@ static errr init_other(void)
 		st_ptr->stock_size = STORE_INVEN_MAX;
 
 		/* Allocate the stock */
-		C_MAKE(st_ptr->stock, st_ptr->stock_size, object_type);
+		st_ptr->stock = C_ZNEW(st_ptr->stock_size, object_type);
 
 		/* No table for the black market or home */
 		if (N_ELEMENTS(store_table) <= i) continue;
@@ -1445,7 +1412,7 @@ static errr init_other(void)
 		st_ptr->table_size = store_table_limits[i];
 
 		/* Allocate the stock */
-		C_MAKE(st_ptr->table, st_ptr->table_size, s16b);
+		st_ptr->table = C_ZNEW(st_ptr->table_size, s16b);
 
 		/* Scan the choices */
 		for (k = 0; k < store_table_limits[i]; k++)
@@ -1497,12 +1464,8 @@ static errr init_alloc(void)
 
 
 	/*** Analyze object allocation info ***/
-
-	/* Clear the "aux" array */
-	C_WIPE(aux, MAX_DEPTH);
-
-	/* Clear the "num" array */
-	C_WIPE(num, MAX_DEPTH);
+	C_WIPE(aux, MAX_DEPTH); /* Clear the "aux" array */
+	C_WIPE(num, MAX_DEPTH); /* Clear the "num" array */
 
 	/* Size of "alloc_kind_table" */
 	alloc_kind_size = 0;
@@ -1527,21 +1490,15 @@ static errr init_alloc(void)
 		}
 	}
 
-	/* Collect the level indexes */
-	for (i = 1; i < MAX_DEPTH; i++)
-	{
-		/* Group by level */
-		num[i] += num[i-1];
-	}
+	/* Collect the level indexes, grouping by level */
+	for (i = 1; i < MAX_DEPTH; i++) num[i] += num[i-1];
 
 	/* Paranoia */
 	if (!num[0]) quit("No town objects!");
 
 
 	/*** Initialize object allocation info ***/
-
-	/* Allocate the alloc_kind_table */
-	C_MAKE(alloc_kind_table, alloc_kind_size, alloc_entry);
+	alloc_kind_table = C_ZNEW(alloc_kind_size, alloc_entry); /* Allocate */
 
 	/* Get the table entry */
 	table = alloc_kind_table;
@@ -1557,19 +1514,17 @@ static errr init_alloc(void)
 			/* Count the "legal" entries */
 			if (k_ptr->chance[j])
 			{
-				int p, x, y, z;
-
 				/* Extract the base level */
-				x = k_ptr->locale[j];
+				const int x = k_ptr->locale[j];
 
 				/* Extract the base probability */
-				p = (100 / k_ptr->chance[j]);
+				const int p = (100 / k_ptr->chance[j]);
 
 				/* Skip entries preceding our locale */
-				y = (x > 0) ? num[x-1] : 0;
+				const int y = (x > 0) ? num[x-1] : 0;
 
 				/* Skip previous entries at this locale */
-				z = y + aux[x];
+				const int z = y + aux[x];
 
 				/* Load the entry */
 				table[z].index = i;
@@ -1586,12 +1541,8 @@ static errr init_alloc(void)
 
 
 	/*** Analyze monster allocation info ***/
-
-	/* Clear the "aux" array */
-	C_WIPE(aux, MAX_DEPTH);
-
-	/* Clear the "num" array */
-	C_WIPE(num, MAX_DEPTH);
+	C_WIPE(aux, MAX_DEPTH); /* Clear the "aux" array */
+	C_WIPE(num, MAX_DEPTH); /* Clear the "num" array */
 
 	/* Size of "alloc_race_table" */
 	alloc_race_size = 0;
@@ -1613,21 +1564,15 @@ static errr init_alloc(void)
 		}
 	}
 
-	/* Collect the level indexes */
-	for (i = 1; i < MAX_DEPTH; i++)
-	{
-		/* Group by level */
-		num[i] += num[i-1];
-	}
+	/* Collect the level indexes, grouping by level */
+	for (i = 1; i < MAX_DEPTH; i++) num[i] += num[i-1];
 
 	/* Paranoia */
 	if (!num[0]) quit("No town monsters!");
 
 
 	/*** Initialize monster allocation info ***/
-
-	/* Allocate the alloc_race_table */
-	C_MAKE(alloc_race_table, alloc_race_size, alloc_entry);
+	alloc_race_table = C_ZNEW(alloc_race_size, alloc_entry); /* Allocate */
 
 	/* Get the table entry */
 	table = alloc_race_table;
@@ -1641,19 +1586,17 @@ static errr init_alloc(void)
 		/* Count valid pairs */
 		if (r_ptr->rarity)
 		{
-			int p, x, y, z;
-
 			/* Extract the base level */
-			x = r_ptr->level;
+			const int x = r_ptr->level;
 
 			/* Extract the base probability */
-			p = (100 / r_ptr->rarity);
+			const int p = (100 / r_ptr->rarity);
 
 			/* Skip entries preceding our locale */
-			y = (x > 0) ? num[x-1] : 0;
+			const int y = (x > 0) ? num[x-1] : 0;
 
 			/* Skip previous entries at this locale */
-			z = y + aux[x];
+			const int z = y + aux[x];
 
 			/* Load the entry */
 			table[z].index = i;
@@ -1668,12 +1611,8 @@ static errr init_alloc(void)
 	}
 
 	/*** Analyze ego_item allocation info ***/
-
-	/* Clear the "aux" array */
-	C_WIPE(aux, MAX_DEPTH);
-
-	/* Clear the "num" array */
-	C_WIPE(num, MAX_DEPTH);
+	C_WIPE(aux, MAX_DEPTH); /* Clear the "aux" array */
+	C_WIPE(num, MAX_DEPTH); /* Clear the "num" array */
 
 	/* Size of "alloc_ego_table" */
 	alloc_ego_size = 0;
@@ -1687,25 +1626,16 @@ static errr init_alloc(void)
 		/* Legal items */
 		if (e_ptr->rarity)
 		{
-			/* Count the entries */
-			alloc_ego_size++;
-
-			/* Group by level */
-			num[e_ptr->level]++;
+			alloc_ego_size++; /* Count the entries */
+			num[e_ptr->level]++; /* Group by level */
 		}
 	}
 
-	/* Collect the level indexes */
-	for (i = 1; i < MAX_DEPTH; i++)
-	{
-		/* Group by level */
-		num[i] += num[i-1];
-	}
+	/* Collect the level indexes, grouping by level */
+	for (i = 1; i < MAX_DEPTH; i++) num[i] += num[i-1];
 
 	/*** Initialize ego-item allocation info ***/
-
-	/* Allocate the alloc_ego_table */
-	C_MAKE(alloc_ego_table, alloc_ego_size, alloc_entry);
+	alloc_ego_table = C_ZNEW(alloc_ego_size, alloc_entry); /* Allocate */
 
 	/* Get the table entry */
 	table = alloc_ego_table;
@@ -1719,19 +1649,17 @@ static errr init_alloc(void)
 		/* Count valid pairs */
 		if (e_ptr->rarity)
 		{
-			int p, x, y, z;
-
 			/* Extract the base level */
-			x = e_ptr->level;
+			const int x = e_ptr->level;
 
 			/* Extract the base probability */
-			p = (100 / e_ptr->rarity);
+			const int p = (100 / e_ptr->rarity);
 
 			/* Skip entries preceding our locale */
-			y = (x > 0) ? num[x-1] : 0;
+			const int y = (x > 0) ? num[x-1] : 0;
 
 			/* Skip previous entries at this locale */
-			z = y + aux[x];
+			const int z = y + aux[x];
 
 			/* Load the entry */
 			table[z].index = i;
@@ -1746,8 +1674,7 @@ static errr init_alloc(void)
 	}
 
 
-	/* Success */
-	return (0);
+	return 0; /* Success */
 }
 
 

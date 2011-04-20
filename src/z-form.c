@@ -612,7 +612,7 @@ char *vformat(const char* fmt, va_list vp)
 	if (!format_buf)
 	{
 		format_len = 1024;
-		C_MAKE(format_buf, format_len, char);
+		format_buf = C_ZNEW(format_len, char);
 	}
 
 	/* Null format yields last result */
@@ -621,22 +621,20 @@ char *vformat(const char* fmt, va_list vp)
 	/* Keep going until successful */
 	while (1)
 	{
-		size_t len;
-
 		/* Build the string */
-		len = vstrnfmt(format_buf, format_len, fmt, vp);
+		const size_t len = vstrnfmt(format_buf, format_len, fmt, vp);
 
 		/* Success */
 		if (len < format_len-1) break;
 
 		/* Grow the buffer */
 		KILL(format_buf);
-		format_len = format_len * 2;
-		C_MAKE(format_buf, format_len, char);
+		format_len *= 2;
+		format_buf = C_ZNEW(format_len, char);
 	}
 
 	/* Return the new buffer */
-	return (format_buf);
+	return format_buf;
 }
 
 void vformat_kill(void)
@@ -650,20 +648,15 @@ void vformat_kill(void)
  */
 size_t strnfmt(char *buf, size_t max, const char* fmt, ...)
 {
-	size_t len;
 	va_list vp;
 
-	/* Begin the Varargs Stuff */
-	va_start(vp, fmt);
+	va_start(vp, fmt); /* Begin the Varargs Stuff */
 
 	/* Do the va_arg fmt to the buffer */
-	len = vstrnfmt(buf, max, fmt, vp);
+	const size_t len = vstrnfmt(buf, max, fmt, vp);
 
-	/* End the Varargs Stuff */
-	va_end(vp);
-
-	/* Return the number of bytes written */
-	return (len);
+	va_end(vp); /* End the Varargs Stuff */
+	return len; /* Return the number of bytes written */
 }
 
 
@@ -675,20 +668,15 @@ size_t strnfmt(char *buf, size_t max, const char* fmt, ...)
  */
 char *format(const char* fmt, ...)
 {
-	char *res;
 	va_list vp;
 
-	/* Begin the Varargs Stuff */
-	va_start(vp, fmt);
+	va_start(vp, fmt); /* Begin the Varargs Stuff */
 
 	/* Format the args */
-	res = vformat(fmt, vp);
+	char * const res = vformat(fmt, vp);
 
-	/* End the Varargs Stuff */
-	va_end(vp);
-
-	/* Return the result */
-	return (res);
+	va_end(vp); /* End the Varargs Stuff */
+	return res; /* Return the result */
 }
 
 
@@ -699,20 +687,15 @@ char *format(const char* fmt, ...)
  */
 void plog_fmt(const char* fmt, ...)
 {
-	char *res;
 	va_list vp;
 
-	/* Begin the Varargs Stuff */
-	va_start(vp, fmt);
+	va_start(vp, fmt); /* Begin the Varargs Stuff */
 
 	/* Format the args */
-	res = vformat(fmt, vp);
+	char * const res = vformat(fmt, vp);
 
-	/* End the Varargs Stuff */
-	va_end(vp);
-
-	/* Call plog */
-	plog(res);
+	va_end(vp); /* End the Varargs Stuff */
+	plog(res); /* Call plog */
 }
 
 
@@ -722,20 +705,15 @@ void plog_fmt(const char* fmt, ...)
  */
 void quit_fmt(const char* fmt, ...)
 {
-	char *res;
 	va_list vp;
 
-	/* Begin the Varargs Stuff */
-	va_start(vp, fmt);
+	va_start(vp, fmt); /* Begin the Varargs Stuff */
 
 	/* Format */
-	res = vformat(fmt, vp);
+	char * const res = vformat(fmt, vp);
 
-	/* End the Varargs Stuff */
-	va_end(vp);
-
-	/* Call quit() */
-	quit(res);
+	va_end(vp); /* End the Varargs Stuff */
+	quit(res); /* Call quit() */
 }
 
 
@@ -745,18 +723,13 @@ void quit_fmt(const char* fmt, ...)
  */
 void core_fmt(const char* fmt, ...)
 {
-	char *res;
 	va_list vp;
 
-	/* Begin the Varargs Stuff */
-	va_start(vp, fmt);
+	va_start(vp, fmt); /* Begin the Varargs Stuff */
 
 	/* If requested, Do a virtual fprintf to stderr */
-	res = vformat(fmt, vp);
+	char * const res = vformat(fmt, vp);
 
-	/* End the Varargs Stuff */
-	va_end(vp);
-
-	/* Call core() */
-	core(res);
+	va_end(vp); /* End the Varargs Stuff */
+	core(res); /* Call core() */
 }

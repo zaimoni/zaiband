@@ -40,9 +40,6 @@ extern size_t vstrnfmt(char *buf, size_t max, const char* fmt, va_list vp);
 /* Simple interface to "vstrnfmt()" */
 extern size_t strnfmt(char *buf, size_t max, const char* fmt, ...);
 
-/* Format arguments into a static resizing buffer */
-extern char *vformat(const char* fmt, va_list vp);
-
 /* Free the memory allocated for the format buffer */
 extern void vformat_kill(void);
 
