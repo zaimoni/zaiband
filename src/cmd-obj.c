@@ -103,7 +103,7 @@ static void obj_wear(object_type *o_ptr, int item)
 
 	/* Check the slot */
 	int slot = wield_slot(o_ptr);
-	assert((INVEN_EQUIP_ORIGIN < slot) && (slot < INVEN_EQUIP_STRICT_UB) && "retval precondition");
+	assert((INVEN_EQUIP_ORIGIN <= slot) && (slot < INVEN_EQUIP_STRICT_UB) && "retval precondition");
 	const object_type* const equip_o_ptr = &p_ptr->inventory[slot];
 
 	/* Prevent wielding into a cursed slot */
