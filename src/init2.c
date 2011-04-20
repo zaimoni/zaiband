@@ -1387,12 +1387,6 @@ static errr init_other(void)
 	C_MAKE(cave_cost, DUNGEON_HGT, byte_wid);
 	C_MAKE(cave_when, DUNGEON_HGT, byte_wid);
 
-	/*** Prepare "vinfo" array ***/
-
-	/* Used by "update_view()" */
-	vinfo_init();
-
-
 	/*** Prepare entity arrays ***/
 
 	/* Objects */

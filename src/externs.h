@@ -192,7 +192,6 @@ extern void lite_spot(coord g);
 extern void prt_map(void);
 extern void display_map(int *cy, int *cx);
 extern void do_cmd_view_map(void);
-extern errr vinfo_init(void);
 extern void forget_view(void);
 extern void update_view(void);
 extern void forget_flow(void);
