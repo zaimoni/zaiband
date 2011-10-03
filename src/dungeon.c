@@ -1340,6 +1340,9 @@ static void process_command(void)
 		/* Wear/wield equipment */
 		case 'w':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_wield();
 			break;
 		}
@@ -1347,6 +1350,9 @@ static void process_command(void)
 		/* Take off equipment */
 		case 't':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_takeoff();
 			break;
 		}
@@ -1354,6 +1360,9 @@ static void process_command(void)
 		/* Drop an item */
 		case 'd':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_drop();
 			break;
 		}
@@ -1361,6 +1370,9 @@ static void process_command(void)
 		/* Destroy an item */
 		case 'k':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_destroy();
 			break;
 		}
@@ -1368,6 +1380,9 @@ static void process_command(void)
 		/* Equipment list */
 		case 'e':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_equip();
 			break;
 		}
@@ -1375,6 +1390,9 @@ static void process_command(void)
 		/* Inventory list */
 		case 'i':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_inven();
 			break;
 		}
@@ -1385,6 +1403,9 @@ static void process_command(void)
 		/* Identify an object */
 		case 'I':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_observe();
 			break;
 		}
@@ -1392,6 +1413,9 @@ static void process_command(void)
 		/* Hack -- toggle windows */
 		case KTRL('E'):
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			toggle_inven_equip();
 			break;
 		}
@@ -1402,6 +1426,9 @@ static void process_command(void)
 		/* Alter a grid */
 		case '+':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_alter();
 			break;
 		}
@@ -1409,6 +1436,9 @@ static void process_command(void)
 		/* Dig a tunnel */
 		case 'T':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_tunnel();
 			break;
 		}
@@ -1416,6 +1446,9 @@ static void process_command(void)
 		/* Walk */
 		case ';':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_walk();
 			break;
 		}
@@ -1423,6 +1456,9 @@ static void process_command(void)
 		/* Jump */
 		case '-':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_jump();
 			break;
 		}
@@ -1433,6 +1469,9 @@ static void process_command(void)
 		/* Begin Running -- Arg is Max Distance */
 		case '.':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_run();
 			break;
 		}
@@ -1440,6 +1479,9 @@ static void process_command(void)
 		/* Hold still */
 		case ',':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_hold();
 			break;
 		}
@@ -1447,6 +1489,9 @@ static void process_command(void)
 		/* Stay still */
 		case 'g':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_stay();
 			break;
 		}
@@ -1454,6 +1499,9 @@ static void process_command(void)
 		/* Rest -- Arg is time */
 		case 'R':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_rest();
 			break;
 		}
@@ -1461,6 +1509,9 @@ static void process_command(void)
 		/* Search for traps/doors */
 		case 's':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_search();
 			break;
 		}
@@ -1468,6 +1519,9 @@ static void process_command(void)
 		/* Toggle search mode */
 		case 'S':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_toggle_search();
 			break;
 		}
@@ -1478,6 +1532,9 @@ static void process_command(void)
 		/* Enter store */
 		case '_':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_store();
 			break;
 		}
@@ -1485,6 +1542,9 @@ static void process_command(void)
 		/* Go up staircase */
 		case '<':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_go_up();
 			break;
 		}
@@ -1492,6 +1552,9 @@ static void process_command(void)
 		/* Go down staircase */
 		case '>':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_go_down();
 			break;
 		}
@@ -1499,6 +1562,9 @@ static void process_command(void)
 		/* Open a door or chest */
 		case 'o':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_open();
 			break;
 		}
@@ -1506,6 +1572,9 @@ static void process_command(void)
 		/* Close a door */
 		case 'c':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_close();
 			break;
 		}
@@ -1513,6 +1582,9 @@ static void process_command(void)
 		/* Jam a door with spikes */
 		case 'j':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_spike();
 			break;
 		}
@@ -1520,6 +1592,9 @@ static void process_command(void)
 		/* Bash a door */
 		case 'B':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_bash();
 			break;
 		}
@@ -1527,6 +1602,9 @@ static void process_command(void)
 		/* Disarm a trap or chest */
 		case 'D':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_disarm();
 			break;
 		}
@@ -1537,6 +1615,9 @@ static void process_command(void)
 		/* Gain new spells/prayers */
 		case 'G':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_study();
 			break;
 		}
@@ -1544,6 +1625,9 @@ static void process_command(void)
 		/* Browse a book */
 		case 'b':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_browse();
 			break;
 		}
@@ -1551,22 +1635,26 @@ static void process_command(void)
 		/* Cast a spell */
 		case 'm':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			if (p_ptr->spell_book() == TV_PRAYER_BOOK)
 				do_cmd_pray();
 			else
 				do_cmd_cast();
-
 			break;
 		}
 
 		/* Pray a prayer */
 		case 'p':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			if (p_ptr->spell_book() == TV_MAGIC_BOOK)
 				do_cmd_cast();
 			else
 				do_cmd_pray();
-
 			break;
 		}
 
@@ -1576,6 +1664,9 @@ static void process_command(void)
 		/* Inscribe an object */
 		case '{':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_inscribe();
 			break;
 		}
@@ -1583,6 +1674,9 @@ static void process_command(void)
 		/* Uninscribe an object */
 		case '}':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_uninscribe();
 			break;
 		}
@@ -1590,6 +1684,9 @@ static void process_command(void)
 		/* Activate an artifact */
 		case 'A':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_activate();
 			break;
 		}
@@ -1597,6 +1694,9 @@ static void process_command(void)
 		/* Eat some food */
 		case 'E':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_eat_food();
 			break;
 		}
@@ -1604,6 +1704,9 @@ static void process_command(void)
 		/* Fuel your lantern/torch */
 		case 'F':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_refill();
 			break;
 		}
@@ -1611,6 +1714,9 @@ static void process_command(void)
 		/* Fire an item */
 		case 'f':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_fire();
 			break;
 		}
@@ -1618,6 +1724,9 @@ static void process_command(void)
 		/* Throw an item */
 		case 'v':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_throw();
 			break;
 		}
@@ -1625,6 +1734,9 @@ static void process_command(void)
 		/* Aim a wand */
 		case 'a':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_aim_wand();
 			break;
 		}
@@ -1632,6 +1744,9 @@ static void process_command(void)
 		/* Zap a rod */
 		case 'z':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_zap_rod();
 			break;
 		}
@@ -1639,6 +1754,9 @@ static void process_command(void)
 		/* Quaff a potion */
 		case 'q':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_quaff_potion();
 			break;
 		}
@@ -1646,6 +1764,9 @@ static void process_command(void)
 		/* Read a scroll */
 		case 'r':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_read_scroll();
 			break;
 		}
@@ -1653,6 +1774,9 @@ static void process_command(void)
 		/* Use a staff */
 		case 'u':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			do_cmd_use_staff();
 			break;
 		}
@@ -1719,6 +1843,9 @@ static void process_command(void)
 		/* Hack -- User interface */
 		case '!':
 		{
+#ifdef DEBUG_AUTOSAVE
+ 			do_cmd_save_game();
+#endif
 			(void)Term_user(0);
 			break;
 		}

@@ -18,7 +18,7 @@ Changes Zaiband 3.0.10
 ** Confusion
 ** Fear
 ** Stunning
-
+- debugging build option DEBUG_AUTOSAVE implemented.
 
 Changes Zaiband 3.0.9
 - The Black Market has what you need, when you need it (as long as it is affordable).  At least, for:

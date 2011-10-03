@@ -205,7 +205,6 @@
  */
 #define USE_GRAPHICS
 
-
 /*
  * Hack -- Macintosh stuff
  */
@@ -366,6 +365,13 @@
 # define VERIFY_SAVEFILE
 # define VERIFY_CHECKSUMS
 # define VERIFY_TIMESTAMP
+#endif
+
+#ifndef VERIFY_SAVEFILE
+/*
+ * OPTION: autosave before every move that uses energy 
+ */
+/*#define DEBUG_AUTOSAVE */
 #endif
 
 /*
