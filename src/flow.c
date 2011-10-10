@@ -21,7 +21,7 @@
 #include "rational.hpp"
 using zaiband::rational;
 
-#define WRAPQUEUE_LEN 4*254+1
+#define WRAPQUEUE_LEN (4*254+1)
 
 /*
  * This is essentially a Djikstra implementation, with some enhancements.
