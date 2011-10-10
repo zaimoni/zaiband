@@ -26,6 +26,10 @@ extern void flow_from(unsigned char* raw,unsigned char range,coord g,coord_actio
 inline size_t distance_square_idx(coord_delta tmp,int range)
 {	return (tmp.y+range)*(2*range+1)+(tmp.x+range);	}
 
+#ifndef NDEBUG
+#define distance_square_idx(X,Y) (assert(-(Y)<=(X).x && (Y)>=(X).x),assert(-(Y)<=(X).y && (Y)>=(X).y),distance_square_idx(X,Y))
+#endif
+
 /*
  * A "view octagon" is composed of all squares within range of the source, inclusive.  Range is that of the classical 
  * V Angband distance function, although the implementation doesn't use this explicitly.

@@ -86,7 +86,8 @@ void flow_from(unsigned char* raw,unsigned char range,coord g,coord_action* test
 		i = 0;
 		do	{
 			coord_delta tmp(wrap_queue[old_trailing_edge] + dd_coord_ddd[i]);
-
+			if (-range>tmp.x || range<tmp.x) continue;
+			if (-range>tmp.y || range<tmp.y) continue;
 			if (0 != raw[distance_square_idx(tmp,range)]) continue;
 			if (test && !test(coord(g+tmp)))
 			{
